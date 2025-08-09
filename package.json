@@ -1,0 +1,23 @@
+{
+  "name": "arrow3-aerospace-platform",
+  "version": "1.0.0",
+  "description": "Arrow3 Aerospace Platform - E-commerce web application for drone sales and management",
+  "main": "server/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "install-server": "cd server && npm install",
+    "install-client": "cd client && npm install",
+    "install-all": "npm run install-server && npm run install-client",
+    "test": "cd server && npm test && cd ../client && npm test",
+    "start": "cd server && npm start"
+  },
+  "keywords": ["drone", "e-commerce", "aerospace", "mern", "react", "mongodb"],
+  "author": "Arrow3 Aerospace",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

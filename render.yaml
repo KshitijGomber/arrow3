@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: arrow3-aerospace-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: arrow3-mongodb
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        value: https://your-frontend-app.vercel.app
+      - key: MOCK_PAYMENT_ENABLED
+        value: true
+      - key: PAYMENT_SUCCESS_RATE
+        value: 100
+
+databases:
+  - name: arrow3-mongodb
+    databaseName: arrow3-aerospace
+    user: arrow3user
