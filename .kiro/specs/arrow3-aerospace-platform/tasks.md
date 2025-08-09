@@ -16,7 +16,7 @@
   - Set up mock payment system instead of Stripe integration
   - _Requirements: 11.1, 12.5_
 
-- [ ] 2. Configure database and core models
+- [x] 2. Configure database and core models
   - [x] 2.1 Set up MongoDB Atlas connection and configuration
     - Create MongoDB Atlas cluster with recommended settings (Free tier, AWS, tag: project:arrow3-aerospace)
     - Configure database connection utility with Mongoose for cloud deployment
@@ -25,50 +25,50 @@
     - Configure database access and network security settings
     - _Requirements: 11.1_
 
-  - [-] 2.2 Create User model with authentication schema
+  - [x] 2.2 Create User model with authentication schema
     - Define User schema with email, password, role fields
     - Implement password hashing with bcrypt
     - Add validation rules and unique constraints
     - Create user model methods for authentication
     - _Requirements: 8.1, 8.2, 11.2_
 
-  - [ ] 2.3 Create Drone model with specifications schema
+  - [x] 2.3 Create Drone model with specifications schema
     - Define comprehensive Drone schema with all technical specifications
     - Implement nested specifications object with validation
     - Add image and video URL arrays
     - Create indexes for search and filtering
     - _Requirements: 3.3, 5.3_
 
-  - [ ] 2.4 Create Order model with payment tracking
+  - [x] 2.4 Create Order model with payment tracking
     - Define Order schema linking users and drones
     - Implement order status and payment status enums
     - Add shipping address and customer info nested objects
     - Create order validation and business logic methods
     - _Requirements: 4.4, 10.2_
 
-- [ ] 3. Implement authentication system
-  - [ ] 3.1 Create JWT authentication middleware
+- [-] 3. Implement authentication system
+  - [x] 3.1 Create JWT authentication middleware
     - Implement JWT token generation and validation functions
     - Create authentication middleware for protected routes
     - Add token refresh mechanism
     - Implement role-based access control
     - _Requirements: 8.2, 8.4, 11.3_
 
-  - [ ] 3.2 Implement email/password authentication
+  - [x] 3.2 Implement email/password authentication
     - Create user registration endpoint with validation
     - Implement login endpoint with password verification
     - Add password hashing and comparison utilities
     - Create user profile management endpoints
     - _Requirements: 8.1, 11.2_
 
-  - [ ] 3.3 Integrate Google OAuth authentication
+  - [x] 3.3 Integrate Google OAuth authentication
     - Configure Passport.js with Google OAuth strategy
     - Create OAuth callback endpoints
     - Implement user creation/linking for OAuth users
     - Add frontend OAuth integration
     - _Requirements: 8.3_
 
-  - [ ] 3.4 Implement password reset functionality
+  - [x] 3.4 Implement password reset functionality
     - Create password reset request endpoint
     - Generate secure reset tokens with expiration
     - Implement password reset confirmation endpoint

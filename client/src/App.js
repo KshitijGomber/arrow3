@@ -9,6 +9,7 @@ import OrderPage from './pages/OrderPage';
 import PaymentPage from './pages/PaymentPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import OAuthCallback from './pages/auth/OAuthCallback';
 import AdminPanel from './pages/admin/AdminPanel';
 
 // Context providers
@@ -29,6 +30,7 @@ function App() {
           {/* Auth routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
           
           {/* Admin routes */}
           <Route path="/admin/*" element={<AdminPanel />} />

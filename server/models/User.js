@@ -163,6 +163,48 @@ userSchema.statics.findOrCreateGoogleUser = async function(profile) {
   }
 };
 
+// Instance method to create password reset token
+userSchema.methods.createPasswordResetToken = function() {
+  const crypto = require('crypto');
+  
+  // Generate random token
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  
+  // Hash token and set to resetPasswordToken field
+  this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  
+  // Set expire time (1 hour from now)
+  this.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+  
+  // Return unhashed token (this is what gets sent via email)
+  return resetToken;
+};
+
+// Instance method to verify password reset token
+userSchema.methods.verifyPasswordResetToken = function(token) {
+  const crypto = require('crypto');
+  
+  // Hash the provided token
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  
+  // Check if token matches and hasn't expired
+  return this.resetPasswordToken === hashedToken && this.resetPasswordExpires > Date.now();
+};
+
+// Static method to find user by valid reset token
+userSchema.statics.findByValidResetToken = function(token) {
+  const crypto = require('crypto');
+  
+  // Hash the provided token
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  
+  // Find user with matching token that hasn't expired
+  return this.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() }
+  }).select('+resetPasswordToken +resetPasswordExpires');
+};
+
 // Virtual for user's full name
 userSchema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;

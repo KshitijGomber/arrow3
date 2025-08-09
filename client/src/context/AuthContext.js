@@ -61,25 +61,76 @@ const initialState = {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Check for existing token on mount
+  // Check for existing token on mount and verify it
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // TODO: Verify token with backend in later tasks
-      console.log('Token found in localStorage:', token);
-    }
+    const verifyToken = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+          const response = await fetch(`${apiUrl}/auth/verify-token`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            dispatch({
+              type: 'LOGIN_SUCCESS',
+              payload: {
+                user: data.data.user,
+                token
+              }
+            });
+          } else {
+            // Token is invalid, remove it
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+          }
+        } catch (error) {
+          console.error('Token verification failed:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+        }
+      }
+    };
+
+    verifyToken();
   }, []);
 
-  // Auth actions (placeholders for now)
+  // Auth actions
   const login = async (credentials) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      // TODO: Implement actual login logic in later tasks
-      console.log('Login attempt:', credentials);
-      dispatch({ 
-        type: 'LOGIN_FAILURE', 
-        payload: 'Login functionality not implemented yet' 
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+      const response = await fetch(`${apiUrl}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
       });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.data.accessToken);
+        localStorage.setItem('refreshToken', data.data.refreshToken);
+        
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            user: data.data.user,
+            token: data.data.accessToken
+          }
+        });
+      } else {
+        dispatch({ 
+          type: 'LOGIN_FAILURE', 
+          payload: data.message || 'Login failed' 
+        });
+      }
     } catch (error) {
       dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
     }
@@ -88,19 +139,73 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      // TODO: Implement actual registration logic in later tasks
-      console.log('Registration attempt:', userData);
-      dispatch({ 
-        type: 'LOGIN_FAILURE', 
-        payload: 'Registration functionality not implemented yet' 
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+      const response = await fetch(`${apiUrl}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
       });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.data.accessToken);
+        localStorage.setItem('refreshToken', data.data.refreshToken);
+        
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            user: data.data.user,
+            token: data.data.accessToken
+          }
+        });
+      } else {
+        dispatch({ 
+          type: 'LOGIN_FAILURE', 
+          payload: data.message || 'Registration failed' 
+        });
+      }
     } catch (error) {
       dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
     }
   };
 
+  // Google OAuth login
+  const loginWithGoogle = () => {
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+    window.location.href = `${apiUrl}/auth/google`;
+  };
+
+  // Handle OAuth callback
+  const handleOAuthCallback = (token, refreshToken, user) => {
+    try {
+      localStorage.setItem('token', token);
+      localStorage.setItem('refreshToken', refreshToken);
+      
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: {
+          user: JSON.parse(user),
+          token
+        }
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('OAuth callback error:', error);
+      dispatch({
+        type: 'LOGIN_FAILURE',
+        payload: 'Failed to process OAuth login'
+      });
+      return false;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     dispatch({ type: 'LOGOUT' });
   };
 
@@ -114,6 +219,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     clearError,
+    loginWithGoogle,
+    handleOAuthCallback,
   };
 
   return (
