@@ -22,10 +22,36 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration
+// app.use(cors({
+//   origin: process.env.CLIENT_URL || 'http://localhost:3000' || 'https://arrow3.vercel.app/',
+//   credentials: true
+// }));
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://arrow3.vercel.app'
+];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000' || 'https://arrow3.vercel.app/',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked request from: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+
+
+// This helps with OPTIONS preflight for all routes
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
+
 
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
