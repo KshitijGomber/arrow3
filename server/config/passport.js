@@ -6,10 +6,13 @@ const User = require('../models/User');
 
 // Google OAuth Strategy (only if credentials are provided)
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'your-google-client-id') {
+
+
+
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback"
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://arrow3.onrender.com/api/auth/google/callback"
   }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Check if user already exists with this Google ID

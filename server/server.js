@@ -7,6 +7,7 @@ const passport = require('./config/passport');
 const { connectDB, checkDBHealth } = require('./config/database');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Connect to MongoDB Atlas
 connectDB();
