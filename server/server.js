@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const passport = require('./config/passport');
 const { connectDB, checkDBHealth } = require('./config/database');
-require('dotenv').config();
 
 const app = express();
 
@@ -39,6 +39,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/drones', require('./routes/drones'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/media', require('./routes/media'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

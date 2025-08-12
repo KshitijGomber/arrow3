@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import { STORAGE_KEYS, API_ENDPOINTS } from '../utils/constants';
+import api from '../utils/api';
 
 // Auth context
 const AuthContext = createContext();
@@ -6,6 +8,11 @@ const AuthContext = createContext();
 // Auth reducer
 const authReducer = (state, action) => {
   switch (action.type) {
+    case 'SET_LOADING':
+      return {
+        ...state,
+        loading: action.payload,
+      };
     case 'LOGIN_START':
       return {
         ...state,
@@ -33,10 +40,16 @@ const authReducer = (state, action) => {
     case 'LOGOUT':
       return {
         ...state,
+        loading: false,
         isAuthenticated: false,
         user: null,
         token: null,
         error: null,
+      };
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload },
       };
     case 'CLEAR_ERROR':
       return {
@@ -52,8 +65,8 @@ const authReducer = (state, action) => {
 const initialState = {
   isAuthenticated: false,
   user: null,
-  token: localStorage.getItem('token'),
-  loading: false,
+  token: localStorage.getItem(STORAGE_KEYS.TOKEN),
+  loading: true, // Start with loading true to check existing token
   error: null,
 };
 
@@ -61,152 +74,210 @@ const initialState = {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
+  // Token refresh function
+  const refreshToken = useCallback(async () => {
+    const refreshTokenValue = localStorage.getItem('refreshToken');
+    if (!refreshTokenValue) {
+      throw new Error('No refresh token available');
+    }
+
+    try {
+      const response = await api.post('/auth/refresh', {
+        refreshToken: refreshTokenValue
+      });
+
+      const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+      
+      localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+      
+      return accessToken;
+    } catch (error) {
+      // Refresh failed, logout user
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem('refreshToken');
+      dispatch({ type: 'LOGOUT' });
+      throw error;
+    }
+  }, []);
+
   // Check for existing token on mount and verify it
   useEffect(() => {
     const verifyToken = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
       if (token) {
         try {
-          const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
-          const response = await fetch(`${apiUrl}/auth/verify-token`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
+          const response = await api.get(API_ENDPOINTS.VERIFY_TOKEN);
+          
+          if (response.data.success) {
             dispatch({
               type: 'LOGIN_SUCCESS',
               payload: {
-                user: data.data.user,
+                user: response.data.data.user,
                 token
               }
             });
           } else {
-            // Token is invalid, remove it
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
+            // Token is invalid, try to refresh
+            try {
+              await refreshToken();
+            } catch (refreshError) {
+              console.error('Token refresh failed:', refreshError);
+            }
           }
         } catch (error) {
-          console.error('Token verification failed:', error);
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
+          // If token verification fails, try to refresh
+          if (error.response?.status === 401) {
+            try {
+              await refreshToken();
+            } catch (refreshError) {
+              console.error('Token refresh failed:', refreshError);
+            }
+          } else {
+            console.error('Token verification failed:', error);
+            localStorage.removeItem(STORAGE_KEYS.TOKEN);
+            localStorage.removeItem('refreshToken');
+          }
         }
       }
+      
+      // Set loading to false after token check
+      dispatch({ type: 'SET_LOADING', payload: false });
     };
 
     verifyToken();
-  }, []);
+  }, [refreshToken]);
 
   // Auth actions
   const login = async (credentials) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
-      const response = await fetch(`${apiUrl}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
+      const response = await api.post(API_ENDPOINTS.LOGIN, credentials);
+      const { user, accessToken, refreshToken: newRefreshToken } = response.data.data;
+
+      localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+      
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: {
+          user,
+          token: accessToken
+        }
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.data.accessToken);
-        localStorage.setItem('refreshToken', data.data.refreshToken);
-        
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: {
-            user: data.data.user,
-            token: data.data.accessToken
-          }
-        });
-      } else {
-        dispatch({ 
-          type: 'LOGIN_FAILURE', 
-          payload: data.message || 'Login failed' 
-        });
-      }
+      return { success: true, user };
     } catch (error) {
-      dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      dispatch({ 
+        type: 'LOGIN_FAILURE', 
+        payload: errorMessage
+      });
+      return { success: false, error: errorMessage };
     }
   };
 
   const register = async (userData) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
-      const response = await fetch(`${apiUrl}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
+      const response = await api.post(API_ENDPOINTS.REGISTER, userData);
+      const { user, accessToken, refreshToken: newRefreshToken } = response.data.data;
+
+      localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+      
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: {
+          user,
+          token: accessToken
+        }
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.data.accessToken);
-        localStorage.setItem('refreshToken', data.data.refreshToken);
-        
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: {
-            user: data.data.user,
-            token: data.data.accessToken
-          }
-        });
-      } else {
-        dispatch({ 
-          type: 'LOGIN_FAILURE', 
-          payload: data.message || 'Registration failed' 
-        });
-      }
+      return { success: true, user };
     } catch (error) {
-      dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      dispatch({ 
+        type: 'LOGIN_FAILURE', 
+        payload: errorMessage
+      });
+      return { success: false, error: errorMessage };
     }
   };
 
   // Google OAuth login
   const loginWithGoogle = () => {
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
-    window.location.href = `${apiUrl}/auth/google`;
+    window.location.href = `${apiUrl}${API_ENDPOINTS.GOOGLE_AUTH}`;
   };
 
   // Handle OAuth callback
-  const handleOAuthCallback = (token, refreshToken, user) => {
+  const handleOAuthCallback = (token, refreshTokenValue, user) => {
     try {
-      localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem('refreshToken', refreshTokenValue);
       
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
-          user: JSON.parse(user),
+          user: typeof user === 'string' ? JSON.parse(user) : user,
           token
         }
       });
       
-      return true;
+      return { success: true };
     } catch (error) {
       console.error('OAuth callback error:', error);
       dispatch({
         type: 'LOGIN_FAILURE',
         payload: 'Failed to process OAuth login'
       });
-      return false;
+      return { success: false, error: 'Failed to process OAuth login' };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    dispatch({ type: 'LOGOUT' });
+  const logout = async () => {
+    try {
+      // Optionally call logout endpoint to invalidate tokens on server
+      await api.post('/auth/logout');
+    } catch (error) {
+      // Continue with logout even if server call fails
+      console.error('Logout API call failed:', error);
+    } finally {
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem('refreshToken');
+      dispatch({ type: 'LOGOUT' });
+    }
+  };
+
+  // Update user profile
+  const updateUser = (userData) => {
+    dispatch({ type: 'UPDATE_USER', payload: userData });
+  };
+
+  // Forgot password
+  const forgotPassword = async (email) => {
+    try {
+      const response = await api.post(API_ENDPOINTS.FORGOT_PASSWORD, { email });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to send reset email';
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Reset password
+  const resetPassword = async (token, newPassword) => {
+    try {
+      const response = await api.post(API_ENDPOINTS.RESET_PASSWORD, {
+        token,
+        password: newPassword
+      });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to reset password';
+      return { success: false, error: errorMessage };
+    }
   };
 
   const clearError = () => {
@@ -221,6 +292,10 @@ export const AuthProvider = ({ children }) => {
     clearError,
     loginWithGoogle,
     handleOAuthCallback,
+    updateUser,
+    forgotPassword,
+    resetPassword,
+    refreshToken,
   };
 
   return (

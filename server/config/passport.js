@@ -4,12 +4,13 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const User = require('../models/User');
 
-// Google OAuth Strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "/api/auth/google/callback"
-}, async (accessToken, refreshToken, profile, done) => {
+// Google OAuth Strategy (only if credentials are provided)
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'your-google-client-id') {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/api/auth/google/callback"
+  }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Check if user already exists with this Google ID
     let user = await User.findOne({ googleId: profile.id });
@@ -46,15 +47,19 @@ passport.use(new GoogleStrategy({
     console.error('Google OAuth error:', error);
     return done(error, null);
   }
-}));
+  }));
+} else {
+  console.warn('Google OAuth not configured - Google authentication will not be available');
+}
 
 // JWT Strategy for API authentication
-passport.use(new JwtStrategy({
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
-  issuer: 'arrow3-aerospace',
-  audience: 'arrow3-users'
-}, async (payload, done) => {
+if (process.env.JWT_SECRET) {
+  passport.use(new JwtStrategy({
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_SECRET,
+    issuer: 'arrow3-aerospace',
+    audience: 'arrow3-users'
+  }, async (payload, done) => {
   try {
     const user = await User.findById(payload.userId);
     if (user) {
@@ -64,7 +69,10 @@ passport.use(new JwtStrategy({
   } catch (error) {
     return done(error, false);
   }
-}));
+  }));
+} else {
+  console.warn('JWT_SECRET not configured - JWT authentication will not be available');
+}
 
 // Serialize user for session (not used in JWT auth, but required by Passport)
 passport.serializeUser((user, done) => {

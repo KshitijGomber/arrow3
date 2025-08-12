@@ -6,6 +6,7 @@
 class MockPaymentService {
   constructor() {
     this.successRate = parseInt(process.env.PAYMENT_SUCCESS_RATE) || 95;
+    this.paymentIntents = new Map(); // Store payment intents with order IDs
   }
 
   /**
@@ -32,6 +33,14 @@ class MockPaymentService {
         order_id: paymentData.orderId || null
       }
     };
+
+    // Store the payment intent with order ID for later reference
+    this.paymentIntents.set(paymentIntent.id, {
+      orderId: paymentData.orderId,
+      amount: amount,
+      customerInfo: customerInfo,
+      created: paymentIntent.created
+    });
 
     console.log('🎭 Mock Payment Intent Created:', paymentIntent.id);
     return paymentIntent;
@@ -73,7 +82,8 @@ class MockPaymentService {
         created: Math.floor(Date.now() / 1000),
         metadata: {
           mock: true,
-          processed_at: new Date().toISOString()
+          processed_at: new Date().toISOString(),
+          order_id: this.getOrderIdFromPaymentIntent(paymentIntentId)
         }
       };
 
@@ -158,6 +168,16 @@ class MockPaymentService {
         mock: true
       }
     };
+  }
+
+  /**
+   * Get order ID from payment intent
+   * @param {string} paymentIntentId - Payment intent ID
+   * @returns {string|null} Order ID
+   */
+  getOrderIdFromPaymentIntent(paymentIntentId) {
+    const paymentIntent = this.paymentIntents.get(paymentIntentId);
+    return paymentIntent?.orderId || null;
   }
 
   /**

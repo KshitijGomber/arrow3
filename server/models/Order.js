@@ -119,6 +119,20 @@ const orderSchema = new mongoose.Schema({
     },
     default: 'mock_payment'
   },
+  paymentDetails: {
+    paymentMethod: {
+      id: String,
+      type: String,
+      card: {
+        brand: String,
+        last4: String,
+        exp_month: Number,
+        exp_year: Number
+      }
+    },
+    receiptUrl: String,
+    processedAt: Date
+  },
   shippingAddress: {
     type: shippingAddressSchema,
     required: [true, 'Shipping address is required']

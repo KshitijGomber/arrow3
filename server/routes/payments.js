@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mockPayment = require('../services/mockPayment');
+const { Order } = require('../models');
+const emailService = require('../services/emailService');
 
 // Create payment intent (mock)
 router.post('/create-intent', async (req, res) => {
@@ -50,11 +52,66 @@ router.post('/confirm', async (req, res) => {
     const result = await mockPayment.confirmPayment(paymentIntentId, paymentMethod);
 
     if (result.success) {
-      res.json({
-        success: true,
-        payment: result.payment,
-        message: 'Payment processed successfully (mock)'
-      });
+      // Find the order associated with this payment intent
+      const orderId = result.payment.metadata?.order_id;
+      if (orderId) {
+        try {
+          // Update order status to confirmed and payment status to completed
+          const updatedOrder = await Order.findByIdAndUpdate(
+            orderId,
+            {
+              status: 'confirmed',
+              paymentStatus: 'completed',
+              paymentIntentId: paymentIntentId,
+              $set: {
+                'paymentDetails.paymentMethod': result.payment.payment_method,
+                'paymentDetails.receiptUrl': result.payment.receipt_url,
+                'paymentDetails.processedAt': new Date()
+              }
+            },
+            { new: true }
+          ).populate('droneId');
+
+          if (updatedOrder) {
+            // Send order confirmation email
+            try {
+              await emailService.sendOrderConfirmation(updatedOrder);
+              console.log('✅ Order confirmation email sent for order:', orderId);
+            } catch (emailError) {
+              console.error('❌ Failed to send order confirmation email:', emailError);
+              // Don't fail the payment if email fails
+            }
+
+            res.json({
+              success: true,
+              payment: result.payment,
+              order: updatedOrder,
+              message: 'Payment processed successfully and order confirmed (mock)'
+            });
+          } else {
+            console.warn('⚠️ Order not found for payment intent:', paymentIntentId);
+            res.json({
+              success: true,
+              payment: result.payment,
+              message: 'Payment processed successfully (mock)'
+            });
+          }
+        } catch (orderError) {
+          console.error('❌ Failed to update order after payment:', orderError);
+          // Still return success for payment, but log the error
+          res.json({
+            success: true,
+            payment: result.payment,
+            message: 'Payment processed successfully, but order update failed (mock)'
+          });
+        }
+      } else {
+        res.json({
+          success: true,
+          payment: result.payment,
+          message: 'Payment processed successfully (mock)'
+        });
+      }
     } else {
       res.status(400).json({
         success: false,

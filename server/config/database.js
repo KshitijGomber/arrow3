@@ -13,13 +13,9 @@ const connectDB = async (retryCount = 0) => {
 
     // MongoDB Atlas optimized connection options
     const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       maxPoolSize: 10, // Maintain up to 10 socket connections
       serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
       socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      bufferMaxEntries: 0, // Disable mongoose buffering
-      bufferCommands: false, // Disable mongoose buffering
       maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
       family: 4, // Use IPv4, skip trying IPv6
     };

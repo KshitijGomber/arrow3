@@ -597,4 +597,78 @@ router.post('/reset-password', [
   }
 });
 
+// @route   POST /api/auth/setup-admin
+// @desc    Create admin user (development only)
+// @access  Public (development only)
+router.post('/setup-admin', async (req, res) => {
+  // Only allow in development environment
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin setup not available in production'
+    });
+  }
+
+  try {
+    const { email, password, firstName, lastName } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({
+        success: false,
+        message: 'All fields are required: email, password, firstName, lastName'
+      });
+    }
+
+    // Check if admin user already exists
+    const existingAdmin = await User.findOne({ email });
+    if (existingAdmin) {
+      return res.status(409).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    // Create admin user directly (bypassing the API restriction)
+    const adminUser = new User({
+      email,
+      password,
+      firstName,
+      lastName,
+      role: 'admin',
+      isEmailVerified: true // Auto-verify admin users
+    });
+
+    await adminUser.save();
+
+    // Generate tokens
+    const accessToken = generateToken(adminUser._id, adminUser.role);
+    const refreshToken = generateRefreshToken(adminUser._id);
+
+    res.status(201).json({
+      success: true,
+      message: 'Admin user created successfully',
+      data: {
+        accessToken,
+        refreshToken,
+        user: {
+          id: adminUser._id,
+          email: adminUser.email,
+          firstName: adminUser.firstName,
+          lastName: adminUser.lastName,
+          role: adminUser.role,
+          isEmailVerified: adminUser.isEmailVerified
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Admin setup error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create admin user'
+    });
+  }
+});
+
 module.exports = router;

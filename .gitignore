@@ -78,8 +78,11 @@ jspm_packages/
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
-# Uploads directory
-/server/uploads/
+# Uploaded files (but keep directory structure)
+/server/uploads/**/*
+!/server/uploads/.gitkeep
+!/server/uploads/images/.gitkeep
+!/server/uploads/videos/.gitkeep
 
 # OS generated files
 .DS_Store

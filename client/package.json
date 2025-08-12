@@ -4,19 +4,23 @@
   "description": "Arrow3 Aerospace Platform Frontend",
   "private": true,
   "dependencies": {
-    "@mui/material": "^5.14.5",
-    "@mui/icons-material": "^5.14.3",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.3",
+    "@mui/material": "^5.14.5",
     "@tanstack/react-query": "^4.32.6",
     "@tanstack/react-query-devtools": "^4.32.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.15.0",
-    "react-hook-form": "^7.45.4",
     "axios": "^1.5.0",
+    "formik": "^2.4.6",
     "framer-motion": "^10.16.1",
-    "react-hot-toast": "^2.4.1"
+    "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.3.8",
+    "react-hook-form": "^7.62.0",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.15.0",
+    "yup": "^1.7.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -43,10 +47,10 @@
     ]
   },
   "devDependencies": {
-    "react-scripts": "5.0.1",
     "@testing-library/jest-dom": "^6.1.2",
     "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3"
+    "@testing-library/user-event": "^14.4.3",
+    "react-scripts": "5.0.1"
   },
   "proxy": "http://localhost:5001"
 }
