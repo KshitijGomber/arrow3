@@ -207,25 +207,51 @@ export const AuthProvider = ({ children }) => {
 
   // Google OAuth login
   const loginWithGoogle = () => {
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
-    window.location.href = `${apiUrl}${API_ENDPOINTS.GOOGLE_AUTH}`;
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+      const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+      
+      // Check if Google OAuth is configured
+      if (!googleClientId || googleClientId === 'your-google-client-id') {
+        throw new Error('Google OAuth is not configured');
+      }
+      
+      // Set loading state
+      dispatch({ type: 'LOGIN_START' });
+      
+      // Redirect to Google OAuth
+      window.location.href = `${apiUrl}${API_ENDPOINTS.GOOGLE_AUTH}`;
+    } catch (error) {
+      console.error('Google OAuth initiation error:', error);
+      dispatch({
+        type: 'LOGIN_FAILURE',
+        payload: error.message || 'Failed to initiate Google login'
+      });
+      throw error;
+    }
   };
 
   // Handle OAuth callback
   const handleOAuthCallback = (token, refreshTokenValue, user) => {
     try {
+      if (!token || !refreshTokenValue || !user) {
+        throw new Error('Missing required OAuth callback parameters');
+      }
+
       localStorage.setItem(STORAGE_KEYS.TOKEN, token);
       localStorage.setItem('refreshToken', refreshTokenValue);
+      
+      const userData = typeof user === 'string' ? JSON.parse(user) : user;
       
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
-          user: typeof user === 'string' ? JSON.parse(user) : user,
+          user: userData,
           token
         }
       });
       
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       console.error('OAuth callback error:', error);
       dispatch({
@@ -233,6 +259,46 @@ export const AuthProvider = ({ children }) => {
         payload: 'Failed to process OAuth login'
       });
       return { success: false, error: 'Failed to process OAuth login' };
+    }
+  };
+
+  // Link Google account to existing user
+  const linkGoogleAccount = async (googleId) => {
+    try {
+      const response = await api.post('/auth/google/link', { googleId });
+      
+      if (response.data.success) {
+        dispatch({
+          type: 'UPDATE_USER',
+          payload: response.data.data.user
+        });
+        return { success: true, message: 'Google account linked successfully' };
+      }
+      
+      return { success: false, error: 'Failed to link Google account' };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to link Google account';
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Unlink Google account
+  const unlinkGoogleAccount = async () => {
+    try {
+      const response = await api.delete('/auth/google/unlink');
+      
+      if (response.data.success) {
+        dispatch({
+          type: 'UPDATE_USER',
+          payload: response.data.data.user
+        });
+        return { success: true, message: 'Google account unlinked successfully' };
+      }
+      
+      return { success: false, error: 'Failed to unlink Google account' };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to unlink Google account';
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -292,6 +358,8 @@ export const AuthProvider = ({ children }) => {
     clearError,
     loginWithGoogle,
     handleOAuthCallback,
+    linkGoogleAccount,
+    unlinkGoogleAccount,
     updateUser,
     forgotPassword,
     resetPassword,

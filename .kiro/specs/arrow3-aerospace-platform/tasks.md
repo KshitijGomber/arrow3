@@ -256,14 +256,14 @@
     - _Requirements: 10.3_
 
 - [ ] 12. Implement user authentication pages
-  - [ ] 12.1 Create login and registration forms
+  - [x] 12.1 Create login and registration forms
     - Build responsive login form with email/password fields
     - Create registration form with validation
     - Implement form error handling and success messages
     - Add "Forgot Password" link and functionality
     - _Requirements: 8.1, 9.1_
 
-  - [ ] 12.2 Build password reset flow
+  - [x] 12.2 Build password reset flow
     - Create password reset request form
     - Implement password reset confirmation page
     - Add token validation and expiration handling
