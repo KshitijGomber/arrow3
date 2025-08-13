@@ -9,19 +9,51 @@ router.post('/create-intent', async (req, res) => {
   try {
     const { amount, currency, customerInfo, orderId } = req.body;
 
-    if (!amount || amount <= 0) {
+    // Debug logging
+    console.log('Payment intent request data:', {
+      amount,
+      currency,
+      customerInfo,
+      orderId,
+      fullBody: req.body
+    });
+
+    // Validate required fields
+    if (!amount) {
+      console.error('Payment validation error: Missing amount');
       return res.status(400).json({
         success: false,
-        error: 'Invalid amount provided'
+        error: 'Amount is required',
+        details: 'Please provide a valid amount for the payment'
+      });
+    }
+
+    if (amount <= 0) {
+      console.error('Payment validation error: Invalid amount:', amount);
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid amount provided',
+        details: `Amount must be greater than 0, received: ${amount}`
+      });
+    }
+
+    if (!customerInfo) {
+      console.error('Payment validation error: Missing customer info');
+      return res.status(400).json({
+        success: false,
+        error: 'Customer information is required',
+        details: 'Please provide customer information for the payment'
       });
     }
 
     const paymentIntent = await mockPayment.createPaymentIntent({
       amount,
-      currency,
+      currency: currency || 'USD',
       customerInfo,
       orderId
     });
+
+    console.log('Payment intent created successfully:', paymentIntent.id);
 
     res.json({
       success: true,
@@ -32,7 +64,8 @@ router.post('/create-intent', async (req, res) => {
     console.error('Payment intent creation error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to create payment intent'
+      error: 'Failed to create payment intent',
+      details: error.message
     });
   }
 });

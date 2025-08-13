@@ -66,11 +66,27 @@ const MockPaymentForm = ({ orderData, onPaymentSuccess, onPaymentError }) => {
       .required('Cardholder name is required')
       .min(2, 'Name must be at least 2 characters'),
     billingAddress: Yup.object({
-      street: Yup.string().required('Street address is required'),
-      city: Yup.string().required('City is required'),
-      state: Yup.string().required('State is required'),
-      zipCode: Yup.string().required('ZIP code is required'),
-      country: Yup.string().required('Country is required'),
+      street: Yup.string()
+        .min(5, 'Street address must be at least 5 characters')
+        .max(200, 'Street address cannot exceed 200 characters')
+        .required('Street address is required'),
+      city: Yup.string()
+        .min(2, 'City must be at least 2 characters')
+        .max(100, 'City cannot exceed 100 characters')
+        .required('City is required'),
+      state: Yup.string()
+        .min(2, 'State/Province must be at least 2 characters')
+        .max(100, 'State/Province cannot exceed 100 characters')
+        .required('State/Province is required'),
+      zipCode: Yup.string()
+        .min(3, 'Postal/ZIP code must be at least 3 characters')
+        .max(10, 'Postal/ZIP code cannot exceed 10 characters')
+        .matches(/^[A-Za-z0-9\s\-]{3,10}$/, 'Please enter a valid postal/ZIP code (3-10 characters, letters, numbers, spaces, dashes allowed)')
+        .required('Postal/ZIP code is required'),
+      country: Yup.string()
+        .min(2, 'Country must be at least 2 characters')
+        .max(100, 'Country cannot exceed 100 characters')
+        .required('Country is required'),
     }),
   });
 
@@ -152,6 +168,27 @@ const MockPaymentForm = ({ orderData, onPaymentSuccess, onPaymentError }) => {
         customerInfo: orderData.customerInfo,
         orderId: orderData._id,
       };
+
+      // Debug logging
+      console.log('Creating payment intent with data:', {
+        ...paymentIntentData,
+        orderDataKeys: Object.keys(orderData),
+        hasOrderId: !!orderData._id,
+        amountType: typeof orderData.totalAmount,
+        amountValue: orderData.totalAmount
+      });
+
+      if (!orderData._id) {
+        throw new Error('Order ID is missing. Please try placing the order again.');
+      }
+
+      if (!orderData.totalAmount || orderData.totalAmount <= 0) {
+        throw new Error(`Invalid order amount: ${orderData.totalAmount}. Please try again.`);
+      }
+
+      if (!orderData.customerInfo) {
+        throw new Error('Customer information is missing. Please try again.');
+      }
 
       const paymentIntent = await createPaymentIntentMutation.mutateAsync(paymentIntentData);
       
@@ -446,7 +483,7 @@ const MockPaymentForm = ({ orderData, onPaymentSuccess, onPaymentError }) => {
           <Grid item xs={12} sm={3}>
             <TextField
               fullWidth
-              label="State"
+              label="State/Province"
               name="billingAddress.state"
               value={formik.values.billingAddress.state}
               onChange={formik.handleChange}
@@ -460,7 +497,7 @@ const MockPaymentForm = ({ orderData, onPaymentSuccess, onPaymentError }) => {
           <Grid item xs={12} sm={3}>
             <TextField
               fullWidth
-              label="ZIP Code"
+              label="Postal/ZIP Code"
               name="billingAddress.zipCode"
               value={formik.values.billingAddress.zipCode}
               onChange={formik.handleChange}

@@ -68,20 +68,48 @@ const OrderPage = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Form validation schema
+  // Form validation schema - International friendly
   const validationSchema = Yup.object({
     customerInfo: Yup.object({
-      firstName: Yup.string().required('First name is required'),
-      lastName: Yup.string().required('Last name is required'),
-      email: Yup.string().email('Invalid email').required('Email is required'),
-      phone: Yup.string().required('Phone number is required'),
+      firstName: Yup.string()
+        .min(1, 'First name must be at least 1 character')
+        .max(50, 'First name cannot exceed 50 characters')
+        .required('First name is required'),
+      lastName: Yup.string()
+        .min(1, 'Last name must be at least 1 character')
+        .max(50, 'Last name cannot exceed 50 characters')
+        .required('Last name is required'),
+      email: Yup.string()
+        .email('Please enter a valid email address')
+        .required('Email is required'),
+      phone: Yup.string()
+        .min(8, 'Phone number must be at least 8 digits')
+        .max(20, 'Phone number cannot exceed 20 characters')
+        .matches(/^[\+]?[\d\s\-\(\)]{8,20}$/, 'Please enter a valid phone number (8-20 digits, can include +, spaces, dashes, parentheses)')
+        .required('Phone number is required'),
     }),
     shippingAddress: Yup.object({
-      street: Yup.string().required('Street address is required'),
-      city: Yup.string().required('City is required'),
-      state: Yup.string().required('State is required'),
-      zipCode: Yup.string().required('ZIP code is required'),
-      country: Yup.string().required('Country is required'),
+      street: Yup.string()
+        .min(5, 'Street address must be at least 5 characters')
+        .max(200, 'Street address cannot exceed 200 characters')
+        .required('Street address is required'),
+      city: Yup.string()
+        .min(2, 'City must be at least 2 characters')
+        .max(100, 'City cannot exceed 100 characters')
+        .required('City is required'),
+      state: Yup.string()
+        .min(2, 'State/Province must be at least 2 characters')
+        .max(100, 'State/Province cannot exceed 100 characters')
+        .required('State/Province is required'),
+      zipCode: Yup.string()
+        .min(3, 'Postal/ZIP code must be at least 3 characters')
+        .max(10, 'Postal/ZIP code cannot exceed 10 characters')
+        .matches(/^[A-Za-z0-9\s\-]{3,10}$/, 'Please enter a valid postal/ZIP code (3-10 characters, letters, numbers, spaces, dashes allowed)')
+        .required('Postal/ZIP code is required'),
+      country: Yup.string()
+        .min(2, 'Country must be at least 2 characters')
+        .max(100, 'Country cannot exceed 100 characters')
+        .required('Country is required'),
     }),
   });
 
@@ -437,7 +465,7 @@ const OrderPage = () => {
                       <Grid item xs={12} sm={3}>
                         <TextField
                           fullWidth
-                          label="State"
+                          label="State/Province"
                           name="shippingAddress.state"
                           value={formik.values.shippingAddress.state}
                           onChange={formik.handleChange}
@@ -449,7 +477,7 @@ const OrderPage = () => {
                       <Grid item xs={12} sm={3}>
                         <TextField
                           fullWidth
-                          label="ZIP Code"
+                          label="Postal/ZIP Code"
                           name="shippingAddress.zipCode"
                           value={formik.values.shippingAddress.zipCode}
                           onChange={formik.handleChange}
