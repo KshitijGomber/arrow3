@@ -339,7 +339,10 @@ orderSchema.statics.createOrder = async function(orderData) {
   }
 
   // Calculate total amount (always use server-calculated amount for security)
-  const totalAmount = drone.price * quantity;
+  const subtotal = drone.price * quantity;
+  const taxRate = 0.08; // 8% tax rate (same as frontend)
+  const tax = subtotal * taxRate;
+  const totalAmount = subtotal + tax;
 
   // Log for debugging
   console.log('Order creation data:', {
@@ -347,6 +350,8 @@ orderSchema.statics.createOrder = async function(orderData) {
     droneId,
     quantity,
     dronePrice: drone.price,
+    subtotal: subtotal,
+    tax: tax,
     calculatedTotal: totalAmount,
     providedTotal,
     shippingAddress,

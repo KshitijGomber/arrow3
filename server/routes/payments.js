@@ -114,7 +114,9 @@ router.post('/confirm', async (req, res) => {
                 status: 'confirmed',
                 paymentStatus: 'completed',
                 paymentIntentId: paymentIntentId,
-                'paymentDetails.paymentMethod': result.payment.payment_method,
+                'paymentDetails.paymentMethod.id': result.payment.payment_method.id,
+                'paymentDetails.paymentMethod.type': result.payment.payment_method.type,
+                'paymentDetails.paymentMethod.card': result.payment.payment_method.card,
                 'paymentDetails.receiptUrl': result.payment.receipt_url,
                 'paymentDetails.processedAt': new Date()
               }
@@ -202,13 +204,17 @@ router.post('/confirm', async (req, res) => {
         
         // Send order confirmation email
         try {
-          await emailService.sendOrderConfirmation(updatedOrder);
-          console.log('✅ Order confirmation email sent for order:', updatedOrder._id);
+          console.log('📧 About to call emailService.sendOrderConfirmation...');
+          const emailResult = await emailService.sendOrderConfirmation(updatedOrder);
+          console.log('✅ Order confirmation email sent successfully for order:', updatedOrder._id);
+          console.log('📧 Email service result:', emailResult);
         } catch (emailError) {
           console.error('❌ Failed to send order confirmation email:', emailError);
           console.error('❌ Email error details:', {
             message: emailError.message,
-            stack: emailError.stack
+            stack: emailError.stack,
+            name: emailError.name,
+            code: emailError.code
           });
           // Don't fail the payment if email fails
         }
@@ -345,6 +351,67 @@ router.post('/debug-update-order', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to update order',
+      details: error.message
+    });
+  }
+});
+
+// Debug endpoint to test email sending
+router.post('/debug-send-email', async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Order ID is required'
+      });
+    }
+
+    console.log('📧 Debug: Attempting to send email for order:', orderId);
+
+    // Find the order with populated drone data
+    const order = await Order.findById(orderId).populate('droneId');
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found',
+        orderId
+      });
+    }
+
+    console.log('📧 Debug: Found order for email:', {
+      orderId: order._id,
+      customerEmail: order.customerInfo?.email,
+      hasCustomerInfo: !!order.customerInfo,
+      hasDroneId: !!order.droneId,
+      droneData: order.droneId ? {
+        name: order.droneId.name,
+        id: order.droneId._id
+      } : 'No drone data'
+    });
+
+    // Attempt to send email
+    const emailResult = await emailService.sendOrderConfirmation(order);
+    
+    console.log('✅ Debug: Email sent successfully:', emailResult);
+
+    res.json({
+      success: true,
+      message: 'Order confirmation email sent successfully',
+      emailResult: emailResult,
+      order: {
+        id: order._id,
+        customerEmail: order.customerInfo?.email,
+        droneName: order.droneId?.name
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Debug: Email send failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to send email',
       details: error.message
     });
   }
