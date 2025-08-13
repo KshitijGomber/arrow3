@@ -363,6 +363,9 @@ router.put('/:id/status', authenticate, authorize('admin'), statusUpdateValidati
       });
     }
 
+    // Capture previous status before updating
+    const previousStatus = order.status;
+
     // Update status using the model method (includes validation)
     await order.updateStatus(status, adminUserId, notes);
 
