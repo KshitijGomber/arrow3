@@ -656,4 +656,61 @@ router.get('/debug/recent', authenticate, authorize('admin'), async (req, res) =
   }
 });
 
+// @route   GET /api/orders/debug/:id
+// @desc    Debug specific order details (temporary debug endpoint)
+// @access  Private
+router.get('/debug/:id', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    console.log('🧪 Debug: Looking for order with ID:', {
+      id,
+      idType: typeof id,
+      idLength: id?.length,
+      isValidObjectId: /^[0-9a-fA-F]{24}$/.test(id)
+    });
+
+    const order = await Order.findById(id)
+      .populate('droneId', 'name model price')
+      .populate('userId', 'firstName lastName email');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found',
+        searchedId: id
+      });
+    }
+
+    const debugInfo = {
+      _id: order._id,
+      id: order.id, // Virtual ID
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      paymentIntentId: order.paymentIntentId,
+      totalAmount: order.totalAmount,
+      orderDate: order.orderDate,
+      customerEmail: order.customerInfo?.email,
+      droneName: order.droneId?.name,
+      paymentDetails: order.paymentDetails,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt
+    };
+
+    res.json({
+      success: true,
+      message: 'Order debug info',
+      data: debugInfo,
+      searchedId: id
+    });
+  } catch (error) {
+    console.error('🧪 Debug order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve order debug info',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
