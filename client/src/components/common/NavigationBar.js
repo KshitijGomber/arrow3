@@ -45,7 +45,7 @@ const NavigationBar = () => {
     { label: 'Specialized', path: '/drones?category=specialized' },
     { label: 'Explore', path: '/drones' },
     { label: 'Support', path: '/support' },
-    { label: 'Where to Buy', path: '/order' },
+    { label: 'Where to Buy', path: '/where-to-buy' },
   ];
 
   const handleMobileMenuToggle = () => {

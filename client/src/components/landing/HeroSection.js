@@ -114,13 +114,13 @@ const HeroSection = () => {
                   >
                     <Button
                       variant="contained"
-                      size="large"
+                      size="medium"
                       startIcon={<FlightTakeoff />}
-                      onClick={() => navigate('/order')}
+                      onClick={() => navigate('/drones')}
                       sx={{
                         px: 4,
-                        py: 2,
-                        fontSize: '1.1rem',
+                        py: 1.2,
+                        fontSize: '1rem',
                         fontWeight: 600,
                         borderRadius: 3,
                         background: `linear-gradient(135deg, 

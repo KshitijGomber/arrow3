@@ -15,6 +15,8 @@ const DroneCatalog = React.lazy(() => import('./pages/DroneCatalog'));
 const DroneDetailsPage = React.lazy(() => import('./pages/DroneDetailsPage'));
 const OrderPage = React.lazy(() => import('./pages/OrderPage'));
 const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
+const SupportPage = React.lazy(() => import('./pages/SupportPage'));
+const WhereToBuyPage = React.lazy(() => import('./pages/WhereToBuyPage'));
 const LoginPage = React.lazy(() => import('./pages/auth/LoginPage'));
 const RegisterPage = React.lazy(() => import('./pages/auth/RegisterPage'));
 const ForgotPasswordPage = React.lazy(() => import('./pages/auth/ForgotPasswordPage'));
@@ -38,6 +40,8 @@ function App() {
               <Route path="/drones/:droneId" element={<DroneDetailsPage />} />
               <Route path="/order" element={<OrderPage />} />
               <Route path="/order/:droneId" element={<OrderPage />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/where-to-buy" element={<WhereToBuyPage />} />
               
               {/* Auth routes */}
               <Route path="/login" element={<LoginPage />} />

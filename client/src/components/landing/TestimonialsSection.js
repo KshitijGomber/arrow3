@@ -386,13 +386,13 @@ const TestimonialsSection = () => {
             </Typography>
             <Button
               variant="contained"
-              size="large"
+              size="medium"
               startIcon={<PlayArrow />}
               onClick={() => navigate('/drones')}
               sx={{
                 px: 4,
-                py: 2,
-                fontSize: '1.1rem',
+                py: 1.2,
+                fontSize: '1rem',
                 fontWeight: 600,
                 borderRadius: 3,
                 background: `linear-gradient(135deg, 
