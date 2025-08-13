@@ -2,6 +2,13 @@ import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Box } from '@mui/material';
 
+// Common components
+import { ErrorBoundary, ProtectedRoute, LoadingSpinner, PerformanceMonitor } from './components/common';
+
+// Context providers
+import { AuthProvider } from './context/AuthContext';
+
+
 // Lazy load components for code splitting
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const DroneCatalog = React.lazy(() => import('./pages/DroneCatalog'));
@@ -16,11 +23,6 @@ const OAuthCallback = React.lazy(() => import('./pages/auth/OAuthCallback'));
 const AdminPanel = React.lazy(() => import('./pages/admin/AdminPanel'));
 const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin'));
 
-// Common components
-import { ErrorBoundary, ProtectedRoute, LoadingSpinner, PerformanceMonitor } from './components/common';
-
-// Context providers
-import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
