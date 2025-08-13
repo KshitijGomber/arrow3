@@ -13,10 +13,10 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#00ff88',
-      light: '#4dffaa',
-      dark: '#00cc6a',
-      contrastText: '#000000',
+      main: '#2ea4a5',
+      light: '#5cbbc0',
+      dark: '#1f7374',
+      contrastText: '#ffffff',
     },
     secondary: {
       main: '#ff6b35',
@@ -42,7 +42,7 @@ const theme = createTheme({
       main: '#00aaff',
     },
     success: {
-      main: '#00ff88',
+      main: '#2ea4a5',
     },
   },
   typography: {
@@ -130,9 +130,9 @@ const theme = createTheme({
           },
         },
         contained: {
-          boxShadow: '0 4px 12px rgba(0, 255, 136, 0.3)',
+          boxShadow: '0 4px 12px rgba(46, 164, 165, 0.3)',
           '&:hover': {
-            boxShadow: '0 6px 16px rgba(0, 255, 136, 0.4)',
+            boxShadow: '0 6px 16px rgba(46, 164, 165, 0.4)',
           },
         },
       },
@@ -144,8 +144,8 @@ const theme = createTheme({
           border: '1px solid #333',
           borderRadius: 12,
           '&:hover': {
-            border: '1px solid #00ff88',
-            boxShadow: '0 4px 20px rgba(0, 255, 136, 0.1)',
+            border: '1px solid #2ea4a5',
+            boxShadow: '0 4px 20px rgba(46, 164, 165, 0.1)',
           },
           '@media (max-width:600px)': {
             borderRadius: 8,
@@ -177,10 +177,10 @@ const theme = createTheme({
               borderColor: '#333',
             },
             '&:hover fieldset': {
-              borderColor: '#00ff88',
+              borderColor: '#2ea4a5',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#00ff88',
+              borderColor: '#2ea4a5',
             },
           },
         },

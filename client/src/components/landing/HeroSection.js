@@ -43,9 +43,9 @@ const HeroSection = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: `radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                      radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                      radial-gradient(circle at 40% 40%, rgba(0, 255, 136, 0.05) 0%, transparent 50%)`,
+          background: `radial-gradient(circle at 20% 80%, rgba(46, 164, 165, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(46, 164, 165, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 40% 40%, rgba(46, 164, 165, 0.05) 0%, transparent 50%)`,
           animation: 'pulse 4s ease-in-out infinite alternate',
           '@keyframes pulse': {
             '0%': { opacity: 0.5 },
@@ -76,7 +76,7 @@ const HeroSection = () => {
                       backgroundClip: 'text',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                      textShadow: '0 0 30px rgba(0, 255, 136, 0.3)',
+                      textShadow: '0 0 30px rgba(46, 164, 165, 0.3)',
                     }}
                   >
                     Take Flight with
@@ -127,11 +127,11 @@ const HeroSection = () => {
                           ${theme.palette.primary.main} 0%, 
                           ${theme.palette.primary.dark} 100%
                         )`,
-                        boxShadow: `0 8px 32px rgba(0, 255, 136, 0.3)`,
+                        boxShadow: `0 8px 32px rgba(46, 164, 165, 0.3)`,
                         transition: 'all 0.3s ease',
                         '&:hover': {
                           transform: 'translateY(-2px)',
-                          boxShadow: `0 12px 40px rgba(0, 255, 136, 0.4)`,
+                          boxShadow: `0 12px 40px rgba(46, 164, 165, 0.4)`,
                           background: `linear-gradient(135deg, 
                             ${theme.palette.primary.light} 0%, 
                             ${theme.palette.primary.main} 100%
@@ -159,9 +159,9 @@ const HeroSection = () => {
                         transition: 'all 0.3s ease',
                         '&:hover': {
                           borderColor: 'primary.light',
-                          backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                          backgroundColor: 'rgba(46, 164, 165, 0.1)',
                           transform: 'translateY(-2px)',
-                          boxShadow: `0 8px 24px rgba(0, 255, 136, 0.2)`,
+                          boxShadow: `0 8px 24px rgba(46, 164, 165, 0.2)`,
                         },
                       }}
                     >
@@ -287,8 +287,8 @@ const HeroSection = () => {
                       width: '60%',
                       height: '60%',
                       background: `radial-gradient(circle, 
-                        rgba(0, 255, 136, 0.2) 0%, 
-                        rgba(0, 255, 136, 0.1) 50%, 
+                        rgba(46, 164, 165, 0.2) 0%, 
+                        rgba(46, 164, 165, 0.1) 50%, 
                         transparent 100%
                       )`,
                       borderRadius: '50%',

@@ -30,12 +30,12 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #00ff88;
+  background: #2ea4a5;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00cc6a;
+  background: #1f7374;
 }
 
 /* Smooth scrolling */

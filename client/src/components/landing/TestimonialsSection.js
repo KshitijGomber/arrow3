@@ -132,8 +132,8 @@ const TestimonialsSection = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 80%, rgba(0, 255, 136, 0.03) 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 20% 20%, rgba(46, 164, 165, 0.03) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 80%, rgba(46, 164, 165, 0.03) 0%, transparent 50%)`,
           pointerEvents: 'none',
         }}
       />
@@ -218,7 +218,7 @@ const TestimonialsSection = () => {
                     rgba(42, 42, 42, 0.6) 100%
                   )`,
                   border: '1px solid',
-                  borderColor: 'rgba(0, 255, 136, 0.2)',
+                  borderColor: 'rgba(46, 164, 165, 0.2)',
                   borderRadius: 3,
                   p: 4,
                   minHeight: 280,
@@ -313,12 +313,12 @@ const TestimonialsSection = () => {
                   left: -20,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                  backgroundColor: 'rgba(46, 164, 165, 0.1)',
                   border: '1px solid',
                   borderColor: 'primary.main',
                   color: 'primary.main',
                   '&:hover': {
-                    backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                    backgroundColor: 'rgba(46, 164, 165, 0.2)',
                   },
                 }}
               >
@@ -332,12 +332,12 @@ const TestimonialsSection = () => {
                   right: -20,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                  backgroundColor: 'rgba(46, 164, 165, 0.1)',
                   border: '1px solid',
                   borderColor: 'primary.main',
                   color: 'primary.main',
                   '&:hover': {
-                    backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                    backgroundColor: 'rgba(46, 164, 165, 0.2)',
                   },
                 }}
               >
@@ -381,7 +381,7 @@ const TestimonialsSection = () => {
                       borderRadius: 2,
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        backgroundColor: 'rgba(0, 255, 136, 0.05)',
+                        backgroundColor: 'rgba(46, 164, 165, 0.05)',
                       },
                     }}
                   >
@@ -429,11 +429,11 @@ const TestimonialsSection = () => {
               p: 6,
               borderRadius: 3,
               background: `linear-gradient(135deg, 
-                rgba(0, 255, 136, 0.1) 0%, 
-                rgba(0, 255, 136, 0.05) 100%
+                rgba(46, 164, 165, 0.1) 0%, 
+                rgba(46, 164, 165, 0.05) 100%
               )`,
               border: '1px solid',
-              borderColor: 'rgba(0, 255, 136, 0.3)',
+              borderColor: 'rgba(46, 164, 165, 0.3)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -475,11 +475,11 @@ const TestimonialsSection = () => {
                   ${theme.palette.primary.main} 0%, 
                   ${theme.palette.primary.dark} 100%
                 )`,
-                boxShadow: `0 8px 32px rgba(0, 255, 136, 0.3)`,
+                boxShadow: `0 8px 32px rgba(46, 164, 165, 0.3)`,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'translateY(-2px)',
-                  boxShadow: `0 12px 40px rgba(0, 255, 136, 0.4)`,
+                  boxShadow: `0 12px 40px rgba(46, 164, 165, 0.4)`,
                 },
               }}
             >

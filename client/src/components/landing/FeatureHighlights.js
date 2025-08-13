@@ -72,8 +72,8 @@ const FeatureHighlights = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `radial-gradient(circle at 25% 25%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                           radial-gradient(circle at 75% 75%, rgba(0, 255, 136, 0.05) 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 25% 25%, rgba(46, 164, 165, 0.05) 0%, transparent 50%),
+                           radial-gradient(circle at 75% 75%, rgba(46, 164, 165, 0.05) 0%, transparent 50%)`,
           pointerEvents: 'none',
         }}
       />
@@ -136,7 +136,7 @@ const FeatureHighlights = () => {
                     '&:hover': {
                       borderColor: 'primary.main',
                       transform: 'translateY(-8px)',
-                      boxShadow: `0 20px 40px rgba(0, 255, 136, 0.2)`,
+                      boxShadow: `0 20px 40px rgba(46, 164, 165, 0.2)`,
                       '& .feature-icon': {
                         color: 'primary.main',
                         transform: 'scale(1.1)',
@@ -183,7 +183,7 @@ const FeatureHighlights = () => {
                           p: 2,
                           borderRadius: '50%',
                           background: `radial-gradient(circle, 
-                            rgba(0, 255, 136, 0.1) 0%, 
+                            rgba(46, 164, 165, 0.1) 0%, 
                             transparent 70%
                           )`,
                         }}
@@ -270,11 +270,11 @@ const FeatureHighlights = () => {
               p: 4,
               borderRadius: 3,
               background: `linear-gradient(135deg, 
-                rgba(0, 255, 136, 0.05) 0%, 
-                rgba(0, 255, 136, 0.02) 100%
+                rgba(46, 164, 165, 0.05) 0%, 
+                rgba(46, 164, 165, 0.02) 100%
               )`,
               border: '1px solid',
-              borderColor: 'rgba(0, 255, 136, 0.2)',
+              borderColor: 'rgba(46, 164, 165, 0.2)',
             }}
           >
             <Typography
@@ -313,9 +313,9 @@ const FeatureHighlights = () => {
                     px: 2,
                     py: 1,
                     borderRadius: 2,
-                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    backgroundColor: 'rgba(46, 164, 165, 0.1)',
                     border: '1px solid',
-                    borderColor: 'rgba(0, 255, 136, 0.3)',
+                    borderColor: 'rgba(46, 164, 165, 0.3)',
                   }}
                 >
                   <Typography
