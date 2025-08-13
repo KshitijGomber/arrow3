@@ -4,6 +4,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const https = require('https');
+const http = require('http');
+const { URL } = require('url');
 const passport = require('./config/passport');
 const { connectDB, checkDBHealth } = require('./config/database');
 
@@ -72,14 +75,30 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/media', require('./routes/media'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 
-// Health check endpoint
+// Health check endpoint with detailed server info
 app.get('/api/health', (req, res) => {
   const dbHealth = checkDBHealth();
   res.status(200).json({ 
     success: true, 
     message: 'Arrow3 Aerospace API is running',
     timestamp: new Date().toISOString(),
-    database: dbHealth 
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.0',
+    database: dbHealth,
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB'
+    }
+  });
+});
+
+// Ping endpoint specifically for keep-alive (lighter response)
+app.get('/api/ping', (req, res) => {
+  res.status(200).json({ 
+    success: true, 
+    timestamp: new Date().toISOString(),
+    uptime: Math.round(process.uptime())
   });
 });
 
@@ -125,6 +144,58 @@ const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log(`🚀 Arrow3 Aerospace Server running on port ${PORT}`);
+  
+  // Self-ping mechanism to keep Render free tier alive
+  if (process.env.NODE_ENV === 'production' && process.env.RENDER_EXTERNAL_URL) {
+    const pingInterval = 14 * 60 * 1000; // 14 minutes (before 15-minute timeout)
+    
+    setInterval(() => {
+      try {
+        const url = new URL(`${process.env.RENDER_EXTERNAL_URL}/api/ping`);
+        const client = url.protocol === 'https:' ? https : http;
+        
+        const req = client.request({
+          hostname: url.hostname,
+          port: url.port,
+          path: url.pathname,
+          method: 'GET'
+        }, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            if (res.statusCode === 200) {
+              try {
+                const result = JSON.parse(data);
+                console.log(`🏓 Self-ping successful - server alive for ${result.uptime}s`);
+              } catch (e) {
+                console.log('🏓 Self-ping successful - server responded');
+              }
+            } else {
+              console.warn('⚠️ Self-ping failed with status:', res.statusCode);
+            }
+          });
+        });
+        
+        req.on('error', (error) => {
+          console.error('❌ Self-ping error:', error.message);
+        });
+        
+        req.setTimeout(5000, () => {
+          req.destroy();
+          console.warn('⚠️ Self-ping timeout');
+        });
+        
+        req.end();
+      } catch (error) {
+        console.error('❌ Self-ping setup error:', error.message);
+      }
+    }, pingInterval);
+    
+    console.log('⏰ Self-ping enabled - will ping every 14 minutes to prevent sleep');
+    console.log(`📡 Will ping: ${process.env.RENDER_EXTERNAL_URL}/api/ping`);
+  } else {
+    console.log('💤 Self-ping disabled (not in production or RENDER_EXTERNAL_URL not set)');
+  }
 });
 
 module.exports = app;
