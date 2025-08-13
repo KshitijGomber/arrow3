@@ -24,6 +24,7 @@ const ResetPasswordPage = React.lazy(() => import('./pages/auth/ResetPasswordPag
 const OAuthCallback = React.lazy(() => import('./pages/auth/OAuthCallback'));
 const AdminPanel = React.lazy(() => import('./pages/admin/AdminPanel'));
 const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 
 
 function App() {
@@ -51,6 +52,14 @@ function App() {
               <Route path="/auth/callback" element={<OAuthCallback />} />
               
               {/* Protected routes */}
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/payment" 
                 element={
