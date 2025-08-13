@@ -23,6 +23,10 @@ export const API_ENDPOINTS = {
   CREATE_PAYMENT_INTENT: '/payments/create-intent',
   CONFIRM_PAYMENT: '/payments/confirm',
   PAYMENT_STATUS: (orderId) => `/payments/${orderId}/status`,
+  
+  // Dashboard endpoints  
+  DASHBOARD_STATS: '/dashboard/stats',
+  DASHBOARD_ALERTS: '/dashboard/alerts',
 };
 
 export const ROUTES = {

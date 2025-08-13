@@ -53,31 +53,90 @@ const AdminDashboard = () => {
   const lowStockProducts = dashboardData?.lowStockProducts || [];
   const alerts = alertsData?.alerts || [];
 
+  // Debug logging
+  console.log('Dashboard data:', { dashboardData, stats, statsLoading, statsError });
+
+  // Add loading state check
+  if (statsLoading) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" gutterBottom sx={{ color: 'white', mb: 4 }}>
+          Dashboard
+        </Typography>
+        <Grid container spacing={3}>
+          {[1, 2, 3, 4].map((item) => (
+            <Grid item xs={12} sm={6} md={3} key={item}>
+              <Card sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333' }}>
+                <CardContent>
+                  <Skeleton variant="text" width="60%" height={24} />
+                  <Skeleton variant="text" width="40%" height={32} />
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    );
+  }
+
+  // Add error state check
+  if (statsError) {
+    console.error('Dashboard stats error:', statsError);
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" gutterBottom sx={{ color: 'white', mb: 4 }}>
+          Dashboard
+        </Typography>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Failed to load dashboard data
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {statsError.response?.status === 401 
+              ? 'Access denied. Please ensure you have admin privileges.'
+              : statsError.response?.data?.message || 'Please try refreshing the page or contact support if the problem persists.'
+            }
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            <Button onClick={refetchStats} variant="contained" sx={{ mr: 2 }}>
+              Retry
+            </Button>
+            {statsError.response?.status === 401 && (
+              <Button onClick={() => navigate('/login')} variant="outlined">
+                Login Again
+              </Button>
+            )}
+          </Box>
+        </Alert>
+      </Box>
+    );
+  }
+
   const statCards = [
     {
       title: 'Total Products',
-      value: stats.totalProducts,
+      value: stats.totalProducts || 0,
       icon: <ProductsIcon sx={{ fontSize: 40, color: '#00ff88' }} />,
       action: () => navigate('/admin/products'),
       color: '#00ff88'
     },
     {
       title: 'Total Orders',
-      value: stats.totalOrders,
+      value: stats.totalOrders || 0,
       icon: <OrdersIcon sx={{ fontSize: 40, color: '#ff6b35' }} />,
       action: () => navigate('/admin/orders'),
       color: '#ff6b35'
     },
     {
       title: 'Total Users',
-      value: stats.totalUsers,
+      value: stats.totalUsers || 0,
       icon: <UsersIcon sx={{ fontSize: 40, color: '#4fc3f7' }} />,
       action: () => {},
       color: '#4fc3f7'
     },
     {
       title: 'Total Revenue',
-      value: `$${stats.totalRevenue.toLocaleString()}`,
+      value: `$${(stats.totalRevenue || 0).toLocaleString()}`,
       icon: <RevenueIcon sx={{ fontSize: 40, color: '#ffd54f' }} />,
       action: () => {},
       color: '#ffd54f'
@@ -216,18 +275,18 @@ const AdminDashboard = () => {
                     >
                       <Box>
                         <Typography variant="subtitle2" sx={{ color: 'white' }}>
-                          {order.orderId}
+                          {order.orderId || 'N/A'}
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#aaa' }}>
-                          {order.customer}
+                          {order.customer || 'Unknown Customer'}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#666' }}>
-                          {order.drone}
+                          {order.drone || 'Unknown Drone'}
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Typography variant="subtitle2" sx={{ color: '#00ff88' }}>
-                          ${order.amount}
+                          ${(order.amount || 0).toFixed(2)}
                         </Typography>
                         <Chip 
                           label={order.status} 
