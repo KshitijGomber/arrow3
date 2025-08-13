@@ -618,4 +618,39 @@ router.get('/stats/summary', authenticate, authorize('admin'), async (req, res) 
   }
 });
 
+// @route   GET /api/orders/debug/recent
+// @desc    Debug recent orders to check payment status (temporary debug endpoint)
+// @access  Private (Admin)
+router.get('/debug/recent', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const recentOrders = await Order.find()
+      .populate('droneId', 'name model price')
+      .sort({ orderDate: -1 })
+      .limit(10);
+
+    const debugInfo = recentOrders.map(order => ({
+      _id: order._id,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      paymentIntentId: order.paymentIntentId,
+      totalAmount: order.totalAmount,
+      orderDate: order.orderDate,
+      customerEmail: order.customerInfo?.email,
+      droneName: order.droneId?.name
+    }));
+
+    res.json({
+      success: true,
+      message: 'Recent orders debug info',
+      data: debugInfo
+    });
+  } catch (error) {
+    console.error('Debug recent orders error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve debug info'
+    });
+  }
+});
+
 module.exports = router;

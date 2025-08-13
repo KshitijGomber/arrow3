@@ -43,6 +43,14 @@ class MockPaymentService {
     });
 
     console.log('🎭 Mock Payment Intent Created:', paymentIntent.id);
+    console.log('🎭 Stored payment intent data:', {
+      paymentIntentId: paymentIntent.id,
+      orderId: paymentData.orderId,
+      orderIdType: typeof paymentData.orderId,
+      amount: amount,
+      metadataOrderId: paymentIntent.metadata.order_id
+    });
+    
     return paymentIntent;
   }
 
@@ -177,7 +185,15 @@ class MockPaymentService {
    */
   getOrderIdFromPaymentIntent(paymentIntentId) {
     const paymentIntent = this.paymentIntents.get(paymentIntentId);
-    return paymentIntent?.orderId || null;
+    const orderId = paymentIntent?.orderId || null;
+    
+    console.log('🔍 Getting order ID from payment intent:', {
+      paymentIntentId,
+      foundPaymentIntent: !!paymentIntent,
+      orderId: orderId
+    });
+    
+    return orderId;
   }
 
   /**

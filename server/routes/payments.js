@@ -84,19 +84,36 @@ router.post('/confirm', async (req, res) => {
 
     const result = await mockPayment.confirmPayment(paymentIntentId, paymentMethod);
 
+    console.log('💳 Payment confirmation result:', {
+      success: result.success,
+      paymentId: paymentIntentId,
+      orderIdFromMetadata: result.payment?.metadata?.order_id
+    });
+
     if (result.success) {
       // Find the order associated with this payment intent
       const orderId = result.payment.metadata?.order_id;
+      console.log('🔍 Looking for order with ID:', orderId);
+      
+      let updatedOrder = null;
+      
       if (orderId) {
         try {
+          console.log('📝 Updating order status and payment status for order:', orderId);
+          console.log('📝 Order ID type:', typeof orderId, 'Length:', orderId?.length);
+          console.log('📝 MongoDB ObjectId validation:', {
+            isValidObjectId: /^[0-9a-fA-F]{24}$/.test(orderId),
+            orderId: orderId
+          });
+          
           // Update order status to confirmed and payment status to completed
-          const updatedOrder = await Order.findByIdAndUpdate(
+          updatedOrder = await Order.findByIdAndUpdate(
             orderId,
             {
-              status: 'confirmed',
-              paymentStatus: 'completed',
-              paymentIntentId: paymentIntentId,
               $set: {
+                status: 'confirmed',
+                paymentStatus: 'completed',
+                paymentIntentId: paymentIntentId,
                 'paymentDetails.paymentMethod': result.payment.payment_method,
                 'paymentDetails.receiptUrl': result.payment.receipt_url,
                 'paymentDetails.processedAt': new Date()
@@ -106,44 +123,14 @@ router.post('/confirm', async (req, res) => {
           ).populate('droneId');
 
           if (updatedOrder) {
-            console.log('📧 Attempting to send order confirmation email for order:', orderId);
-            console.log('📧 Order data for email:', {
+            console.log('✅ Order updated successfully:', {
               orderId: updatedOrder._id,
-              customerEmail: updatedOrder.customerInfo?.email,
-              hasCustomerInfo: !!updatedOrder.customerInfo,
-              hasDroneId: !!updatedOrder.droneId,
-              droneData: updatedOrder.droneId ? {
-                name: updatedOrder.droneId.name,
-                id: updatedOrder.droneId._id
-              } : 'No drone data'
-            });
-            
-            // Send order confirmation email
-            try {
-              await emailService.sendOrderConfirmation(updatedOrder);
-              console.log('✅ Order confirmation email sent for order:', orderId);
-            } catch (emailError) {
-              console.error('❌ Failed to send order confirmation email:', emailError);
-              console.error('❌ Email error details:', {
-                message: emailError.message,
-                stack: emailError.stack
-              });
-              // Don't fail the payment if email fails
-            }
-
-            res.json({
-              success: true,
-              payment: result.payment,
-              order: updatedOrder,
-              message: 'Payment processed successfully and order confirmed (mock)'
+              status: updatedOrder.status,
+              paymentStatus: updatedOrder.paymentStatus,
+              paymentIntentId: updatedOrder.paymentIntentId
             });
           } else {
-            console.warn('⚠️ Order not found for payment intent:', paymentIntentId);
-            res.json({
-              success: true,
-              payment: result.payment,
-              message: 'Payment processed successfully (mock)'
-            });
+            console.warn('⚠️ Order update returned null - order may not exist:', orderId);
           }
         } catch (orderError) {
           console.error('❌ Failed to update order after payment:', orderError);
@@ -153,8 +140,87 @@ router.post('/confirm', async (req, res) => {
             payment: result.payment,
             message: 'Payment processed successfully, but order update failed (mock)'
           });
+          return;
         }
       } else {
+        console.warn('⚠️ No order ID found in payment metadata, trying to find by payment intent ID');
+        
+        // Fallback: try to find order by payment intent ID if it was stored during order creation
+        try {
+          const orderByPaymentIntent = await Order.findOne({ paymentIntentId: paymentIntentId }).populate('droneId');
+          if (orderByPaymentIntent) {
+            console.log('🔍 Found order by payment intent ID:', orderByPaymentIntent._id);
+            
+            orderByPaymentIntent.status = 'confirmed';
+            orderByPaymentIntent.paymentStatus = 'completed';
+            orderByPaymentIntent.paymentDetails = {
+              paymentMethod: result.payment.payment_method,
+              receiptUrl: result.payment.receipt_url,
+              processedAt: new Date()
+            };
+            
+            updatedOrder = await orderByPaymentIntent.save();
+            
+            console.log('✅ Order updated via fallback method:', {
+              orderId: updatedOrder._id,
+              status: updatedOrder.status,
+              paymentStatus: updatedOrder.paymentStatus
+            });
+          } else {
+            console.warn('⚠️ Order not found for payment intent:', paymentIntentId);
+            res.json({
+              success: true,
+              payment: result.payment,
+              message: 'Payment processed successfully (mock)'
+            });
+            return;
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback order lookup failed:', fallbackError);
+          res.json({
+            success: true,
+            payment: result.payment,
+            message: 'Payment processed successfully, but order update failed (mock)'
+          });
+          return;
+        }
+      }
+
+      // Send order confirmation email if we have an updated order
+      if (updatedOrder) {
+        console.log('📧 Attempting to send order confirmation email for order:', updatedOrder._id);
+        console.log('📧 Order data for email:', {
+          orderId: updatedOrder._id,
+          customerEmail: updatedOrder.customerInfo?.email,
+          hasCustomerInfo: !!updatedOrder.customerInfo,
+          hasDroneId: !!updatedOrder.droneId,
+          droneData: updatedOrder.droneId ? {
+            name: updatedOrder.droneId.name,
+            id: updatedOrder.droneId._id
+          } : 'No drone data'
+        });
+        
+        // Send order confirmation email
+        try {
+          await emailService.sendOrderConfirmation(updatedOrder);
+          console.log('✅ Order confirmation email sent for order:', updatedOrder._id);
+        } catch (emailError) {
+          console.error('❌ Failed to send order confirmation email:', emailError);
+          console.error('❌ Email error details:', {
+            message: emailError.message,
+            stack: emailError.stack
+          });
+          // Don't fail the payment if email fails
+        }
+
+        res.json({
+          success: true,
+          payment: result.payment,
+          order: updatedOrder,
+          message: 'Payment processed successfully and order confirmed (mock)'
+        });
+      } else {
+        console.warn('⚠️ No order was updated');
         res.json({
           success: true,
           payment: result.payment,
@@ -209,6 +275,79 @@ router.post('/webhook', (req, res) => {
     event,
     message: 'Mock webhook processed'
   });
+});
+
+// Debug endpoint to test payment status updates
+router.post('/debug-update-order', async (req, res) => {
+  try {
+    const { orderId, paymentStatus = 'completed' } = req.body;
+    
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Order ID is required'
+      });
+    }
+
+    console.log('🧪 Debug: Attempting to update order payment status:', {
+      orderId,
+      paymentStatus,
+      orderIdType: typeof orderId
+    });
+
+    // First, check if order exists
+    const existingOrder = await Order.findById(orderId);
+    if (!existingOrder) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found',
+        orderId
+      });
+    }
+
+    console.log('🧪 Debug: Found existing order:', {
+      orderId: existingOrder._id,
+      currentStatus: existingOrder.status,
+      currentPaymentStatus: existingOrder.paymentStatus
+    });
+
+    // Update the order
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      {
+        $set: {
+          paymentStatus: paymentStatus,
+          status: 'confirmed'
+        }
+      },
+      { new: true }
+    );
+
+    console.log('🧪 Debug: Order update result:', {
+      success: !!updatedOrder,
+      orderId: updatedOrder?._id,
+      newStatus: updatedOrder?.status,
+      newPaymentStatus: updatedOrder?.paymentStatus
+    });
+
+    res.json({
+      success: true,
+      message: 'Order payment status updated successfully',
+      order: {
+        id: updatedOrder._id,
+        status: updatedOrder.status,
+        paymentStatus: updatedOrder.paymentStatus
+      }
+    });
+
+  } catch (error) {
+    console.error('🧪 Debug: Order update failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update order',
+      details: error.message
+    });
+  }
 });
 
 module.exports = router;
