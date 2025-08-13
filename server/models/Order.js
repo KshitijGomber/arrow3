@@ -35,6 +35,25 @@ const shippingAddressSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
+// Payment method sub-schema
+const paymentMethodSchema = new mongoose.Schema({
+  id: { type: String },
+  type: { type: String },
+  card: {
+    brand: { type: String },
+    last4: { type: String },
+    exp_month: { type: String },
+    exp_year: { type: String }
+  }
+}, { _id: false });
+
+// Payment details sub-schema
+const paymentDetailsSchema = new mongoose.Schema({
+  paymentMethod: paymentMethodSchema,
+  receiptUrl: { type: String },
+  processedAt: { type: Date }
+}, { _id: false });
+
 // Customer info sub-schema
 const customerInfoSchema = new mongoose.Schema({
   firstName: {
@@ -112,18 +131,7 @@ const orderSchema = new mongoose.Schema({
     sparse: true // Allows multiple null values but unique non-null values
   },
   paymentDetails: {
-    paymentMethod: {
-      id: String,
-      type: String,
-      card: {
-        brand: String,
-        last4: String,
-        exp_month: Number,
-        exp_year: Number
-      }
-    },
-    receiptUrl: String,
-    processedAt: Date
+    type: paymentDetailsSchema
   },
   shippingAddress: {
     type: shippingAddressSchema,
@@ -434,7 +442,29 @@ orderSchema.statics.searchOrders = function(filters = {}) {
     .sort({ orderDate: -1 });
 };
 
-// Pre-save middleware for business logic
+// Pre-save middleware to clean up old data format
+orderSchema.pre('save', function(next) {
+  // Remove any old paymentMethod field that might conflict
+  if (this.paymentMethod !== undefined) {
+    this.paymentMethod = undefined;
+  }
+  
+  // Ensure paymentDetails structure is correct
+  if (this.paymentDetails && this.paymentDetails.paymentMethod) {
+    // If paymentMethod is a string (old format), convert it to object format
+    if (typeof this.paymentDetails.paymentMethod === 'string') {
+      this.paymentDetails.paymentMethod = {
+        type: this.paymentDetails.paymentMethod || 'mock_payment',
+        id: `converted_${Date.now()}`,
+        card: {}
+      };
+    }
+  }
+  
+  next();
+});
+
+// Pre-save middleware to handle estimated delivery
 orderSchema.pre('save', function(next) {
   // Auto-set estimated delivery if not set and status is confirmed
   if (this.status === 'confirmed' && !this.estimatedDelivery) {

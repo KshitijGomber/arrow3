@@ -372,6 +372,12 @@ router.put('/:id/status', authenticate, authorize('admin'), statusUpdateValidati
     // Add tracking number if provided and status is shipped
     if (trackingNumber && status === 'shipped') {
       order.trackingNumber = trackingNumber;
+      
+      // Clean up any potential old paymentMethod field that might cause validation issues
+      if (order.paymentMethod !== undefined) {
+        order.paymentMethod = undefined;
+      }
+      
       await order.save();
     }
 
