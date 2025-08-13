@@ -35,6 +35,37 @@ const HeroSection = () => {
         overflow: 'hidden',
       }}
     >
+      {/* Logo at top-left */}
+      <Box
+        onClick={() => navigate('/')}
+        sx={{
+          position: 'absolute',
+          top: { xs: 12, sm: 16 },
+          left: { xs: 12, sm: 16 },
+          zIndex: 3,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          cursor: 'pointer',
+        }}
+      >
+        <img
+          src="/logoarrow3.png"
+          alt="Arrow3"
+          style={{
+            height: 36,
+            width: 'auto',
+            filter: `drop-shadow(0 0 6px ${theme.palette.primary.main})`,
+          }}
+        />
+        <Typography
+          variant="h6"
+          sx={{ color: 'primary.main', fontWeight: 700, display: { xs: 'none', sm: 'block' } }}
+        >
+          Arrow3
+        </Typography>
+      </Box>
+
       {/* Animated background elements */}
       <Box
         sx={{
@@ -77,28 +108,11 @@ const HeroSection = () => {
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       textShadow: '0 0 30px rgba(46, 164, 165, 0.3)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2,
-                      flexDirection: { xs: 'column', sm: 'row' },
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <img
-                        src="/logoarrow3.png"
-                        alt="Arrow3 Logo"
-                        style={{
-                          height: '60px',
-                          width: 'auto',
-                          filter: `drop-shadow(0 0 10px ${theme.palette.primary.main})`,
-                        }}
-                      />
-                      <Box>
-                        Take Flight with
-                        <br />
-                        Arrow3 Aerospace
-                      </Box>
-                    </Box>
+                    Take Flight with
+                    <br />
+                    Arrow3 Aerospace
                   </Typography>
                 </Slide>
 

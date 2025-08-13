@@ -105,8 +105,8 @@ const DroneForm = ({ mode = 'create' }) => {
 
   // Load drone data into form when editing
   useEffect(() => {
-    if (isEditMode && droneData?.drone) {
-      const drone = droneData.drone;
+    if (isEditMode && droneData) {
+      const drone = droneData;
       reset({
         name: drone.name,
         model: drone.model,
