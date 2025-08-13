@@ -45,21 +45,27 @@ const DroneCard = ({ drone, onOrderClick }) => {
   };
 
   const formatPrice = (price) => {
+    const numPrice = parseFloat(price);
+    if (isNaN(numPrice) || numPrice <= 0) {
+      return 'Price not available';
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(price);
+    }).format(numPrice);
   };
 
   const getAvailabilityColor = (drone) => {
+    if (!drone || typeof drone.inStock === 'undefined') return 'default';
     if (!drone.inStock || drone.stockQuantity === 0) return 'error';
     if (drone.stockQuantity < 5) return 'warning';
     return 'success';
   };
 
   const getAvailabilityText = (drone) => {
+    if (!drone || typeof drone.inStock === 'undefined') return 'Unknown';
     if (!drone.inStock || drone.stockQuantity === 0) return 'Out of Stock';
     if (drone.stockQuantity < 5) return 'Low Stock';
     return 'In Stock';
@@ -158,7 +164,7 @@ const DroneCard = ({ drone, onOrderClick }) => {
                 color="text.secondary"
                 sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
               >
-                {drone.specifications?.cameraResolution || 'N/A'}
+                {drone.specifications?.cameraResolution || 'No Camera'}
               </Typography>
             </Box>
           </Grid>
@@ -171,7 +177,7 @@ const DroneCard = ({ drone, onOrderClick }) => {
                 color="text.secondary"
                 sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
               >
-                {drone.specifications?.maxSpeed ? `${drone.specifications.maxSpeed} km/h` : 'N/A'}
+                {drone.specifications?.maxSpeed && !isNaN(drone.specifications.maxSpeed) ? `${drone.specifications.maxSpeed} km/h` : 'Speed N/A'}
               </Typography>
             </Box>
           </Grid>
@@ -184,7 +190,7 @@ const DroneCard = ({ drone, onOrderClick }) => {
                 color="text.secondary"
                 sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
               >
-                {drone.specifications?.flightTime ? `${drone.specifications.flightTime} min` : 'N/A'}
+                {drone.specifications?.flightTime && !isNaN(drone.specifications.flightTime) ? `${drone.specifications.flightTime} min` : 'Flight N/A'}
               </Typography>
             </Box>
           </Grid>
@@ -197,7 +203,7 @@ const DroneCard = ({ drone, onOrderClick }) => {
                 color="text.secondary"
                 sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
               >
-                {drone.specifications?.batteryCapacity ? `${drone.specifications.batteryCapacity} mAh` : 'N/A'}
+                {drone.specifications?.batteryCapacity && !isNaN(drone.specifications.batteryCapacity) ? `${drone.specifications.batteryCapacity} mAh` : 'Battery N/A'}
               </Typography>
             </Box>
           </Grid>

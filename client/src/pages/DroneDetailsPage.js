@@ -99,23 +99,29 @@ const DroneDetailsPage = () => {
   };
 
   const formatPrice = (price) => {
+    const numPrice = parseFloat(price);
+    if (isNaN(numPrice) || numPrice <= 0) {
+      return 'Price not available';
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(price);
+    }).format(numPrice);
   };
 
   const getAvailabilityColor = (drone) => {
-    if (!drone?.inStock || drone?.stockQuantity === 0) return 'error';
-    if (drone?.stockQuantity < 5) return 'warning';
+    if (!drone || typeof drone.inStock === 'undefined') return 'default';
+    if (!drone.inStock || drone.stockQuantity === 0) return 'error';
+    if (drone.stockQuantity < 5) return 'warning';
     return 'success';
   };
 
   const getAvailabilityText = (drone) => {
-    if (!drone?.inStock || drone?.stockQuantity === 0) return 'Out of Stock';
-    if (drone?.stockQuantity < 5) return 'Low Stock';
+    if (!drone || typeof drone.inStock === 'undefined') return 'Unknown';
+    if (!drone.inStock || drone.stockQuantity === 0) return 'Out of Stock';
+    if (drone.stockQuantity < 5) return 'Low Stock';
     return 'In Stock';
   };
 
@@ -398,7 +404,7 @@ const DroneDetailsPage = () => {
                             Camera
                           </Typography>
                           <Typography variant="body1" fontWeight={600}>
-                            {specifications.cameraResolution || 'N/A'}
+                            {specifications.cameraResolution || 'No Camera'}
                           </Typography>
                         </CardContent>
                       </Card>
@@ -412,7 +418,7 @@ const DroneDetailsPage = () => {
                             Max Speed
                           </Typography>
                           <Typography variant="body1" fontWeight={600}>
-                            {specifications.maxSpeed ? `${specifications.maxSpeed} km/h` : 'N/A'}
+                            {specifications.maxSpeed && !isNaN(specifications.maxSpeed) ? `${specifications.maxSpeed} km/h` : 'Speed N/A'}
                           </Typography>
                         </CardContent>
                       </Card>
@@ -426,7 +432,7 @@ const DroneDetailsPage = () => {
                             Flight Time
                           </Typography>
                           <Typography variant="body1" fontWeight={600}>
-                            {specifications.flightTime ? `${specifications.flightTime} min` : 'N/A'}
+                            {specifications.flightTime && !isNaN(specifications.flightTime) ? `${specifications.flightTime} min` : 'Flight N/A'}
                           </Typography>
                         </CardContent>
                       </Card>
@@ -440,7 +446,7 @@ const DroneDetailsPage = () => {
                             Battery
                           </Typography>
                           <Typography variant="body1" fontWeight={600}>
-                            {specifications.batteryCapacity ? `${specifications.batteryCapacity} mAh` : 'N/A'}
+                            {specifications.batteryCapacity && !isNaN(specifications.batteryCapacity) ? `${specifications.batteryCapacity} mAh` : 'Battery N/A'}
                           </Typography>
                         </CardContent>
                       </Card>
@@ -483,7 +489,7 @@ const DroneDetailsPage = () => {
                       Weight
                     </TableCell>
                     <TableCell>
-                      {specifications.weight ? `${specifications.weight}g` : 'N/A'}
+                      {specifications.weight && !isNaN(specifications.weight) ? `${specifications.weight}g` : 'Weight not specified'}
                     </TableCell>
                   </TableRow>
                   
@@ -492,9 +498,12 @@ const DroneDetailsPage = () => {
                       Dimensions
                     </TableCell>
                     <TableCell>
-                      {specifications.dimensions 
+                      {specifications.dimensions && 
+                       specifications.dimensions.length && !isNaN(specifications.dimensions.length) &&
+                       specifications.dimensions.width && !isNaN(specifications.dimensions.width) &&
+                       specifications.dimensions.height && !isNaN(specifications.dimensions.height)
                         ? `${specifications.dimensions.length} × ${specifications.dimensions.width} × ${specifications.dimensions.height} cm`
-                        : 'N/A'
+                        : 'Dimensions not specified'
                       }
                     </TableCell>
                   </TableRow>
@@ -504,7 +513,7 @@ const DroneDetailsPage = () => {
                       Battery Capacity
                     </TableCell>
                     <TableCell>
-                      {specifications.batteryCapacity ? `${specifications.batteryCapacity} mAh` : 'N/A'}
+                      {specifications.batteryCapacity && !isNaN(specifications.batteryCapacity) ? `${specifications.batteryCapacity} mAh` : 'Battery capacity not specified'}
                     </TableCell>
                   </TableRow>
                   
@@ -513,7 +522,7 @@ const DroneDetailsPage = () => {
                       Flight Time
                     </TableCell>
                     <TableCell>
-                      {specifications.flightTime ? `${specifications.flightTime} minutes` : 'N/A'}
+                      {specifications.flightTime && !isNaN(specifications.flightTime) ? `${specifications.flightTime} minutes` : 'Flight time not specified'}
                     </TableCell>
                   </TableRow>
                   
@@ -522,7 +531,7 @@ const DroneDetailsPage = () => {
                       Max Speed
                     </TableCell>
                     <TableCell>
-                      {specifications.maxSpeed ? `${specifications.maxSpeed} km/h` : 'N/A'}
+                      {specifications.maxSpeed && !isNaN(specifications.maxSpeed) ? `${specifications.maxSpeed} km/h` : 'Max speed not specified'}
                     </TableCell>
                   </TableRow>
                   
@@ -531,7 +540,7 @@ const DroneDetailsPage = () => {
                       Camera Resolution
                     </TableCell>
                     <TableCell>
-                      {specifications.cameraResolution || 'N/A'}
+                      {specifications.cameraResolution || 'No camera'}
                     </TableCell>
                   </TableRow>
                   
@@ -540,7 +549,7 @@ const DroneDetailsPage = () => {
                       Stabilization
                     </TableCell>
                     <TableCell>
-                      {specifications.stabilization || 'N/A'}
+                      {specifications.stabilization || 'No stabilization'}
                     </TableCell>
                   </TableRow>
                   
@@ -549,7 +558,7 @@ const DroneDetailsPage = () => {
                       Control Range
                     </TableCell>
                     <TableCell>
-                      {specifications.controlRange ? `${specifications.controlRange} meters` : 'N/A'}
+                      {specifications.controlRange && !isNaN(specifications.controlRange) ? `${specifications.controlRange} meters` : 'Control range not specified'}
                     </TableCell>
                   </TableRow>
                   
@@ -585,7 +594,7 @@ const DroneDetailsPage = () => {
                       Wind Resistance Level
                     </TableCell>
                     <TableCell>
-                      {specifications.windResistanceLevel ? `Level ${specifications.windResistanceLevel}` : 'N/A'}
+                      {specifications.windResistanceLevel && !isNaN(specifications.windResistanceLevel) ? `Level ${specifications.windResistanceLevel}` : 'Wind resistance not specified'}
                     </TableCell>
                   </TableRow>
                   

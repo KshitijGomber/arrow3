@@ -28,6 +28,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { useDrone, useCreateDrone, useUpdateDrone } from '../../../hooks/queries/useDroneQueries';
 import { MediaUploadField } from '../../../components/common';
+import toast from 'react-hot-toast';
 
 const CAMERA_RESOLUTIONS = ['720p', '1080p', '4K', '6K', '8K', 'No Camera'];
 const STABILIZATION_TYPES = ['None', 'Electronic', '2-Axis Gimbal', '3-Axis Gimbal', 'AI Stabilization'];
@@ -169,26 +170,37 @@ const DroneForm = ({ mode = 'create' }) => {
       const existingVideos = mediaFiles.filter(m => m.type === 'video' && m.isExisting).map(m => m.url);
       const newFiles = mediaFiles.filter(m => !m.isExisting);
 
+      // Helper function to safely parse numbers
+      const safeParseFloat = (value, defaultValue = 0) => {
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? defaultValue : parsed;
+      };
+
+      const safeParseInt = (value, defaultValue = 0) => {
+        const parsed = parseInt(value);
+        return isNaN(parsed) ? defaultValue : parsed;
+      };
+
       const formData = {
         ...data,
         images: existingImages.length > 0 ? existingImages : [],
         videos: existingVideos.length > 0 ? existingVideos : [],
-        price: parseFloat(data.price),
+        price: safeParseFloat(data.price),
         specifications: {
           ...data.specifications,
-          weight: parseFloat(data.specifications.weight),
+          weight: safeParseFloat(data.specifications.weight),
           dimensions: {
-            length: parseFloat(data.specifications.dimensions.length),
-            width: parseFloat(data.specifications.dimensions.width),
-            height: parseFloat(data.specifications.dimensions.height)
+            length: safeParseFloat(data.specifications.dimensions.length),
+            width: safeParseFloat(data.specifications.dimensions.width),
+            height: safeParseFloat(data.specifications.dimensions.height)
           },
-          batteryCapacity: parseFloat(data.specifications.batteryCapacity),
-          flightTime: parseFloat(data.specifications.flightTime),
-          maxSpeed: parseFloat(data.specifications.maxSpeed),
-          controlRange: parseFloat(data.specifications.controlRange),
-          windResistanceLevel: parseInt(data.specifications.windResistanceLevel)
+          batteryCapacity: safeParseFloat(data.specifications.batteryCapacity),
+          flightTime: safeParseFloat(data.specifications.flightTime),
+          maxSpeed: safeParseFloat(data.specifications.maxSpeed),
+          controlRange: safeParseFloat(data.specifications.controlRange),
+          windResistanceLevel: safeParseInt(data.specifications.windResistanceLevel, 5)
         },
-        stockQuantity: parseInt(data.stockQuantity)
+        stockQuantity: safeParseInt(data.stockQuantity)
       };
 
       // Debug logging
@@ -214,22 +226,33 @@ const DroneForm = ({ mode = 'create' }) => {
         });
 
         try {
-          await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/media/drones/${droneId}/upload`, {
+          const uploadResponse = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/media/drones/${droneId}/upload`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: uploadFormData
           });
+
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            console.error('File upload failed:', errorData);
+            throw new Error(errorData.message || 'Failed to upload files');
+          }
+
+          const uploadResult = await uploadResponse.json();
+          console.log('Files uploaded successfully:', uploadResult);
         } catch (uploadError) {
           console.error('File upload error:', uploadError);
-          // Don't fail the entire operation if file upload fails
+          // Show user-friendly error message
+          toast.error(`File upload failed: ${uploadError.message}. Drone was saved successfully, but you may need to upload images separately.`);
         }
       }
 
       navigate('/admin/products');
     } catch (error) {
-      // Error handling is done in the mutation hooks
+      console.error('Form submission error:', error);
+      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} drone: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -326,7 +349,15 @@ const DroneForm = ({ mode = 'create' }) => {
                     control={control}
                     rules={{ 
                       required: 'Price is required',
-                      min: { value: 0, message: 'Price must be positive' }
+                      min: { value: 100, message: 'Price cannot be under $100' },
+                      max: { value: 10000, message: 'Price cannot exceed $10,000' },
+                      validate: value => {
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) return 'Please enter a valid price';
+                        if (numValue < 100) return 'Price cannot be under $100';
+                        if (numValue > 10000) return 'Price cannot exceed $10,000';
+                        return true;
+                      }
                     }}
                     render={({ field }) => (
                       <TextField
@@ -334,11 +365,12 @@ const DroneForm = ({ mode = 'create' }) => {
                         fullWidth
                         label="Price"
                         type="number"
+                        inputProps={{ min: 100, max: 10000, step: 0.01 }}
                         InputProps={{
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
                         error={!!errors.price}
-                        helperText={errors.price?.message}
+                        helperText={errors.price?.message || 'Price must be between $100 and $10,000'}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
@@ -425,18 +457,30 @@ const DroneForm = ({ mode = 'create' }) => {
                   <Controller
                     name="specifications.weight"
                     control={control}
-                    rules={{ required: 'Weight is required' }}
+                    rules={{ 
+                      required: 'Weight is required',
+                      min: { value: 50, message: 'Weight must be at least 50g' },
+                      max: { value: 5000, message: 'Weight cannot exceed 5000g' },
+                      validate: value => {
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) return 'Please enter a valid weight';
+                        if (numValue < 50) return 'Weight must be at least 50g';
+                        if (numValue > 5000) return 'Weight cannot exceed 5000g';
+                        return true;
+                      }
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         fullWidth
                         label="Weight"
                         type="number"
+                        inputProps={{ min: 50, max: 5000, step: 1 }}
                         InputProps={{
                           endAdornment: <InputAdornment position="end">g</InputAdornment>,
                         }}
                         error={!!errors.specifications?.weight}
-                        helperText={errors.specifications?.weight?.message}
+                        helperText={errors.specifications?.weight?.message || 'Weight in grams (50-5000g)'}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
@@ -455,18 +499,30 @@ const DroneForm = ({ mode = 'create' }) => {
                   <Controller
                     name="specifications.batteryCapacity"
                     control={control}
-                    rules={{ required: 'Battery capacity is required' }}
+                    rules={{ 
+                      required: 'Battery capacity is required',
+                      min: { value: 1000, message: 'Battery capacity must be at least 1000 mAh' },
+                      max: { value: 10000, message: 'Battery capacity cannot exceed 10000 mAh' },
+                      validate: value => {
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) return 'Please enter a valid battery capacity';
+                        if (numValue < 1000) return 'Battery capacity must be at least 1000 mAh';
+                        if (numValue > 10000) return 'Battery capacity cannot exceed 10000 mAh';
+                        return true;
+                      }
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         fullWidth
                         label="Battery Capacity"
                         type="number"
+                        inputProps={{ min: 1000, max: 10000, step: 100 }}
                         InputProps={{
                           endAdornment: <InputAdornment position="end">mAh</InputAdornment>,
                         }}
                         error={!!errors.specifications?.batteryCapacity}
-                        helperText={errors.specifications?.batteryCapacity?.message}
+                        helperText={errors.specifications?.batteryCapacity?.message || 'Battery capacity in mAh (1000-10000 mAh)'}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
@@ -485,18 +541,30 @@ const DroneForm = ({ mode = 'create' }) => {
                   <Controller
                     name="specifications.flightTime"
                     control={control}
-                    rules={{ required: 'Flight time is required' }}
+                    rules={{ 
+                      required: 'Flight time is required',
+                      min: { value: 5, message: 'Flight time must be at least 5 minutes' },
+                      max: { value: 120, message: 'Flight time cannot exceed 120 minutes' },
+                      validate: value => {
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) return 'Please enter a valid flight time';
+                        if (numValue < 5) return 'Flight time must be at least 5 minutes';
+                        if (numValue > 120) return 'Flight time cannot exceed 120 minutes';
+                        return true;
+                      }
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         fullWidth
                         label="Flight Time"
                         type="number"
+                        inputProps={{ min: 5, max: 120, step: 1 }}
                         InputProps={{
                           endAdornment: <InputAdornment position="end">min</InputAdornment>,
                         }}
                         error={!!errors.specifications?.flightTime}
-                        helperText={errors.specifications?.flightTime?.message}
+                        helperText={errors.specifications?.flightTime?.message || 'Flight time in minutes (5-120 min)'}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
@@ -515,18 +583,30 @@ const DroneForm = ({ mode = 'create' }) => {
                   <Controller
                     name="specifications.maxSpeed"
                     control={control}
-                    rules={{ required: 'Max speed is required' }}
+                    rules={{ 
+                      required: 'Max speed is required',
+                      min: { value: 10, message: 'Max speed must be at least 10 km/h' },
+                      max: { value: 200, message: 'Max speed cannot exceed 200 km/h' },
+                      validate: value => {
+                        const numValue = parseFloat(value);
+                        if (isNaN(numValue)) return 'Please enter a valid max speed';
+                        if (numValue < 10) return 'Max speed must be at least 10 km/h';
+                        if (numValue > 200) return 'Max speed cannot exceed 200 km/h';
+                        return true;
+                      }
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         fullWidth
                         label="Max Speed"
                         type="number"
+                        inputProps={{ min: 10, max: 200, step: 1 }}
                         InputProps={{
                           endAdornment: <InputAdornment position="end">km/h</InputAdornment>,
                         }}
                         error={!!errors.specifications?.maxSpeed}
-                        helperText={errors.specifications?.maxSpeed?.message}
+                        helperText={errors.specifications?.maxSpeed?.message || 'Max speed in km/h (10-200 km/h)'}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
@@ -614,7 +694,10 @@ const DroneForm = ({ mode = 'create' }) => {
                   <Controller
                     name="specifications.dimensions.length"
                     control={control}
-                    rules={{ required: 'Length is required' }}
+                    rules={{ 
+                      required: 'Length is required',
+                      min: { value: 0.1, message: 'Length must be positive' }
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
@@ -674,7 +757,10 @@ const DroneForm = ({ mode = 'create' }) => {
                   <Controller
                     name="specifications.dimensions.height"
                     control={control}
-                    rules={{ required: 'Height is required' }}
+                    rules={{ 
+                      required: 'Height is required',
+                      min: { value: 0.1, message: 'Height must be positive' }
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
@@ -974,16 +1060,27 @@ const DroneForm = ({ mode = 'create' }) => {
                   <Controller
                     name="stockQuantity"
                     control={control}
-                    rules={{ required: 'Stock quantity is required' }}
+                    rules={{ 
+                      required: 'Stock quantity is required',
+                      min: { value: 0, message: 'Stock quantity cannot be negative' },
+                      max: { value: 1000, message: 'Stock quantity cannot exceed 1000 units' },
+                      validate: value => {
+                        const numValue = parseInt(value);
+                        if (isNaN(numValue)) return 'Please enter a valid stock quantity';
+                        if (numValue < 0) return 'Stock quantity cannot be negative';
+                        if (numValue > 1000) return 'Stock quantity cannot exceed 1000 units';
+                        return true;
+                      }
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         fullWidth
                         label="Stock Quantity"
                         type="number"
-                        inputProps={{ min: 0 }}
+                        inputProps={{ min: 0, max: 1000, step: 1 }}
                         error={!!errors.stockQuantity}
-                        helperText={errors.stockQuantity?.message}
+                        helperText={errors.stockQuantity?.message || 'Number of units in stock (0-1000)'}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             color: 'white',

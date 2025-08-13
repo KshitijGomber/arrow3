@@ -9,12 +9,14 @@ const router = express.Router();
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.error('Validation errors:', errors.array());
     return res.status(400).json({
       success: false,
       message: 'Validation failed',
       errors: errors.array().map(error => ({
-        field: error.path,
-        message: error.msg
+        field: error.path || error.param,
+        message: error.msg,
+        value: error.value
       }))
     });
   }
@@ -99,8 +101,8 @@ const droneValidation = [
         throw new Error('Battery capacity is required');
       }
       const num = parseFloat(value);
-      if (isNaN(num) || num < 100 || num > 50000) {
-        throw new Error('Battery capacity must be between 100 and 50,000 mAh');
+      if (isNaN(num) || num < 100 || num > 200000) {
+        throw new Error('Battery capacity must be between 100 and 200,000 mAh');
       }
       return true;
     }),
@@ -110,8 +112,8 @@ const droneValidation = [
         throw new Error('Flight time is required');
       }
       const num = parseFloat(value);
-      if (isNaN(num) || num < 1 || num > 180) {
-        throw new Error('Flight time must be between 1 and 180 minutes');
+      if (isNaN(num) || num < 1 || num > 2000) {
+        throw new Error('Flight time must be between 1 and 2000 minutes');
       }
       return true;
     }),
@@ -421,11 +423,7 @@ router.post('/debug', authenticate, authorize('admin'), (req, res) => {
 // @route   POST /api/drones
 // @desc    Create new drone (admin only)
 // @access  Private (Admin)
-router.post('/', authenticate, authorize('admin'), (req, res, next) => {
-  // Temporarily bypass validation for debugging
-  console.log('BYPASS: Skipping validation for debugging');
-  next();
-}, async (req, res) => {
+router.post('/', authenticate, authorize('admin'), droneValidation, handleValidationErrors, async (req, res) => {
   try {
     const droneData = req.body;
 
