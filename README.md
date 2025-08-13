@@ -21,7 +21,7 @@ A comprehensive e-commerce web application for drone sales and management built 
 - Material-UI v5 for component library with dark theme
 - React Router v6 for client-side routing
 - React Query for server state management
-- Axios for HTTP client
+- Axios for HTTP clients
 - Framer Motion for animations
 
 ### Backend
