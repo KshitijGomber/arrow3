@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Drone Creation</title>
+</head>
+<body>
+    <h1>Test Drone Creation</h1>
+    <button onclick="testDroneCreation()">Test Create Drone</button>
+    <div id="result"></div>
+
+    <script>
+        async function testDroneCreation() {
+            const testData = {
+                name: "Test Drone " + Date.now(),
+                model: "TD-2024",
+                price: 1299,
+                description: "A test drone for debugging",
+                category: "camera",
+                specifications: {
+                    weight: 900,
+                    dimensions: {
+                        length: 35,
+                        width: 35,
+                        height: 12
+                    },
+                    batteryCapacity: 5000,
+                    flightTime: 30,
+                    maxSpeed: 65,
+                    cameraResolution: "4K",
+                    stabilization: "3-Axis Gimbal",
+                    controlRange: 7000,
+                    gpsSupport: true,
+                    obstacleAvoidance: false,
+                    returnToHome: true,
+                    windResistanceLevel: 6,
+                    appCompatibility: ["iOS", "Android"],
+                    aiModes: ["Follow Me"]
+                },
+                stockQuantity: 10,
+                inStock: true,
+                featured: false,
+                images: [],
+                videos: []
+            };
+
+            console.log('Sending test data:', JSON.stringify(testData, null, 2));
+
+            try {
+                const response = await fetch('https://arrow3.onrender.com/api/drones', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_ADMIN_TOKEN_HERE' // Replace with actual token
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                console.log('Response:', result);
+                
+                document.getElementById('result').innerHTML = 
+                    '<h3>Response:</h3><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                    
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 
+                    '<h3>Error:</h3><pre>' + error.message + '</pre>';
+            }
+        }
+    </script>
+</body>
+</html>

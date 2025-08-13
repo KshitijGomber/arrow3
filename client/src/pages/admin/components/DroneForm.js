@@ -191,6 +191,9 @@ const DroneForm = ({ mode = 'create' }) => {
         stockQuantity: parseInt(data.stockQuantity)
       };
 
+      // Debug logging
+      console.log('Submitting drone data:', JSON.stringify(formData, null, 2));
+
       let droneId = id;
       
       // Create or update the drone first

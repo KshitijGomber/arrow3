@@ -32,9 +32,16 @@ const droneValidation = [
     .isLength({ min: 1, max: 50 })
     .withMessage('Model is required and must be less than 50 characters'),
   body('price')
-    .isNumeric()
-    .isFloat({ min: 0, max: 100000 })
-    .withMessage('Price must be a number between 0 and 100,000'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Price is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 0 || num > 100000) {
+        throw new Error('Price must be a number between 0 and 100,000');
+      }
+      return true;
+    }),
   body('description')
     .trim()
     .isLength({ min: 1, max: 2000 })
@@ -43,33 +50,82 @@ const droneValidation = [
     .isIn(['camera', 'handheld', 'power', 'specialized'])
     .withMessage('Category must be one of: camera, handheld, power, specialized'),
   body('specifications.weight')
-    .isNumeric()
-    .isFloat({ min: 1, max: 50000 })
-    .withMessage('Weight must be between 1 and 50,000 grams'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Weight is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 1 || num > 50000) {
+        throw new Error('Weight must be between 1 and 50,000 grams');
+      }
+      return true;
+    }),
   body('specifications.dimensions.length')
-    .isNumeric()
-    .isFloat({ min: 1 })
-    .withMessage('Length must be a positive number'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Length is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 1) {
+        throw new Error('Length must be a positive number');
+      }
+      return true;
+    }),
   body('specifications.dimensions.width')
-    .isNumeric()
-    .isFloat({ min: 1 })
-    .withMessage('Width must be a positive number'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Width is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 1) {
+        throw new Error('Width must be a positive number');
+      }
+      return true;
+    }),
   body('specifications.dimensions.height')
-    .isNumeric()
-    .isFloat({ min: 1 })
-    .withMessage('Height must be a positive number'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Height is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 1) {
+        throw new Error('Height must be a positive number');
+      }
+      return true;
+    }),
   body('specifications.batteryCapacity')
-    .isNumeric()
-    .isFloat({ min: 100, max: 50000 })
-    .withMessage('Battery capacity must be between 100 and 50,000 mAh'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Battery capacity is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 100 || num > 50000) {
+        throw new Error('Battery capacity must be between 100 and 50,000 mAh');
+      }
+      return true;
+    }),
   body('specifications.flightTime')
-    .isNumeric()
-    .isFloat({ min: 1, max: 180 })
-    .withMessage('Flight time must be between 1 and 180 minutes'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Flight time is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 1 || num > 180) {
+        throw new Error('Flight time must be between 1 and 180 minutes');
+      }
+      return true;
+    }),
   body('specifications.maxSpeed')
-    .isNumeric()
-    .isFloat({ min: 1, max: 200 })
-    .withMessage('Max speed must be between 1 and 200 km/h'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Max speed is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 1 || num > 200) {
+        throw new Error('Max speed must be between 1 and 200 km/h');
+      }
+      return true;
+    }),
   body('specifications.cameraResolution')
     .isIn(['720p', '1080p', '4K', '6K', '8K', 'No Camera'])
     .withMessage('Camera resolution must be one of: 720p, 1080p, 4K, 6K, 8K, No Camera'),
@@ -77,13 +133,27 @@ const droneValidation = [
     .isIn(['None', 'Electronic', '2-Axis Gimbal', '3-Axis Gimbal', 'AI Stabilization'])
     .withMessage('Stabilization must be one of: None, Electronic, 2-Axis Gimbal, 3-Axis Gimbal, AI Stabilization'),
   body('specifications.controlRange')
-    .isNumeric()
-    .isFloat({ min: 10, max: 15000 })
-    .withMessage('Control range must be between 10 and 15,000 meters'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Control range is required');
+      }
+      const num = parseFloat(value);
+      if (isNaN(num) || num < 10 || num > 15000) {
+        throw new Error('Control range must be between 10 and 15,000 meters');
+      }
+      return true;
+    }),
   body('specifications.windResistanceLevel')
-    .isNumeric()
-    .isInt({ min: 1, max: 10 })
-    .withMessage('Wind resistance level must be between 1 and 10'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        throw new Error('Wind resistance level is required');
+      }
+      const num = parseInt(value);
+      if (isNaN(num) || num < 1 || num > 10) {
+        throw new Error('Wind resistance level must be between 1 and 10');
+      }
+      return true;
+    }),
   body('images')
     .optional()
     .isArray()
@@ -109,13 +179,44 @@ const droneValidation = [
     .withMessage('Each video must be a valid URL'),
   body('stockQuantity')
     .optional()
-    .isNumeric()
-    .isInt({ min: 0 })
-    .withMessage('Stock quantity must be a non-negative integer'),
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) {
+        return true; // Optional field
+      }
+      const num = parseInt(value);
+      if (isNaN(num) || num < 0) {
+        throw new Error('Stock quantity must be a non-negative integer');
+      }
+      return true;
+    }),
   body('featured')
     .optional()
     .isBoolean()
-    .withMessage('Featured must be a boolean value')
+    .withMessage('Featured must be a boolean value'),
+  body('inStock')
+    .optional()
+    .isBoolean()
+    .withMessage('In stock must be a boolean value'),
+  body('specifications.gpsSupport')
+    .optional()
+    .isBoolean()
+    .withMessage('GPS support must be a boolean value'),
+  body('specifications.obstacleAvoidance')
+    .optional()
+    .isBoolean()
+    .withMessage('Obstacle avoidance must be a boolean value'),
+  body('specifications.returnToHome')
+    .optional()
+    .isBoolean()
+    .withMessage('Return to home must be a boolean value'),
+  body('specifications.appCompatibility')
+    .optional()
+    .isArray()
+    .withMessage('App compatibility must be an array'),
+  body('specifications.aiModes')
+    .optional()
+    .isArray()
+    .withMessage('AI modes must be an array')
 ];
 
 // Query validation for drone listing
@@ -313,6 +414,9 @@ router.post('/', authenticate, authorize('admin'), droneValidation, handleValida
   try {
     const droneData = req.body;
 
+    // Debug logging
+    console.log('Received drone data:', JSON.stringify(droneData, null, 2));
+
     // Check if drone with same name already exists
     const existingDrone = await Drone.findOne({ name: droneData.name });
     if (existingDrone) {
@@ -335,6 +439,11 @@ router.post('/', authenticate, authorize('admin'), droneValidation, handleValida
     });
   } catch (error) {
     console.error('Create drone error:', error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      errors: error.errors
+    });
     
     // Handle validation errors
     if (error.name === 'ValidationError') {
@@ -342,6 +451,8 @@ router.post('/', authenticate, authorize('admin'), droneValidation, handleValida
         field: err.path,
         message: err.message
       }));
+      
+      console.error('Validation errors:', validationErrors);
       
       return res.status(400).json({
         success: false,
