@@ -116,7 +116,10 @@ router.post('/confirm', async (req, res) => {
                 paymentIntentId: paymentIntentId,
                 'paymentDetails.paymentMethod.id': result.payment.payment_method.id,
                 'paymentDetails.paymentMethod.type': result.payment.payment_method.type,
-                'paymentDetails.paymentMethod.card': result.payment.payment_method.card,
+                'paymentDetails.paymentMethod.card.brand': result.payment.payment_method.card.brand,
+                'paymentDetails.paymentMethod.card.last4': result.payment.payment_method.card.last4,
+                'paymentDetails.paymentMethod.card.exp_month': result.payment.payment_method.card.exp_month,
+                'paymentDetails.paymentMethod.card.exp_year': result.payment.payment_method.card.exp_year,
                 'paymentDetails.receiptUrl': result.payment.receipt_url,
                 'paymentDetails.processedAt': new Date()
               }
