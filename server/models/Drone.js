@@ -344,15 +344,15 @@ droneSchema.statics.updateStock = async function(droneId, quantity) {
 
 // Pre-save middleware to validate specifications
 droneSchema.pre('save', function(next) {
-  // Ensure at least one image is provided
-  if (!this.images || this.images.length === 0) {
-    return next(new Error('At least one image is required'));
-  }
-  
   // Ensure app compatibility includes at least iOS or Android
   const specs = this.specifications;
   if (!specs.appCompatibility || specs.appCompatibility.length === 0) {
     specs.appCompatibility = ['iOS', 'Android']; // Default compatibility
+  }
+  
+  // Add placeholder image if no images provided (for admin creation)
+  if (!this.images || this.images.length === 0) {
+    this.images = ['https://via.placeholder.com/400x300/2a2a2a/00ff88?text=Drone+Image'];
   }
   
   next();

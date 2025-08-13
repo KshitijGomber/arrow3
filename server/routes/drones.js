@@ -90,8 +90,15 @@ const droneValidation = [
     .withMessage('Images must be an array'),
   body('images.*')
     .optional()
-    .isURL()
-    .withMessage('Each image must be a valid URL'),
+    .custom((value) => {
+      // Allow empty string or valid URL
+      if (value === '' || value === null || value === undefined) {
+        return true;
+      }
+      const urlRegex = /^https?:\/\/.+/;
+      return urlRegex.test(value);
+    })
+    .withMessage('Each image must be a valid URL or empty'),
   body('videos')
     .optional()
     .isArray()

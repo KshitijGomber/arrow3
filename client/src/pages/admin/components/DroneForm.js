@@ -171,8 +171,8 @@ const DroneForm = ({ mode = 'create' }) => {
 
       const formData = {
         ...data,
-        images: existingImages,
-        videos: existingVideos,
+        images: existingImages.length > 0 ? existingImages : [],
+        videos: existingVideos.length > 0 ? existingVideos : [],
         price: parseFloat(data.price),
         specifications: {
           ...data.specifications,
