@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const passport = require('./config/passport');
 const { connectDB, checkDBHealth } = require('./config/database');
 
@@ -58,7 +59,7 @@ app.options('*', cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Note: Static file serving removed - using Cloudinary for media storage
+// Static file serving removed - using Cloudinary for media storage
 
 // Initialize Passport
 app.use(passport.initialize());

@@ -1,416 +1,286 @@
 const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs').promises;
 const { authenticate, authorize } = require('../middleware/auth');
 const Drone = require('../models/Drone');
+const { upload, deleteFromCloudinary, getOptimizedUrl } = require('../services/cloudinaryService');
 
 const router = express.Router();
 
-// Create uploads directory if it doesn't exist
-const createUploadsDir = async () => {
-  const uploadsDir = path.join(__dirname, '../uploads');
-  const imagesDir = path.join(uploadsDir, 'images');
-  const videosDir = path.join(uploadsDir, 'videos');
-  
+// Upload single file endpoint
+router.post('/upload', authenticate, authorize(['admin']), upload.single('file'), async (req, res) => {
   try {
-    await fs.access(uploadsDir);
-  } catch {
-    await fs.mkdir(uploadsDir, { recursive: true });
-  }
-  
-  try {
-    await fs.access(imagesDir);
-  } catch {
-    await fs.mkdir(imagesDir, { recursive: true });
-  }
-  
-  try {
-    await fs.access(videosDir);
-  } catch {
-    await fs.mkdir(videosDir, { recursive: true });
-  }
-};
-
-// Initialize uploads directory
-createUploadsDir().catch(console.error);
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const isImage = file.mimetype.startsWith('image/');
-    const isVideo = file.mimetype.startsWith('video/');
-    
-    if (isImage) {
-      cb(null, path.join(__dirname, '../uploads/images'));
-    } else if (isVideo) {
-      cb(null, path.join(__dirname, '../uploads/videos'));
-    } else {
-      cb(new Error('Invalid file type'), null);
-    }
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename with timestamp and random string
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = path.extname(file.originalname);
-    const baseName = path.basename(file.originalname, extension)
-      .replace(/[^a-zA-Z0-9]/g, '-')
-      .toLowerCase();
-    
-    cb(null, `${baseName}-${uniqueSuffix}${extension}`);
-  }
-});
-
-// File filter function
-const fileFilter = (req, file, cb) => {
-  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-  const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/mov', 'video/avi'];
-  
-  if (allowedImageTypes.includes(file.mimetype) || allowedVideoTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Invalid file type. Only images (JPEG, PNG, WebP, GIF) and videos (MP4, WebM, MOV, AVI) are allowed.'), false);
-  }
-};
-
-// Configure multer with size limits
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
-    files: 10 // Maximum 10 files per request
-  }
-});
-
-// Helper function to generate file URL
-const generateFileUrl = (req, filename, type) => {
-  const baseUrl = process.env.API_BASE_URL || `${req.protocol}://${req.get('host')}`;
-  return `${baseUrl}/uploads/${type}/${filename}`;
-};
-
-// Helper function to validate drone ownership for admin
-const validateDroneAccess = async (droneId, userId, userRole) => {
-  if (userRole !== 'admin') {
-    throw new Error('Access denied. Admin privileges required.');
-  }
-  
-  if (!droneId.match(/^[0-9a-fA-F]{24}$/)) {
-    throw new Error('Invalid drone ID format');
-  }
-  
-  const drone = await Drone.findById(droneId);
-  if (!drone) {
-    throw new Error('Drone not found');
-  }
-  
-  return drone;
-};
-
-// @route   POST /api/media/drones/:id/upload
-// @desc    Upload media files for a specific drone
-// @access  Private (Admin)
-router.post('/drones/:id/upload', authenticate, authorize('admin'), (req, res) => {
-  upload.array('files', 10)(req, res, async (err) => {
-    if (err instanceof multer.MulterError) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({
-          success: false,
-          message: 'File too large. Maximum size is 50MB per file.'
-        });
-      } else if (err.code === 'LIMIT_FILE_COUNT') {
-        return res.status(400).json({
-          success: false,
-          message: 'Too many files. Maximum 10 files per upload.'
-        });
-      }
-      return res.status(400).json({
-        success: false,
-        message: `Upload error: ${err.message}`
-      });
-    } else if (err) {
-      return res.status(400).json({
-        success: false,
-        message: err.message
-      });
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    try {
-      const { id: droneId } = req.params;
-      const userId = req.user._id;
-      const userRole = req.user.role;
-
-      // Validate drone access
-      const drone = await validateDroneAccess(droneId, userId, userRole);
-
-      // Check if files were uploaded
-      if (!req.files || req.files.length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'No files uploaded'
-        });
-      }
-
-      // Process uploaded files
-      const uploadedFiles = {
-        images: [],
-        videos: []
-      };
-
-      const fileUrls = {
-        images: [],
-        videos: []
-      };
-
-      req.files.forEach(file => {
-        const fileUrl = generateFileUrl(req, file.filename, file.mimetype.startsWith('image/') ? 'images' : 'videos');
-        
-        if (file.mimetype.startsWith('image/')) {
-          uploadedFiles.images.push(file.filename);
-          fileUrls.images.push(fileUrl);
-        } else if (file.mimetype.startsWith('video/')) {
-          uploadedFiles.videos.push(file.filename);
-          fileUrls.videos.push(fileUrl);
-        }
-      });
-
-      // Update drone with new media URLs
-      const updateData = {};
-      if (fileUrls.images.length > 0) {
-        updateData.$push = { images: { $each: fileUrls.images } };
-      }
-      if (fileUrls.videos.length > 0) {
-        if (updateData.$push) {
-          updateData.$push.videos = { $each: fileUrls.videos };
-        } else {
-          updateData.$push = { videos: { $each: fileUrls.videos } };
-        }
-      }
-
-      const updatedDrone = await Drone.findByIdAndUpdate(
-        droneId,
-        updateData,
-        { new: true, runValidators: true }
-      );
-
-      res.status(201).json({
-        success: true,
-        message: 'Media files uploaded successfully',
-        data: {
-          uploadedFiles: {
-            images: fileUrls.images,
-            videos: fileUrls.videos
-          },
-          drone: {
-            id: updatedDrone._id,
-            name: updatedDrone.name,
-            totalImages: updatedDrone.images.length,
-            totalVideos: updatedDrone.videos.length
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Media upload error:', error);
-      
-      // Clean up uploaded files on error
-      if (req.files) {
-        req.files.forEach(async (file) => {
-          try {
-            await fs.unlink(file.path);
-          } catch (unlinkError) {
-            console.error('Error cleaning up file:', unlinkError);
-          }
-        });
-      }
-
-      if (error.message.includes('Access denied') || error.message.includes('not found') || error.message.includes('Invalid')) {
-        return res.status(400).json({
-          success: false,
-          message: error.message
-        });
-      }
-
-      res.status(500).json({
-        success: false,
-        message: 'Failed to upload media files. Please try again.'
-      });
-    }
-  });
-});
-
-// @route   GET /api/media/images/:filename
-// @desc    Serve uploaded image files
-// @access  Public
-router.get('/images/:filename', async (req, res) => {
-  try {
-    const { filename } = req.params;
-    const filePath = path.join(__dirname, '../uploads/images', filename);
-    
-    // Check if file exists
-    try {
-      await fs.access(filePath);
-    } catch {
-      return res.status(404).json({
-        success: false,
-        message: 'Image not found'
-      });
-    }
-
-    // Set appropriate headers
-    res.setHeader('Content-Type', 'image/*');
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
-    
-    res.sendFile(filePath);
-  } catch (error) {
-    console.error('Serve image error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to serve image'
-    });
-  }
-});
-
-// @route   GET /api/media/videos/:filename
-// @desc    Serve uploaded video files
-// @access  Public
-router.get('/videos/:filename', async (req, res) => {
-  try {
-    const { filename } = req.params;
-    const filePath = path.join(__dirname, '../uploads/videos', filename);
-    
-    // Check if file exists
-    try {
-      await fs.access(filePath);
-    } catch {
-      return res.status(404).json({
-        success: false,
-        message: 'Video not found'
-      });
-    }
-
-    // Set appropriate headers for video streaming
-    res.setHeader('Content-Type', 'video/*');
-    res.setHeader('Accept-Ranges', 'bytes');
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
-    
-    res.sendFile(filePath);
-  } catch (error) {
-    console.error('Serve video error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to serve video'
-    });
-  }
-});
-
-// @route   DELETE /api/media/drones/:id/media
-// @desc    Delete specific media files from a drone
-// @access  Private (Admin)
-router.delete('/drones/:id/media', authenticate, authorize('admin'), async (req, res) => {
-  try {
-    const { id: droneId } = req.params;
-    const { imageUrls = [], videoUrls = [] } = req.body;
-    const userId = req.user._id;
-    const userRole = req.user.role;
-
-    // Validate drone access
-    const drone = await validateDroneAccess(droneId, userId, userRole);
-
-    if (imageUrls.length === 0 && videoUrls.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No media URLs provided for deletion'
-      });
-    }
-
-    // Remove URLs from drone document
-    const updateData = {};
-    if (imageUrls.length > 0) {
-      updateData.$pullAll = { images: imageUrls };
-    }
-    if (videoUrls.length > 0) {
-      if (updateData.$pullAll) {
-        updateData.$pullAll.videos = videoUrls;
-      } else {
-        updateData.$pullAll = { videos: videoUrls };
-      }
-    }
-
-    const updatedDrone = await Drone.findByIdAndUpdate(
-      droneId,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    // Extract filenames from URLs and delete physical files
-    const deletedFiles = [];
-    const allUrls = [...imageUrls, ...videoUrls];
-    
-    for (const url of allUrls) {
-      try {
-        const filename = path.basename(url);
-        const isImage = imageUrls.includes(url);
-        const filePath = path.join(
-          __dirname, 
-          '../uploads', 
-          isImage ? 'images' : 'videos', 
-          filename
-        );
-        
-        await fs.unlink(filePath);
-        deletedFiles.push(filename);
-      } catch (fileError) {
-        console.error(`Error deleting file from URL ${url}:`, fileError);
-        // Continue with other files even if one fails
-      }
-    }
+    const fileData = {
+      id: req.file.public_id,
+      url: req.file.secure_url,
+      publicId: req.file.public_id,
+      originalName: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.bytes,
+      format: req.file.format,
+      resourceType: req.file.resource_type,
+      uploadedAt: new Date(),
+    };
 
     res.json({
       success: true,
-      message: 'Media files deleted successfully',
-      data: {
-        deletedFiles,
-        drone: {
-          id: updatedDrone._id,
-          name: updatedDrone.name,
-          totalImages: updatedDrone.images.length,
-          totalVideos: updatedDrone.videos.length
-        }
-      }
+      message: 'File uploaded successfully',
+      file: fileData,
     });
   } catch (error) {
-    console.error('Delete media error:', error);
-    
-    if (error.message.includes('Access denied') || error.message.includes('not found') || error.message.includes('Invalid')) {
-      return res.status(400).json({
-        success: false,
-        message: error.message
-      });
-    }
-
+    console.error('Upload error:', error);
     res.status(500).json({
-      success: false,
-      message: 'Failed to delete media files. Please try again.'
+      error: 'Upload failed',
+      details: error.message,
     });
   }
 });
 
-// @route   GET /api/media/drones/:id
-// @desc    Get all media files for a specific drone
-// @access  Public
+// Upload multiple files endpoint
+router.post('/upload-multiple', authenticate, authorize(['admin']), upload.array('files', 10), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+
+    const uploadedFiles = req.files.map(file => ({
+      id: file.public_id,
+      url: file.secure_url,
+      publicId: file.public_id,
+      originalName: file.originalname,
+      mimetype: file.mimetype,
+      size: file.bytes,
+      format: file.format,
+      resourceType: file.resource_type,
+      uploadedAt: new Date(),
+    }));
+
+    res.json({
+      success: true,
+      message: `${uploadedFiles.length} files uploaded successfully`,
+      files: uploadedFiles,
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({
+      error: 'Upload failed',
+      details: error.message,
+    });
+  }
+});
+
+// Upload media files for a specific drone
+router.post('/drones/:id/upload', authenticate, authorize(['admin']), upload.array('files', 10), async (req, res) => {
+  try {
+    const { id: droneId } = req.params;
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+
+    // Find the drone
+    const drone = await Drone.findById(droneId);
+    if (!drone) {
+      return res.status(404).json({ error: 'Drone not found' });
+    }
+
+    const uploadedFiles = req.files.map(file => ({
+      id: file.public_id,
+      url: file.secure_url,
+      publicId: file.public_id,
+      originalName: file.originalname,
+      mimetype: file.mimetype,
+      size: file.bytes,
+      format: file.format,
+      resourceType: file.resource_type,
+      uploadedAt: new Date(),
+    }));
+
+    // Separate images and videos
+    const images = uploadedFiles.filter(file => file.resourceType === 'image').map(file => file.url);
+    const videos = uploadedFiles.filter(file => file.resourceType === 'video').map(file => file.url);
+
+    // Update drone with new media URLs
+    if (images.length > 0) {
+      drone.images = [...(drone.images || []), ...images];
+    }
+    
+    if (videos.length > 0) {
+      drone.videos = [...(drone.videos || []), ...videos];
+    }
+
+    await drone.save();
+
+    res.json({
+      success: true,
+      message: `${uploadedFiles.length} files uploaded and associated with drone successfully`,
+      files: uploadedFiles,
+      drone: {
+        id: drone._id,
+        name: drone.name,
+        totalImages: drone.images?.length || 0,
+        totalVideos: drone.videos?.length || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({
+      error: 'Upload failed',
+      details: error.message,
+    });
+  }
+});
+
+// Delete file endpoint
+router.delete('/delete/:publicId', authenticate, authorize(['admin']), async (req, res) => {
+  try {
+    const { publicId } = req.params;
+    
+    if (!publicId) {
+      return res.status(400).json({ error: 'Public ID is required' });
+    }
+
+    // Delete from Cloudinary
+    const result = await deleteFromCloudinary(publicId);
+    
+    if (result.result === 'ok') {
+      res.json({
+        success: true,
+        message: 'File deleted successfully',
+      });
+    } else {
+      res.status(404).json({
+        error: 'File not found or already deleted',
+      });
+    }
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({
+      error: 'Delete failed',
+      details: error.message,
+    });
+  }
+});
+
+// Get optimized URL for a file
+router.get('/optimize/:publicId', async (req, res) => {
+  try {
+    const { publicId } = req.params;
+    const { width, height, quality, format } = req.query;
+    
+    const options = {};
+    if (width) options.width = parseInt(width);
+    if (height) options.height = parseInt(height);
+    if (quality) options.quality = quality;
+    if (format) options.format = format;
+
+    const optimizedUrl = getOptimizedUrl(publicId, options);
+    
+    res.json({
+      success: true,
+      url: optimizedUrl,
+    });
+  } catch (error) {
+    console.error('Optimization error:', error);
+    res.status(500).json({
+      error: 'Optimization failed',
+      details: error.message,
+    });
+  }
+});
+
+// Associate media with drone
+router.post('/associate/:droneId', authenticate, authorize(['admin']), async (req, res) => {
+  try {
+    const { droneId } = req.params;
+    const { images, videos, mainImage } = req.body;
+
+    if (!images && !videos && !mainImage) {
+      return res.status(400).json({ error: 'At least one media field is required' });
+    }
+
+    const drone = await Drone.findById(droneId);
+    if (!drone) {
+      return res.status(404).json({ error: 'Drone not found' });
+    }
+
+    // Update drone with new media URLs
+    if (images) {
+      drone.images = [...(drone.images || []), ...images];
+    }
+    
+    if (videos) {
+      drone.videos = [...(drone.videos || []), ...videos];
+    }
+    
+    if (mainImage) {
+      drone.mainImage = mainImage;
+    }
+
+    await drone.save();
+
+    res.json({
+      success: true,
+      message: 'Media associated with drone successfully',
+      drone: drone,
+    });
+  } catch (error) {
+    console.error('Association error:', error);
+    res.status(500).json({
+      error: 'Failed to associate media with drone',
+      details: error.message,
+    });
+  }
+});
+
+// Remove media from drone
+router.delete('/disassociate/:droneId', authenticate, authorize(['admin']), async (req, res) => {
+  try {
+    const { droneId } = req.params;
+    const { imageUrl, videoUrl, removeMainImage } = req.body;
+
+    const drone = await Drone.findById(droneId);
+    if (!drone) {
+      return res.status(404).json({ error: 'Drone not found' });
+    }
+
+    // Remove specific image or video
+    if (imageUrl) {
+      drone.images = drone.images?.filter(url => url !== imageUrl) || [];
+    }
+    
+    if (videoUrl) {
+      drone.videos = drone.videos?.filter(url => url !== videoUrl) || [];
+    }
+    
+    if (removeMainImage) {
+      drone.mainImage = null;
+    }
+
+    await drone.save();
+
+    res.json({
+      success: true,
+      message: 'Media removed from drone successfully',
+      drone: drone,
+    });
+  } catch (error) {
+    console.error('Disassociation error:', error);
+    res.status(500).json({
+      error: 'Failed to remove media from drone',
+      details: error.message,
+    });
+  }
+});
+
+// Get all media files for a drone
 router.get('/drones/:id', async (req, res) => {
   try {
     const { id: droneId } = req.params;
 
-    // Validate ObjectId format
-    if (!droneId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid drone ID format'
-      });
-    }
-
-    const drone = await Drone.findById(droneId).select('name images videos');
+    const drone = await Drone.findById(droneId).select('name images videos mainImage');
     
     if (!drone) {
       return res.status(404).json({
@@ -428,6 +298,7 @@ router.get('/drones/:id', async (req, res) => {
           name: drone.name,
           images: drone.images || [],
           videos: drone.videos || [],
+          mainImage: drone.mainImage,
           totalImages: (drone.images || []).length,
           totalVideos: (drone.videos || []).length
         }
@@ -437,77 +308,67 @@ router.get('/drones/:id', async (req, res) => {
     console.error('Get drone media error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve drone media. Please try again.'
+      message: 'Failed to retrieve drone media'
     });
   }
 });
 
-// @route   POST /api/media/drones/:id/reorder
-// @desc    Reorder media files for a drone
-// @access  Private (Admin)
-router.post('/drones/:id/reorder', authenticate, authorize('admin'), async (req, res) => {
+// Get all media files (for admin dashboard)
+router.get('/list', authenticate, authorize(['admin']), async (req, res) => {
   try {
-    const { id: droneId } = req.params;
-    const { images, videos } = req.body;
-    const userId = req.user._id;
-    const userRole = req.user.role;
-
-    // Validate drone access
-    const drone = await validateDroneAccess(droneId, userId, userRole);
-
-    // Validate that provided arrays contain only existing URLs
-    if (images && !Array.isArray(images)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Images must be an array'
+    // Return files associated with drones
+    const drones = await Drone.find({}, 'name images videos mainImage');
+    
+    const allMedia = [];
+    drones.forEach(drone => {
+      if (drone.mainImage) {
+        allMedia.push({
+          url: drone.mainImage,
+          type: 'image',
+          droneId: drone._id,
+          droneName: drone.name,
+        });
+      }
+      
+      drone.images?.forEach(image => {
+        allMedia.push({
+          url: image,
+          type: 'image',
+          droneId: drone._id,
+          droneName: drone.name,
+        });
       });
-    }
-
-    if (videos && !Array.isArray(videos)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Videos must be an array'
+      
+      drone.videos?.forEach(video => {
+        allMedia.push({
+          url: video,
+          type: 'video',
+          droneId: drone._id,
+          droneName: drone.name,
+        });
       });
-    }
-
-    // Update drone with reordered media
-    const updateData = {};
-    if (images) updateData.images = images;
-    if (videos) updateData.videos = videos;
-
-    const updatedDrone = await Drone.findByIdAndUpdate(
-      droneId,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    });
 
     res.json({
       success: true,
-      message: 'Media files reordered successfully',
-      data: {
-        drone: {
-          id: updatedDrone._id,
-          name: updatedDrone.name,
-          images: updatedDrone.images,
-          videos: updatedDrone.videos
-        }
-      }
+      media: allMedia,
     });
   } catch (error) {
-    console.error('Reorder media error:', error);
-    
-    if (error.message.includes('Access denied') || error.message.includes('not found') || error.message.includes('Invalid')) {
-      return res.status(400).json({
-        success: false,
-        message: error.message
-      });
-    }
-
+    console.error('List media error:', error);
     res.status(500).json({
-      success: false,
-      message: 'Failed to reorder media files. Please try again.'
+      error: 'Failed to list media',
+      details: error.message,
     });
   }
+});
+
+// Health check endpoint
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Media service is healthy',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 module.exports = router;
