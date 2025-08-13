@@ -255,7 +255,7 @@
     - Create order tracking and customer communication tools
     - _Requirements: 10.3_
 
-- [ ] 12. Implement user authentication pages
+- [x] 12. Implement user authentication pages
   - [x] 12.1 Create login and registration forms
     - Build responsive login form with email/password fields
     - Create registration form with validation
@@ -270,22 +270,22 @@
     - Create success and error messaging
     - _Requirements: 9.1, 9.3, 9.4_
 
-  - [ ] 12.3 Integrate Google OAuth login
+  - [x] 12.3 Integrate Google OAuth login
     - Add Google OAuth button to login page
     - Implement OAuth callback handling
     - Create account linking for existing users
     - Add OAuth error handling and fallback
     - _Requirements: 8.3_
 
-- [ ] 13. Add responsive design and performance optimizations
-  - [ ] 13.1 Implement responsive breakpoints
+- [x] 13. Add responsive design and performance optimizations
+  - [x] 13.1 Implement responsive breakpoints
     - Configure Material-UI breakpoints for mobile, tablet, desktop
     - Optimize navigation for mobile devices
     - Implement responsive grid layouts for drone catalog
     - Add mobile-specific UI components and interactions
     - _Requirements: 12.1, 12.2_
 
-  - [ ] 13.2 Add performance optimizations
+  - [x] 13.2 Add performance optimizations
     - Implement lazy loading for images and components
     - Add code splitting for route-based optimization
     - Configure React Query caching strategies

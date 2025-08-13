@@ -32,7 +32,7 @@ import { useAuth } from '../../context/AuthContext';
 const NavigationBar = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { isAuthenticated, user, logout } = useAuth();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

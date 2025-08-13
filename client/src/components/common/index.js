@@ -5,3 +5,7 @@ export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as QueryErrorBoundary } from './QueryErrorBoundary';
 export { default as NavigationBar } from './NavigationBar';
 export { default as MediaUploadField } from './MediaUploadField';
+export { default as ResponsiveContainer } from './ResponsiveContainer';
+export { default as ResponsiveGrid } from './ResponsiveGrid';
+export { default as LazyImage } from './LazyImage';
+export { default as PerformanceMonitor } from './PerformanceMonitor';

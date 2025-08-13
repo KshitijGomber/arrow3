@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Card,
-  CardMedia,
   CardContent,
   CardActions,
   Typography,
@@ -10,7 +9,9 @@ import {
   Chip,
   Grid,
   IconButton,
-  Tooltip
+  Tooltip,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Speed as SpeedIcon,
@@ -22,9 +23,13 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/constants';
+import { LazyImage } from './common';
 
 const DroneCard = ({ drone, onOrderClick }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleViewDetails = () => {
     navigate(`${ROUTES.DRONES}/${drone._id}`);
@@ -76,13 +81,11 @@ const DroneCard = ({ drone, onOrderClick }) => {
       onClick={handleViewDetails}
     >
       <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="200"
-          image={drone.images?.[0] || '/placeholder-drone.jpg'}
+        <LazyImage
+          src={drone.images?.[0] || '/placeholder-drone.jpg'}
           alt={drone.name}
+          height={isMobile ? 180 : isTablet ? 190 : 200}
           sx={{
-            objectFit: 'cover',
             backgroundColor: '#2a2a2a',
           }}
         />
@@ -146,11 +149,15 @@ const DroneCard = ({ drone, onOrderClick }) => {
         </Typography>
 
         {/* Key specifications */}
-        <Grid container spacing={1} sx={{ mb: 2 }}>
+        <Grid container spacing={isMobile ? 0.5 : 1} sx={{ mb: 2 }}>
           <Grid item xs={6}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <CameraIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-              <Typography variant="caption" color="text.secondary">
+              <CameraIcon sx={{ fontSize: isMobile ? 14 : 16, color: 'primary.main' }} />
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
+              >
                 {drone.specifications?.cameraResolution || 'N/A'}
               </Typography>
             </Box>
@@ -158,8 +165,12 @@ const DroneCard = ({ drone, onOrderClick }) => {
           
           <Grid item xs={6}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <SpeedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-              <Typography variant="caption" color="text.secondary">
+              <SpeedIcon sx={{ fontSize: isMobile ? 14 : 16, color: 'primary.main' }} />
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
+              >
                 {drone.specifications?.maxSpeed ? `${drone.specifications.maxSpeed} km/h` : 'N/A'}
               </Typography>
             </Box>
@@ -167,8 +178,12 @@ const DroneCard = ({ drone, onOrderClick }) => {
           
           <Grid item xs={6}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <FlightIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-              <Typography variant="caption" color="text.secondary">
+              <FlightIcon sx={{ fontSize: isMobile ? 14 : 16, color: 'primary.main' }} />
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
+              >
                 {drone.specifications?.flightTime ? `${drone.specifications.flightTime} min` : 'N/A'}
               </Typography>
             </Box>
@@ -176,8 +191,12 @@ const DroneCard = ({ drone, onOrderClick }) => {
           
           <Grid item xs={6}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <BatteryIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-              <Typography variant="caption" color="text.secondary">
+              <BatteryIcon sx={{ fontSize: isMobile ? 14 : 16, color: 'primary.main' }} />
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
+              >
                 {drone.specifications?.batteryCapacity ? `${drone.specifications.batteryCapacity} mAh` : 'N/A'}
               </Typography>
             </Box>
@@ -199,15 +218,19 @@ const DroneCard = ({ drone, onOrderClick }) => {
         <Button
           variant="contained"
           fullWidth
-          startIcon={<CartIcon />}
+          startIcon={!isMobile ? <CartIcon /> : null}
           onClick={handleOrderClick}
           disabled={!drone.inStock || drone.stockQuantity === 0}
           sx={{
-            py: 1.5,
+            py: isMobile ? 1.2 : 1.5,
             fontWeight: 600,
+            fontSize: isMobile ? '0.875rem' : '1rem',
           }}
         >
-          {drone.inStock && drone.stockQuantity > 0 ? 'Order Now' : 'Out of Stock'}
+          {isMobile ? 
+            (drone.inStock && drone.stockQuantity > 0 ? 'Order' : 'Out of Stock') :
+            (drone.inStock && drone.stockQuantity > 0 ? 'Order Now' : 'Out of Stock')
+          }
         </Button>
       </CardActions>
     </Card>

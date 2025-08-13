@@ -9,9 +9,15 @@ import { Toaster } from 'react-hot-toast';
 
 import App from './App';
 import theme from './theme/theme';
+import { preloadCriticalResources, lazyLoadNonCritical, registerServiceWorker } from './utils/bundleOptimization';
 import './index.css';
 
-// Create a client for React Query
+// Initialize performance optimizations
+preloadCriticalResources();
+lazyLoadNonCritical();
+registerServiceWorker();
+
+// Create a client for React Query with optimized caching
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -26,8 +32,14 @@ const queryClient = new QueryClient({
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+      // Optimized cache times for different data types
+      staleTime: 5 * 60 * 1000, // 5 minutes - data considered fresh
+      gcTime: 30 * 60 * 1000, // 30 minutes - garbage collection time (formerly cacheTime)
+      // Enable background refetching for better UX
+      refetchOnMount: 'always',
+      refetchInterval: false, // Disable automatic refetching
+      // Network mode for better offline handling
+      networkMode: 'online',
     },
     mutations: {
       retry: (failureCount, error) => {
@@ -39,6 +51,7 @@ const queryClient = new QueryClient({
         return failureCount < 1;
       },
       retryDelay: 1000,
+      networkMode: 'online',
     },
   },
 });

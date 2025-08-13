@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, API_ENDPOINTS } from '../../utils';
+import { useOptimizedQuery } from '../useOptimizedQuery';
 import toast from 'react-hot-toast';
 
 // Query keys
@@ -11,11 +12,11 @@ export const DRONE_QUERY_KEYS = {
   detail: (id) => [...DRONE_QUERY_KEYS.details(), id],
 };
 
-// Fetch all drones
+// Fetch all drones with optimized caching
 export const useDrones = (filters = {}) => {
-  return useQuery({
-    queryKey: DRONE_QUERY_KEYS.list(filters),
-    queryFn: async () => {
+  return useOptimizedQuery(
+    DRONE_QUERY_KEYS.list(filters),
+    async () => {
       const params = new URLSearchParams();
       
       // Add filters to query params
@@ -27,25 +28,23 @@ export const useDrones = (filters = {}) => {
       
       const response = await api.get(`${API_ENDPOINTS.DRONES}?${params}`);
       return response.data.data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
-  });
+    }
+  );
 };
 
-// Fetch single drone
+// Fetch single drone with optimized caching
 export const useDrone = (droneId, options = {}) => {
-  return useQuery({
-    queryKey: DRONE_QUERY_KEYS.detail(droneId),
-    queryFn: async () => {
+  return useOptimizedQuery(
+    DRONE_QUERY_KEYS.detail(droneId),
+    async () => {
       const response = await api.get(API_ENDPOINTS.DRONE_BY_ID(droneId));
       return response.data.data;
     },
-    enabled: !!droneId,
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 10 * 60 * 1000,
-    ...options,
-  });
+    {
+      enabled: !!droneId,
+      ...options,
+    }
+  );
 };
 
 // Create drone (admin only)
