@@ -390,11 +390,12 @@ const TestimonialsSection = () => {
               startIcon={<PlayArrow />}
               onClick={() => navigate('/drones')}
               sx={{
-                px: 4,
-                py: 1.2,
-                fontSize: '1rem',
+                px: 3,
+                py: 1,
+                fontSize: '0.95rem',
                 fontWeight: 600,
-                borderRadius: 3,
+                borderRadius: 2,
+                minHeight: 'auto',
                 background: `linear-gradient(135deg, 
                   ${theme.palette.primary.main} 0%, 
                   ${theme.palette.primary.dark} 100%
