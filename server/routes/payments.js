@@ -106,12 +106,24 @@ router.post('/confirm', async (req, res) => {
             orderId: orderId
           });
           
-          // Update order status to confirmed and payment status to completed
-          updatedOrder = await Order.findByIdAndUpdate(
+          // Find the order first, then use updateStatus method to ensure stock is properly handled
+          const order = await Order.findById(orderId).populate('droneId');
+          if (!order) {
+            console.error('❌ Order not found for ID:', orderId);
+            return res.status(404).json({ 
+              success: false, 
+              message: 'Order not found' 
+            });
+          }
+
+          // Use the updateStatus method to properly handle stock deduction
+          await order.updateStatus('confirmed', order.userId, 'Order confirmed after payment');
+          
+          // Update payment-related fields separately
+          const updatedOrder = await Order.findByIdAndUpdate(
             orderId,
             {
               $set: {
-                status: 'confirmed',
                 paymentStatus: 'completed',
                 paymentIntentId: paymentIntentId,
                 'paymentDetails.paymentMethod.id': result.payment.payment_method.id,
@@ -156,7 +168,9 @@ router.post('/confirm', async (req, res) => {
           if (orderByPaymentIntent) {
             console.log('🔍 Found order by payment intent ID:', orderByPaymentIntent._id);
             
-            orderByPaymentIntent.status = 'confirmed';
+            // Use the updateStatus method to properly handle stock deduction
+            await orderByPaymentIntent.updateStatus('confirmed', orderByPaymentIntent.userId, 'Order confirmed after payment');
+            
             orderByPaymentIntent.paymentStatus = 'completed';
             orderByPaymentIntent.paymentDetails = {
               paymentMethod: {
@@ -329,13 +343,17 @@ router.post('/debug-update-order', async (req, res) => {
       currentPaymentStatus: existingOrder.paymentStatus
     });
 
-    // Update the order
+    // Use updateStatus method to properly handle stock deduction when confirming
+    if (paymentStatus === 'completed' && existingOrder.status === 'pending') {
+      await existingOrder.updateStatus('confirmed', existingOrder.userId, 'Order confirmed after mock payment');
+    }
+
+    // Update payment status separately
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
       {
         $set: {
-          paymentStatus: paymentStatus,
-          status: 'confirmed'
+          paymentStatus: paymentStatus
         }
       },
       { new: true }
