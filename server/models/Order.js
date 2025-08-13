@@ -24,7 +24,7 @@ const shippingAddressSchema = new mongoose.Schema({
     type: String,
     required: [true, 'ZIP code is required'],
     trim: true,
-    match: [/^\d{5}(-\d{4})?$/, 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)']
+    match: [/^[A-Za-z0-9\s\-]{3,10}$/, 'Please enter a valid postal/ZIP code (3-10 characters)']
   },
   country: {
     type: String,
@@ -63,7 +63,7 @@ const customerInfoSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Phone number is required'],
     trim: true,
-    match: [/^\+?[\d\s\-\(\)]{10,}$/, 'Please enter a valid phone number']
+    match: [/^\+?[\d\s\-\(\)]{8,}$/, 'Please enter a valid phone number (at least 8 digits)']
   }
 }, { _id: false });
 
@@ -314,7 +314,7 @@ orderSchema.methods.updateStatus = async function(newStatus, updatedBy, notes = 
 
 // Static method to create order with validation
 orderSchema.statics.createOrder = async function(orderData) {
-  const { userId, droneId, quantity = 1, shippingAddress, customerInfo } = orderData;
+  const { userId, droneId, quantity = 1, shippingAddress, customerInfo, totalAmount: providedTotal } = orderData;
   
   // Validate user exists
   const User = mongoose.model('User');
@@ -338,15 +338,27 @@ orderSchema.statics.createOrder = async function(orderData) {
     throw new Error(`Only ${drone.stockQuantity} units available`);
   }
 
-  // Calculate total amount
+  // Calculate total amount (always use server-calculated amount for security)
   const totalAmount = drone.price * quantity;
+
+  // Log for debugging
+  console.log('Order creation data:', {
+    userId,
+    droneId,
+    quantity,
+    dronePrice: drone.price,
+    calculatedTotal: totalAmount,
+    providedTotal,
+    shippingAddress,
+    customerInfo
+  });
 
   // Create order
   const order = new this({
     userId,
     droneId,
     quantity,
-    totalAmount,
+    totalAmount, // Use server-calculated amount
     shippingAddress,
     customerInfo
   });
