@@ -86,7 +86,7 @@ const upload = multer({
 // Helper function to generate file URL
 const generateFileUrl = (req, filename, type) => {
   const baseUrl = process.env.API_BASE_URL || `${req.protocol}://${req.get('host')}`;
-  return `${baseUrl}/api/media/${type}/${filename}`;
+  return `${baseUrl}/uploads/${type}/${filename}`;
 };
 
 // Helper function to validate drone ownership for admin

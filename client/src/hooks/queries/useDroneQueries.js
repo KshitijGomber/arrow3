@@ -38,7 +38,7 @@ export const useDrone = (droneId, options = {}) => {
     DRONE_QUERY_KEYS.detail(droneId),
     async () => {
       const response = await api.get(API_ENDPOINTS.DRONE_BY_ID(droneId));
-      return response.data.data;
+      return response.data.data.drone; // Fix: access the drone object correctly
     },
     {
       enabled: !!droneId,
@@ -54,7 +54,7 @@ export const useCreateDrone = () => {
   return useMutation({
     mutationFn: async (droneData) => {
       const response = await api.post(API_ENDPOINTS.DRONES, droneData);
-      return response.data.data;
+      return response.data.data.drone; // Fix: access the drone object correctly
     },
     onSuccess: (newDrone) => {
       // Invalidate and refetch drones list

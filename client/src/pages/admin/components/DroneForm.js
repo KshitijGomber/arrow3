@@ -29,6 +29,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useDrone, useCreateDrone, useUpdateDrone } from '../../../hooks/queries/useDroneQueries';
 import { MediaUploadField } from '../../../components/common';
 import toast from 'react-hot-toast';
+import api from '../../../utils/api';
 
 const CAMERA_RESOLUTIONS = ['720p', '1080p', '4K', '6K', '8K', 'No Camera'];
 const STABILIZATION_TYPES = ['None', 'Electronic', '2-Axis Gimbal', '3-Axis Gimbal', 'AI Stabilization'];
@@ -213,7 +214,7 @@ const DroneForm = ({ mode = 'create' }) => {
         await updateDroneMutation.mutateAsync({ droneId: id, droneData: formData });
       } else {
         const result = await createDroneMutation.mutateAsync(formData);
-        droneId = result.data._id;
+        droneId = result._id; // Fix: result is already the drone object
       }
 
       // Upload new files if any
@@ -226,22 +227,13 @@ const DroneForm = ({ mode = 'create' }) => {
         });
 
         try {
-          const uploadResponse = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/media/drones/${droneId}/upload`, {
-            method: 'POST',
+          const uploadResponse = await api.post(`/media/drones/${droneId}/upload`, uploadFormData, {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Content-Type': 'multipart/form-data',
             },
-            body: uploadFormData
           });
 
-          if (!uploadResponse.ok) {
-            const errorData = await uploadResponse.json();
-            console.error('File upload failed:', errorData);
-            throw new Error(errorData.message || 'Failed to upload files');
-          }
-
-          const uploadResult = await uploadResponse.json();
-          console.log('Files uploaded successfully:', uploadResult);
+          console.log('Files uploaded successfully:', uploadResponse.data);
         } catch (uploadError) {
           console.error('File upload error:', uploadError);
           // Show user-friendly error message
@@ -252,7 +244,15 @@ const DroneForm = ({ mode = 'create' }) => {
       navigate('/admin/products');
     } catch (error) {
       console.error('Form submission error:', error);
-      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} drone: ${error.message || 'Unknown error'}`);
+      
+      // Handle specific error cases
+      if (error.response?.status === 409) {
+        toast.error('A drone with this name already exists. Please choose a different name.');
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(`Failed to ${isEditMode ? 'update' : 'create'} drone: ${error.message || 'Unknown error'}`);
+      }
     }
   };
 
