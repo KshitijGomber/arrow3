@@ -77,11 +77,28 @@ const HeroSection = () => {
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       textShadow: '0 0 30px rgba(46, 164, 165, 0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      flexDirection: { xs: 'column', sm: 'row' },
                     }}
                   >
-                    Take Flight with
-                    <br />
-                    Arrow3 Aerospace
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <img
+                        src="/logoarrow3.png"
+                        alt="Arrow3 Logo"
+                        style={{
+                          height: '60px',
+                          width: 'auto',
+                          filter: `drop-shadow(0 0 10px ${theme.palette.primary.main})`,
+                        }}
+                      />
+                      <Box>
+                        Take Flight with
+                        <br />
+                        Arrow3 Aerospace
+                      </Box>
+                    </Box>
                   </Typography>
                 </Slide>
 
@@ -281,33 +298,29 @@ const HeroSection = () => {
                     }}
                   />
 
-                  {/* Inner drone representation */}
+                  {/* Inner drone representation - replaced with plane image */}
                   <Box
                     sx={{
                       width: '60%',
                       height: '60%',
-                      background: `radial-gradient(circle, 
-                        rgba(46, 164, 165, 0.2) 0%, 
-                        rgba(46, 164, 165, 0.1) 50%, 
-                        transparent 100%
-                      )`,
-                      borderRadius: '50%',
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
                       position: 'relative',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        width: '40%',
-                        height: '40%',
-                        background: theme.palette.primary.main,
-                        borderRadius: '50%',
-                        boxShadow: `0 0 30px ${theme.palette.primary.main}`,
-                        animation: 'pulse 2s ease-in-out infinite alternate',
-                      },
                     }}
-                  />
+                  >
+                    <img
+                      src="/plane.png"
+                      alt="Arrow3 Aerospace Drone"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        filter: `drop-shadow(0 0 20px ${theme.palette.primary.main})`,
+                        animation: 'pulse 2s ease-in-out infinite alternate',
+                      }}
+                    />
+                  </Box>
 
                   {/* Floating particles */}
                   {[...Array(6)].map((_, index) => (
