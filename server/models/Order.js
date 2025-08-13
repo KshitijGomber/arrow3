@@ -299,6 +299,32 @@ orderSchema.methods.updateStatus = async function(newStatus, updatedBy, notes = 
   // Update current status
   this.status = newStatus;
 
+  // Decrease stock when order is confirmed
+  if (newStatus === 'confirmed') {
+    try {
+      const Drone = mongoose.model('Drone');
+      await Drone.updateStock(this.droneId, this.quantity);
+    } catch (stockError) {
+      throw new Error(`Failed to update stock: ${stockError.message}`);
+    }
+  }
+
+  // Restore stock if order is cancelled
+  if (newStatus === 'cancelled' && this.statusHistory.some(h => h.status === 'confirmed')) {
+    try {
+      const Drone = mongoose.model('Drone');
+      const drone = await Drone.findById(this.droneId);
+      if (drone) {
+        drone.stockQuantity += this.quantity;
+        drone.inStock = true; // Restore availability
+        await drone.save();
+      }
+    } catch (stockError) {
+      console.error('Failed to restore stock on cancellation:', stockError);
+      // Don't throw error here as cancellation should still proceed
+    }
+  }
+
   // Set estimated delivery when confirmed
   if (newStatus === 'confirmed' && !this.estimatedDelivery) {
     this.estimatedDelivery = this.calculateEstimatedDelivery();
@@ -313,6 +339,7 @@ orderSchema.methods.updateStatus = async function(newStatus, updatedBy, notes = 
 };
 
 // Static method to create order with validation
+// Note: Stock is NOT decreased on order creation, only when order is confirmed
 orderSchema.statics.createOrder = async function(orderData) {
   const { userId, droneId, quantity = 1, shippingAddress, customerInfo, totalAmount: providedTotal } = orderData;
   
@@ -377,6 +404,17 @@ orderSchema.statics.createOrder = async function(orderData) {
   });
 
   return await order.save();
+};
+
+// Method to confirm order and decrease stock in one transaction
+orderSchema.methods.confirmOrder = async function(confirmedBy, notes = 'Order confirmed after payment') {
+  if (this.status !== 'pending') {
+    throw new Error('Only pending orders can be confirmed');
+  }
+  
+  // Use the updateStatus method which handles stock deduction
+  await this.updateStatus('confirmed', confirmedBy, notes);
+  return this;
 };
 
 // Static method to find orders by user

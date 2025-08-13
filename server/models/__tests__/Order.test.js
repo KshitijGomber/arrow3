@@ -237,6 +237,79 @@ describe('Order Model', () => {
       expect(order.actualDelivery).toBeDefined();
       expect(order.actualDelivery).toBeInstanceOf(Date);
     });
+
+    test('updateStatus should decrease stock when order is confirmed', async () => {
+      const initialStock = testDrone.stockQuantity;
+      const orderQuantity = 2;
+      
+      order.quantity = orderQuantity;
+      await order.save();
+      
+      await order.updateStatus('confirmed', testUser._id, 'Payment confirmed');
+      
+      // Reload drone to check updated stock
+      await testDrone.reload();
+      expect(testDrone.stockQuantity).toBe(initialStock - orderQuantity);
+    });
+
+    test('updateStatus should restore stock when confirmed order is cancelled', async () => {
+      const initialStock = testDrone.stockQuantity;
+      const orderQuantity = 2;
+      
+      order.quantity = orderQuantity;
+      await order.save();
+      
+      // Confirm order (decreases stock)
+      await order.updateStatus('confirmed', testUser._id, 'Payment confirmed');
+      await testDrone.reload();
+      expect(testDrone.stockQuantity).toBe(initialStock - orderQuantity);
+      
+      // Cancel order (should restore stock)
+      await order.updateStatus('cancelled', testUser._id, 'Order cancelled');
+      await testDrone.reload();
+      expect(testDrone.stockQuantity).toBe(initialStock);
+      expect(testDrone.inStock).toBe(true);
+    });
+
+    test('updateStatus should not restore stock when pending order is cancelled', async () => {
+      const initialStock = testDrone.stockQuantity;
+      const orderQuantity = 2;
+      
+      order.quantity = orderQuantity;
+      await order.save();
+      
+      // Cancel order directly from pending (should not affect stock)
+      await order.updateStatus('cancelled', testUser._id, 'Order cancelled');
+      await testDrone.reload();
+      expect(testDrone.stockQuantity).toBe(initialStock);
+    });
+
+    test('confirmOrder method should confirm order and decrease stock', async () => {
+      const initialStock = testDrone.stockQuantity;
+      const orderQuantity = 2;
+      
+      order.quantity = orderQuantity;
+      await order.save();
+      
+      await order.confirmOrder(testUser._id, 'Payment processed successfully');
+      
+      expect(order.status).toBe('confirmed');
+      await testDrone.reload();
+      expect(testDrone.stockQuantity).toBe(initialStock - orderQuantity);
+    });
+
+    test('updateStatus should throw error if insufficient stock when confirming', async () => {
+      // Set drone stock to less than order quantity
+      testDrone.stockQuantity = 1;
+      await testDrone.save();
+      
+      order.quantity = 2;
+      await order.save();
+      
+      await expect(
+        order.updateStatus('confirmed', testUser._id, 'Payment confirmed')
+      ).rejects.toThrow('Failed to update stock: Insufficient stock');
+    });
   });
 
   describe('Virtual Properties', () => {
