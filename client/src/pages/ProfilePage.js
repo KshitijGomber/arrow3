@@ -39,6 +39,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { formatDate, formatPrice } from '../utils/helpers';
+import NavigationBar from '../components/common/NavigationBar';
 
 // Status color mapping
 const getStatusColor = (status) => {
@@ -191,13 +192,15 @@ const ProfilePage = () => {
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: '#0a0a0a',
-        py: 4,
-      }}
-    >
+    <>
+      <NavigationBar />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          backgroundColor: '#0a0a0a',
+          py: 4,
+        }}
+      >
       <Container maxWidth="lg">
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
@@ -640,6 +643,7 @@ const ProfilePage = () => {
         </Dialog>
       </Container>
     </Box>
+    </>
   );
 };
 

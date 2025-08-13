@@ -21,6 +21,7 @@ import {
   Schedule,
   CheckCircle,
 } from '@mui/icons-material';
+import { NavigationBar } from '../components/common';
 
 const SupportPage = () => {
   const theme = useTheme();
@@ -83,18 +84,20 @@ const SupportPage = () => {
   ];
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: `linear-gradient(180deg, 
-          rgba(10, 10, 10, 1) 0%, 
-          rgba(18, 18, 18, 1) 50%, 
-          rgba(10, 10, 10, 1) 100%
-        )`,
-        pt: 10,
-        pb: 8,
-      }}
-    >
+    <>
+      <NavigationBar />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: `linear-gradient(180deg, 
+            rgba(10, 10, 10, 1) 0%, 
+            rgba(18, 18, 18, 1) 50%, 
+            rgba(10, 10, 10, 1) 100%
+          )`,
+          pt: 10,
+          pb: 8,
+        }}
+      >
       {/* Background elements */}
       <Box
         sx={{
@@ -428,6 +431,7 @@ const SupportPage = () => {
         </Fade>
       </Container>
     </Box>
+    </>
   );
 };
 

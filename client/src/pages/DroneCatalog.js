@@ -21,6 +21,7 @@ import {
   ViewList as ListViewIcon,
 } from '@mui/icons-material';
 import { useDrones } from '../hooks/queries/useDroneQueries';
+import { NavigationBar } from '../components/common';
 import DroneCard from '../components/DroneCard';
 import DroneFilters from '../components/DroneFilters';
 import DronePagination from '../components/DronePagination';
@@ -196,8 +197,10 @@ const DroneCatalog = () => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ py: 4 }}>
+    <>
+      <NavigationBar />
+      <Container maxWidth="xl">
+        <Box sx={{ py: 4 }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h2" component="h1" gutterBottom>
@@ -357,6 +360,7 @@ const DroneCatalog = () => {
         </Drawer>
       </Box>
     </Container>
+    </>
   );
 };
 

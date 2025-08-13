@@ -25,6 +25,7 @@ import {
   Public,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { NavigationBar } from '../components/common';
 
 const WhereToBuyPage = () => {
   const theme = useTheme();
@@ -72,18 +73,20 @@ const WhereToBuyPage = () => {
   ];
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: `linear-gradient(180deg, 
-          rgba(10, 10, 10, 1) 0%, 
-          rgba(18, 18, 18, 1) 50%, 
-          rgba(10, 10, 10, 1) 100%
-        )`,
-        pt: 10,
-        pb: 8,
-      }}
-    >
+    <>
+      <NavigationBar />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: `linear-gradient(180deg, 
+            rgba(10, 10, 10, 1) 0%, 
+            rgba(18, 18, 18, 1) 50%, 
+            rgba(10, 10, 10, 1) 100%
+          )`,
+          pt: 10,
+          pb: 8,
+        }}
+      >
       {/* Background elements */}
       <Box
         sx={{
@@ -544,6 +547,7 @@ const WhereToBuyPage = () => {
         </Fade>
       </Container>
     </Box>
+    </>
   );
 };
 
