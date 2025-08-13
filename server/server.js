@@ -78,11 +78,38 @@ app.get('/api/health', (req, res) => {
     success: true, 
     message: 'Arrow3 Aerospace API is running',
     timestamp: new Date().toISOString(),
-    database: dbHealth
+    database: dbHealth 
   });
 });
 
-// Error handling middleware
+// Email test endpoint (for debugging)
+app.post('/api/test-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required'
+      });
+    }
+
+    const emailService = require('./services/emailService');
+    const result = await emailService.sendTestEmail(email);
+    
+    res.json({
+      success: true,
+      message: 'Test email sent successfully',
+      messageId: result.messageId
+    });
+  } catch (error) {
+    console.error('Test email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send test email',
+      error: error.message
+    });
+  }
+});// Error handling middleware
 app.use(require('./middleware/errorHandler'));
 
 // 404 handler

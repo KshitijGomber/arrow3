@@ -375,19 +375,24 @@ router.put('/:id/status', authenticate, authorize('admin'), statusUpdateValidati
     // Send email notification for status changes
     try {
       const emailService = require('../services/emailService');
+      console.log('📧 Attempting to send order status update email for order:', order._id);
+      
       await emailService.sendOrderStatusUpdateEmail({
         to: order.customerInfo.email,
         firstName: order.customerInfo.firstName,
-        order: {
-          id: order._id,
-          status: order.status,
-          droneName: order.droneId.name,
-          trackingNumber: order.trackingNumber
-        }
+        order: order, // Pass the full order object
+        drone: order.droneId, // Pass the full drone object
+        previousStatus: previousStatus
       });
+      
+      console.log('✅ Order status update email sent for order:', order._id);
     } catch (emailError) {
       // Log error but don't fail the status update
-      console.error('Order status email error:', emailError);
+      console.error('❌ Order status email error:', emailError);
+      console.error('❌ Email error details:', {
+        message: emailError.message,
+        stack: emailError.stack
+      });
     }
 
     res.json({

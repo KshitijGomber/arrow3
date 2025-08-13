@@ -26,10 +26,23 @@ class EmailService {
 
   async verifyConnection() {
     try {
+      console.log('🔧 Verifying email service connection...');
+      console.log('🔧 Email configuration:', {
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        user: process.env.EMAIL_USER ? '***@' + process.env.EMAIL_USER.split('@')[1] : 'Not set',
+        hasPassword: !!process.env.EMAIL_PASS
+      });
+      
       await this.transporter.verify();
       console.log('✅ Email service connected successfully');
     } catch (error) {
       console.error('❌ Email service connection failed:', error.message);
+      console.error('❌ Email service details:', {
+        code: error.code,
+        command: error.command,
+        response: error.response
+      });
     }
   }
 
@@ -159,9 +172,40 @@ class EmailService {
    * @returns {Promise<Object>} Email send result
    */
   async sendOrderConfirmation(order) {
+    console.log('📧 EmailService: sendOrderConfirmation called with order:', {
+      orderId: order._id,
+      hasCustomerInfo: !!order.customerInfo,
+      customerEmail: order.customerInfo?.email,
+      hasDroneId: !!order.droneId,
+      droneData: order.droneId ? {
+        name: order.droneId.name,
+        id: order.droneId._id
+      } : null
+    });
+
+    // Validate required data
+    if (!order.customerInfo?.email) {
+      throw new Error('Customer email is missing from order');
+    }
+
+    if (!order.customerInfo?.firstName) {
+      throw new Error('Customer first name is missing from order');
+    }
+
+    if (!order.droneId) {
+      throw new Error('Drone information is missing from order');
+    }
+
     const to = order.customerInfo.email;
     const firstName = order.customerInfo.firstName;
     const drone = order.droneId;
+    
+    console.log('📧 EmailService: Calling sendOrderConfirmationEmail with:', {
+      to,
+      firstName,
+      orderId: order._id,
+      droneName: drone.name
+    });
     
     return await this.sendOrderConfirmationEmail({ to, firstName, order, drone });
   }
@@ -177,6 +221,13 @@ class EmailService {
    */
   async sendOrderConfirmationEmail({ to, firstName, order, drone }) {
     try {
+      console.log('📧 EmailService: sendOrderConfirmationEmail starting...', {
+        to,
+        firstName,
+        orderId: order._id,
+        droneName: drone.name
+      });
+
       const mailOptions = {
         from: {
           name: 'Arrow3 Aerospace',
@@ -188,7 +239,14 @@ class EmailService {
         text: this.getOrderConfirmationTextTemplate(firstName, order, drone)
       };
 
+      console.log('📧 EmailService: Mail options prepared:', {
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject
+      });
+
       const result = await this.retryOperation(async () => {
+        console.log('📧 EmailService: Attempting to send email...');
         return await this.transporter.sendMail(mailOptions);
       });
 
@@ -199,6 +257,11 @@ class EmailService {
       };
     } catch (error) {
       console.error('❌ Failed to send order confirmation email after retries:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response
+      });
       throw new Error('Failed to send order confirmation email');
     }
   }
@@ -215,6 +278,15 @@ class EmailService {
    */
   async sendOrderStatusUpdateEmail({ to, firstName, order, drone, previousStatus }) {
     try {
+      console.log('📧 EmailService: sendOrderStatusUpdateEmail called with:', {
+        to,
+        firstName,
+        orderId: order._id,
+        currentStatus: order.status,
+        previousStatus,
+        droneName: drone?.name
+      });
+
       const mailOptions = {
         from: {
           name: 'Arrow3 Aerospace',
@@ -226,7 +298,14 @@ class EmailService {
         text: this.getOrderStatusUpdateTextTemplate(firstName, order, drone, previousStatus)
       };
 
+      console.log('📧 EmailService: Order status update mail options prepared:', {
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject
+      });
+
       const result = await this.retryOperation(async () => {
+        console.log('📧 EmailService: Attempting to send order status update email...');
         return await this.transporter.sendMail(mailOptions);
       });
 
@@ -237,6 +316,11 @@ class EmailService {
       };
     } catch (error) {
       console.error('❌ Failed to send order status update email after retries:', error);
+      console.error('❌ Order status email error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response
+      });
       throw new Error('Failed to send order status update email');
     }
   }
@@ -256,6 +340,51 @@ class EmailService {
       'cancelled': 'Cancelled'
     };
     return statusMap[status] || status;
+  }
+
+  /**
+   * Send a test email to verify email service is working
+   * @param {string} to - Test email address
+   * @returns {Promise<Object>} Email send result
+   */
+  async sendTestEmail(to) {
+    try {
+      console.log('📧 EmailService: Sending test email to:', to);
+      
+      const mailOptions = {
+        from: {
+          name: 'Arrow3 Aerospace',
+          address: process.env.EMAIL_USER
+        },
+        to: to,
+        subject: 'Test Email - Arrow3 Aerospace Email Service',
+        html: `
+          <h2>Email Service Test</h2>
+          <p>This is a test email to verify that the Arrow3 Aerospace email service is working correctly.</p>
+          <p>Sent at: ${new Date().toISOString()}</p>
+        `,
+        text: `
+          Email Service Test
+          
+          This is a test email to verify that the Arrow3 Aerospace email service is working correctly.
+          
+          Sent at: ${new Date().toISOString()}
+        `
+      };
+
+      const result = await this.retryOperation(async () => {
+        return await this.transporter.sendMail(mailOptions);
+      });
+
+      console.log('✅ Test email sent successfully:', result.messageId);
+      return {
+        success: true,
+        messageId: result.messageId
+      };
+    } catch (error) {
+      console.error('❌ Failed to send test email:', error);
+      throw new Error('Failed to send test email');
+    }
   }
 
   /**

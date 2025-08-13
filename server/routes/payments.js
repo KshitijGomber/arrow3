@@ -106,12 +106,28 @@ router.post('/confirm', async (req, res) => {
           ).populate('droneId');
 
           if (updatedOrder) {
+            console.log('📧 Attempting to send order confirmation email for order:', orderId);
+            console.log('📧 Order data for email:', {
+              orderId: updatedOrder._id,
+              customerEmail: updatedOrder.customerInfo?.email,
+              hasCustomerInfo: !!updatedOrder.customerInfo,
+              hasDroneId: !!updatedOrder.droneId,
+              droneData: updatedOrder.droneId ? {
+                name: updatedOrder.droneId.name,
+                id: updatedOrder.droneId._id
+              } : 'No drone data'
+            });
+            
             // Send order confirmation email
             try {
               await emailService.sendOrderConfirmation(updatedOrder);
               console.log('✅ Order confirmation email sent for order:', orderId);
             } catch (emailError) {
               console.error('❌ Failed to send order confirmation email:', emailError);
+              console.error('❌ Email error details:', {
+                message: emailError.message,
+                stack: emailError.stack
+              });
               // Don't fail the payment if email fails
             }
 

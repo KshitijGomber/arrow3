@@ -151,7 +151,7 @@ const OrderPage = () => {
         const completeOrderData = {
           ...newOrder,
           _id: newOrder._id || newOrder.id,
-          totalAmount: newOrder.totalAmount || calculateTotal(),
+          totalAmount: calculateTotal(), // Use the calculated total with tax
           droneId: newOrder.droneId || {
             _id: drone._id,
             name: drone.name,
@@ -163,6 +163,8 @@ const OrderPage = () => {
           quantity: newOrder.quantity || quantity
         };
         
+        console.log('Calculated total for payment:', calculateTotal());
+        console.log('Order total from server:', newOrder.totalAmount);
         console.log('Navigating to payment with order data:', completeOrderData);
         
         // Navigate to payment page with complete order data
