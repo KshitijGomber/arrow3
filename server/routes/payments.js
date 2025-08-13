@@ -159,7 +159,16 @@ router.post('/confirm', async (req, res) => {
             orderByPaymentIntent.status = 'confirmed';
             orderByPaymentIntent.paymentStatus = 'completed';
             orderByPaymentIntent.paymentDetails = {
-              paymentMethod: result.payment.payment_method,
+              paymentMethod: {
+                id: result.payment.payment_method.id,
+                type: result.payment.payment_method.type,
+                card: {
+                  brand: result.payment.payment_method.card.brand,
+                  last4: result.payment.payment_method.card.last4,
+                  exp_month: result.payment.payment_method.card.exp_month,
+                  exp_year: result.payment.payment_method.card.exp_year
+                }
+              },
               receiptUrl: result.payment.receipt_url,
               processedAt: new Date()
             };
