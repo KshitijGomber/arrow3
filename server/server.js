@@ -69,6 +69,7 @@ app.use('/api/drones', require('./routes/drones'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/media', require('./routes/media'));
+app.use('/api/dashboard', require('./routes/dashboard'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
@@ -10,7 +10,9 @@ import {
   Chip,
   LinearProgress,
   Alert,
-  Divider
+  Divider,
+  Skeleton,
+  CircularProgress
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -19,55 +21,37 @@ import {
   TrendingUp as TrendingIcon,
   People as UsersIcon,
   AttachMoney as RevenueIcon,
-  Notifications as NotificationsIcon
+  Notifications as NotificationsIcon,
+  Warning as WarningIcon,
+  Info as InfoIcon,
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useDashboardStats, useDashboardAlerts } from '../../hooks/queries/useDashboardQueries';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    totalProducts: 0,
-    totalOrders: 0,
-    totalUsers: 0,
-    totalRevenue: 0,
-    recentOrders: [],
-    lowStockProducts: []
-  });
-  const [loading, setLoading] = useState(true);
+  
+  // Fetch real-time dashboard data
+  const { 
+    data: dashboardData, 
+    isLoading: statsLoading, 
+    isError: statsError,
+    refetch: refetchStats 
+  } = useDashboardStats();
+  
+  const { 
+    data: alertsData, 
+    isLoading: alertsLoading,
+    isError: alertsError 
+  } = useDashboardAlerts();
 
-  useEffect(() => {
-    // Simulate loading dashboard data
-    const loadDashboardData = async () => {
-      try {
-        // In a real app, these would be API calls
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        setStats({
-          totalProducts: 12,
-          totalOrders: 45,
-          totalUsers: 128,
-          totalRevenue: 89750,
-          recentOrders: [
-            { id: 'ORD-001', customer: 'John Doe', amount: 1299, status: 'pending' },
-            { id: 'ORD-002', customer: 'Jane Smith', amount: 899, status: 'confirmed' },
-            { id: 'ORD-003', customer: 'Mike Johnson', amount: 1599, status: 'shipped' }
-          ],
-          lowStockProducts: [
-            { name: 'Arrow3 Pro', stock: 2 },
-            { name: 'Arrow3 Mini', stock: 1 }
-          ]
-        });
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDashboardData();
-  }, []);
+  const stats = dashboardData?.overview || {};
+  const recentOrders = dashboardData?.recentOrders || [];
+  const lowStockProducts = dashboardData?.lowStockProducts || [];
+  const alerts = alertsData?.alerts || [];
 
   const statCards = [
     {
@@ -111,13 +95,26 @@ const AdminDashboard = () => {
     }
   };
 
-  if (loading) {
+  if (statsLoading) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
           Loading Dashboard...
         </Typography>
         <LinearProgress sx={{ mt: 2, backgroundColor: '#333' }} />
+      </Box>
+    );
+  }
+
+  if (statsError) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Failed to load dashboard data. 
+          <Button onClick={() => refetchStats()} sx={{ ml: 2 }}>
+            Retry
+          </Button>
+        </Alert>
       </Box>
     );
   }
@@ -202,9 +199,9 @@ const AdminDashboard = () => {
               </Typography>
               <Divider sx={{ backgroundColor: '#333', mb: 2 }} />
               
-              {stats.recentOrders.length > 0 ? (
+              {recentOrders.length > 0 ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {stats.recentOrders.map((order) => (
+                  {recentOrders.map((order) => (
                     <Box 
                       key={order.id}
                       sx={{ 
@@ -219,10 +216,13 @@ const AdminDashboard = () => {
                     >
                       <Box>
                         <Typography variant="subtitle2" sx={{ color: 'white' }}>
-                          {order.id}
+                          {order.orderId}
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#aaa' }}>
                           {order.customer}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#666' }}>
+                          {order.drone}
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -276,38 +276,66 @@ const AdminDashboard = () => {
               <Divider sx={{ backgroundColor: '#333', mb: 2 }} />
               
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {stats.lowStockProducts.length > 0 && (
-                  <Alert 
-                    severity="warning" 
-                    sx={{ 
-                      backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                      border: '1px solid rgba(255, 193, 7, 0.3)',
-                      color: '#ffc107'
-                    }}
-                  >
-                    <Typography variant="subtitle2" gutterBottom>
-                      Low Stock Alert
-                    </Typography>
-                    {stats.lowStockProducts.map((product, index) => (
-                      <Typography key={index} variant="body2">
-                        {product.name}: {product.stock} left
-                      </Typography>
-                    ))}
-                  </Alert>
-                )}
-                
-                <Alert 
-                  severity="info"
-                  sx={{ 
-                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                    border: '1px solid rgba(33, 150, 243, 0.3)',
-                    color: '#2196f3'
-                  }}
-                >
-                  <Typography variant="body2">
-                    System running smoothly. All services operational.
+                {alertsLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                    <CircularProgress size={24} sx={{ color: '#00ff88' }} />
+                  </Box>
+                ) : alerts.length > 0 ? (
+                  alerts.map((alert, index) => {
+                    const getAlertIcon = (type) => {
+                      switch (type) {
+                        case 'warning': return <WarningIcon />;
+                        case 'info': return <InfoIcon />;
+                        case 'success': return <CheckCircleIcon />;
+                        default: return <InfoIcon />;
+                      }
+                    };
+
+                    const getAlertColor = (type) => {
+                      switch (type) {
+                        case 'warning': return { bg: 'rgba(255, 193, 7, 0.1)', border: 'rgba(255, 193, 7, 0.3)', color: '#ffc107' };
+                        case 'info': return { bg: 'rgba(33, 150, 243, 0.1)', border: 'rgba(33, 150, 243, 0.3)', color: '#2196f3' };
+                        case 'success': return { bg: 'rgba(76, 175, 80, 0.1)', border: 'rgba(76, 175, 80, 0.3)', color: '#4caf50' };
+                        default: return { bg: 'rgba(33, 150, 243, 0.1)', border: 'rgba(33, 150, 243, 0.3)', color: '#2196f3' };
+                      }
+                    };
+
+                    const colors = getAlertColor(alert.type);
+
+                    return (
+                      <Alert 
+                        key={index}
+                        severity={alert.type}
+                        icon={getAlertIcon(alert.type)}
+                        sx={{ 
+                          backgroundColor: colors.bg,
+                          border: `1px solid ${colors.border}`,
+                          color: colors.color
+                        }}
+                        action={alert.action && (
+                          <Button 
+                            size="small" 
+                            onClick={() => alert.actionUrl && navigate(alert.actionUrl)}
+                            sx={{ color: colors.color }}
+                          >
+                            {alert.action}
+                          </Button>
+                        )}
+                      >
+                        <Typography variant="subtitle2" gutterBottom>
+                          {alert.title}
+                        </Typography>
+                        <Typography variant="body2">
+                          {alert.message}
+                        </Typography>
+                      </Alert>
+                    );
+                  })
+                ) : (
+                  <Typography variant="body2" sx={{ color: '#aaa' }}>
+                    No alerts at this time
                   </Typography>
-                </Alert>
+                )}
               </Box>
             </CardContent>
             <CardActions>
