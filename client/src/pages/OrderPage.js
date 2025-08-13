@@ -296,7 +296,7 @@ const OrderPage = () => {
                         <CardMedia
                           component="img"
                           sx={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 1 }}
-                          image={drone.images?.[0] || '/placeholder-drone.jpg'}
+                          image={drone.images?.[0] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMmEyYTJhIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMGZmODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRyb25lIEltYWdlPC90ZXh0Pgo8L3N2Zz4K'}
                           alt={drone.name}
                         />
                         <CardContent sx={{ flex: 1, pl: 2 }}>

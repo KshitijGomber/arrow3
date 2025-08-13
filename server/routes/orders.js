@@ -45,8 +45,8 @@ const orderValidation = [
     .isLength({ min: 1, max: 100 })
     .withMessage('State is required and must be less than 100 characters'),
   body('shippingAddress.zipCode')
-    .matches(/^\d{5}(-\d{4})?$/)
-    .withMessage('Please enter a valid ZIP code (e.g., 12345 or 12345-6789)'),
+    .matches(/^[A-Za-z0-9\s\-]{3,10}$/)
+    .withMessage('Please enter a valid postal/ZIP code (3-10 characters)'),
   body('shippingAddress.country')
     .optional()
     .trim()
@@ -65,8 +65,8 @@ const orderValidation = [
     .normalizeEmail()
     .withMessage('Please provide a valid email address'),
   body('customerInfo.phone')
-    .matches(/^\+?[\d\s\-\(\)]{10,}$/)
-    .withMessage('Please enter a valid phone number'),
+    .matches(/^\+?[\d\s\-\(\)]{8,}$/)
+    .withMessage('Please enter a valid phone number (at least 8 digits)'),
   body('notes')
     .optional()
     .trim()

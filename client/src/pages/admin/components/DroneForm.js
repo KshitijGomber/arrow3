@@ -55,7 +55,7 @@ const DroneForm = ({ mode = 'create' }) => {
 
   // Fetch drone data for edit mode
   const { data: droneData, isLoading: isLoadingDrone } = useDrone(id, {
-    enabled: isEditMode,
+    enabled: Boolean(isEditMode),
   });
 
   // Mutations
@@ -169,7 +169,15 @@ const DroneForm = ({ mode = 'create' }) => {
       // Separate existing URLs from new files
       const existingImages = mediaFiles.filter(m => m.type === 'image' && m.isExisting).map(m => m.url);
       const existingVideos = mediaFiles.filter(m => m.type === 'video' && m.isExisting).map(m => m.url);
-      const newFiles = mediaFiles.filter(m => !m.isExisting);
+      const newFiles = mediaFiles.filter(m => !m.isExisting && m.file); // Only get files that have actual file objects
+
+      console.log('Media files breakdown:', {
+        totalMediaFiles: mediaFiles.length,
+        existingImages: existingImages.length,
+        existingVideos: existingVideos.length,
+        newFiles: newFiles.length,
+        newFilesDetails: newFiles.map(f => ({ name: f.name, hasFile: !!f.file }))
+      });
 
       // Helper function to safely parse numbers
       const safeParseFloat = (value, defaultValue = 0) => {
@@ -261,6 +269,7 @@ const DroneForm = ({ mode = 'create' }) => {
   };
 
   const handleMediaChange = (newMediaFiles) => {
+    console.log('Media files changed:', newMediaFiles);
     setMediaFiles(newMediaFiles);
   };
 
