@@ -225,8 +225,36 @@ const droneValidation = [
 const listingValidation = [
   query('category')
     .optional()
-    .isIn(['camera', 'handheld', 'power', 'specialized'])
-    .withMessage('Category must be one of: camera, handheld, power, specialized'),
+    .custom((value) => {
+      if (!value) return true;
+      const validCategories = ['camera', 'handheld', 'power', 'specialized'];
+      
+      // Handle comma-separated categories
+      if (typeof value === 'string') {
+        const categories = value.split(',').map(cat => cat.trim());
+        const invalidCategories = categories.filter(cat => !validCategories.includes(cat));
+        if (invalidCategories.length > 0) {
+          throw new Error(`Invalid categories: ${invalidCategories.join(', ')}. Must be one of: ${validCategories.join(', ')}`);
+        }
+        return true;
+      }
+      
+      // Handle array of categories
+      if (Array.isArray(value)) {
+        const invalidCategories = value.filter(cat => !validCategories.includes(cat));
+        if (invalidCategories.length > 0) {
+          throw new Error(`Invalid categories: ${invalidCategories.join(', ')}. Must be one of: ${validCategories.join(', ')}`);
+        }
+        return true;
+      }
+      
+      // Handle single category
+      if (!validCategories.includes(value)) {
+        throw new Error(`Category must be one of: ${validCategories.join(', ')}`);
+      }
+      
+      return true;
+    }),
   query('minPrice')
     .optional()
     .isNumeric()
@@ -284,7 +312,21 @@ router.get('/', listingValidation, handleValidationErrors, async (req, res) => {
 
     // Build filter object
     const filters = {};
-    if (category) filters.category = category;
+    
+    // Handle category filter (single or multiple)
+    if (category) {
+      if (typeof category === 'string' && category.includes(',')) {
+        // Handle comma-separated categories
+        filters.categories = category.split(',').map(cat => cat.trim());
+      } else if (Array.isArray(category)) {
+        // Handle array of categories
+        filters.categories = category;
+      } else {
+        // Handle single category
+        filters.category = category;
+      }
+    }
+    
     if (minPrice || maxPrice) {
       filters.minPrice = minPrice ? parseFloat(minPrice) : undefined;
       filters.maxPrice = maxPrice ? parseFloat(maxPrice) : undefined;
@@ -327,7 +369,7 @@ router.get('/', listingValidation, handleValidationErrors, async (req, res) => {
           limit: limitNum
         },
         filters: {
-          category,
+          category: filters.categories || filters.category,
           minPrice,
           maxPrice,
           cameraResolution,

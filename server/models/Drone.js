@@ -265,9 +265,11 @@ droneSchema.statics.findByCategory = function(category) {
 droneSchema.statics.searchDrones = function(filters = {}) {
   const query = { inStock: true };
   
-  // Category filter
+  // Category filter (single or multiple)
   if (filters.category) {
     query.category = filters.category;
+  } else if (filters.categories && filters.categories.length > 0) {
+    query.category = { $in: filters.categories };
   }
   
   // Price range filter

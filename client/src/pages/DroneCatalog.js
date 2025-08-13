@@ -192,7 +192,7 @@ const DroneCatalog = () => {
   }
   
   const drones = dronesData?.drones || [];
-  const totalItems = dronesData?.total || 0;
+  const totalItems = dronesData?.pagination?.totalCount || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
   return (
