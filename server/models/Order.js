@@ -111,14 +111,6 @@ const orderSchema = new mongoose.Schema({
     trim: true,
     sparse: true // Allows multiple null values but unique non-null values
   },
-  paymentMethod: {
-    type: String,
-    enum: {
-      values: ['credit_card', 'debit_card', 'paypal', 'mock_payment'],
-      message: 'Payment method must be one of: credit_card, debit_card, paypal, mock_payment'
-    },
-    default: 'mock_payment'
-  },
   paymentDetails: {
     paymentMethod: {
       id: String,
