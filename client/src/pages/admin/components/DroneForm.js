@@ -27,7 +27,7 @@ import {
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useDrone, useCreateDrone, useUpdateDrone } from '../../../hooks/queries/useDroneQueries';
-import { MediaUploadField } from '../../../components/common';
+import { CloudinaryUploadField } from '../../../components/common';
 import toast from 'react-hot-toast';
 import api from '../../../utils/api';
 
@@ -63,7 +63,7 @@ const DroneForm = ({ mode = 'create' }) => {
   const updateDroneMutation = useUpdateDrone();
 
   // Form state
-  const [mediaFiles, setMediaFiles] = useState([]);
+  const [mediaUrls, setMediaUrls] = useState([]);
 
   const {
     control,
@@ -138,45 +138,29 @@ const DroneForm = ({ mode = 'create' }) => {
         featured: drone.featured
       });
       
-      // Convert existing URLs to media file objects
-      const existingMedia = [];
-      if (drone.images?.length > 0) {
-        drone.images.forEach((url, index) => {
-          existingMedia.push({
-            url,
-            name: `Image ${index + 1}`,
-            type: 'image',
-            isExisting: true
-          });
-        });
-      }
-      if (drone.videos?.length > 0) {
-        drone.videos.forEach((url, index) => {
-          existingMedia.push({
-            url,
-            name: `Video ${index + 1}`,
-            type: 'video',
-            isExisting: true
-          });
-        });
-      }
-      setMediaFiles(existingMedia);
+      // Set existing media URLs
+      const existingUrls = [...(drone.images || []), ...(drone.videos || [])];
+      setMediaUrls(existingUrls);
     }
   }, [isEditMode, droneData, reset]);
 
   const onSubmit = async (data) => {
     try {
-      // Separate existing URLs from new files
-      const existingImages = mediaFiles.filter(m => m.type === 'image' && m.isExisting).map(m => m.url);
-      const existingVideos = mediaFiles.filter(m => m.type === 'video' && m.isExisting).map(m => m.url);
-      const newFiles = mediaFiles.filter(m => !m.isExisting && m.file); // Only get files that have actual file objects
+      // Separate images and videos from Cloudinary URLs
+      const images = mediaUrls.filter(url => 
+        url.includes('/image/') || 
+        url.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i)
+      );
+      const videos = mediaUrls.filter(url => 
+        url.includes('/video/') || 
+        url.match(/\.(mp4|webm|mov|avi)(\?|$)/i)
+      );
 
-      console.log('Media files breakdown:', {
-        totalMediaFiles: mediaFiles.length,
-        existingImages: existingImages.length,
-        existingVideos: existingVideos.length,
-        newFiles: newFiles.length,
-        newFilesDetails: newFiles.map(f => ({ name: f.name, hasFile: !!f.file }))
+      console.log('Media URLs breakdown:', {
+        totalUrls: mediaUrls.length,
+        images: images.length,
+        videos: videos.length,
+        allUrls: mediaUrls
       });
 
       // Helper function to safely parse numbers
@@ -192,8 +176,8 @@ const DroneForm = ({ mode = 'create' }) => {
 
       const formData = {
         ...data,
-        images: existingImages.length > 0 ? existingImages : [],
-        videos: existingVideos.length > 0 ? existingVideos : [],
+        images: images,
+        videos: videos,
         price: safeParseFloat(data.price),
         specifications: {
           ...data.specifications,
@@ -225,29 +209,7 @@ const DroneForm = ({ mode = 'create' }) => {
         droneId = result._id; // Fix: result is already the drone object
       }
 
-      // Upload new files if any
-      if (newFiles.length > 0) {
-        const uploadFormData = new FormData();
-        newFiles.forEach(mediaFile => {
-          if (mediaFile.file) {
-            uploadFormData.append('files', mediaFile.file);
-          }
-        });
-
-        try {
-          const uploadResponse = await api.post(`/media/drones/${droneId}/upload`, uploadFormData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-
-          console.log('Files uploaded successfully:', uploadResponse.data);
-        } catch (uploadError) {
-          console.error('File upload error:', uploadError);
-          // Show user-friendly error message
-          toast.error(`File upload failed: ${uploadError.message}. Drone was saved successfully, but you may need to upload images separately.`);
-        }
-      }
+      // Files are already uploaded to Cloudinary, URLs are stored in the drone data
 
       navigate('/admin/products');
     } catch (error) {
@@ -268,9 +230,9 @@ const DroneForm = ({ mode = 'create' }) => {
     navigate('/admin/products');
   };
 
-  const handleMediaChange = (newMediaFiles) => {
-    console.log('Media files changed:', newMediaFiles);
-    setMediaFiles(newMediaFiles);
+  const handleMediaChange = (newMediaUrls) => {
+    console.log('Media URLs changed:', newMediaUrls);
+    setMediaUrls(newMediaUrls);
   };
 
   if (isEditMode && isLoadingDrone) {
@@ -1040,9 +1002,9 @@ const DroneForm = ({ mode = 'create' }) => {
           {/* Media Upload */}
           <Grid item xs={12}>
             <Paper sx={{ p: 3, backgroundColor: '#2a2a2a', border: '1px solid #333' }}>
-              <MediaUploadField
+              <CloudinaryUploadField
                 label="Drone Media Files"
-                value={mediaFiles}
+                value={mediaUrls}
                 onChange={handleMediaChange}
                 maxFiles={20}
                 maxSize={50 * 1024 * 1024} // 50MB
@@ -1051,8 +1013,8 @@ const DroneForm = ({ mode = 'create' }) => {
                   'video/*': ['.mp4', '.webm', '.mov', '.avi']
                 }}
                 showPreview={true}
-                allowReorder={true}
-                helperText="Upload images and videos for this drone. You can drag and drop files or click to select. Existing media will be preserved."
+                folder="arrow3/drones"
+                helperText="Upload images and videos for this drone. Files are uploaded directly to Cloudinary for optimal performance and reliability."
               />
             </Paper>
           </Grid>

@@ -24,12 +24,25 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/constants';
 import { LazyImage } from './common';
+import { AdvancedImage } from '@cloudinary/react';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { format, quality } from '@cloudinary/url-gen/actions/delivery';
+import cloudinaryService from '../services/cloudinaryService';
 
 const DroneCard = ({ drone, onOrderClick }) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Initialize Cloudinary
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: process.env.REACT_APP_CLOUDINARY_CLOUD_NAME
+    }
+  });
 
   const handleViewDetails = () => {
     navigate(`${ROUTES.DRONES}/${drone._id}`);
@@ -71,6 +84,63 @@ const DroneCard = ({ drone, onOrderClick }) => {
     return 'In Stock';
   };
 
+  const renderOptimizedImage = (imageUrl) => {
+    if (!imageUrl) {
+      return (
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMmEyYTJhIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMGZmODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRyb25lIEltYWdlPC90ZXh0Pgo8L3N2Zz4K"
+          alt={drone.name}
+          style={{
+            width: '100%',
+            height: isMobile ? 180 : isTablet ? 190 : 200,
+            objectFit: 'cover',
+            backgroundColor: '#2a2a2a',
+          }}
+        />
+      );
+    }
+
+    // Check if it's a Cloudinary URL
+    const publicId = cloudinaryService.extractPublicId(imageUrl);
+    if (publicId && process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
+      try {
+        const img = cld
+          .image(publicId)
+          .format(format.auto())
+          .quality(quality.auto())
+          .resize(auto().gravity(autoGravity()).width(400).height(isMobile ? 180 : isTablet ? 190 : 200));
+
+        return (
+          <AdvancedImage 
+            cldImg={img} 
+            style={{
+              width: '100%',
+              height: isMobile ? 180 : isTablet ? 190 : 200,
+              objectFit: 'cover',
+              backgroundColor: '#2a2a2a',
+            }}
+          />
+        );
+      } catch (error) {
+        console.error('Error rendering Cloudinary image:', error);
+      }
+    }
+
+    // Fallback to regular image
+    return (
+      <img
+        src={imageUrl}
+        alt={drone.name}
+        style={{
+          width: '100%',
+          height: isMobile ? 180 : isTablet ? 190 : 200,
+          objectFit: 'cover',
+          backgroundColor: '#2a2a2a',
+        }}
+      />
+    );
+  };
+
   return (
     <Card
       sx={{
@@ -87,14 +157,7 @@ const DroneCard = ({ drone, onOrderClick }) => {
       onClick={handleViewDetails}
     >
       <Box sx={{ position: 'relative' }}>
-        <LazyImage
-          src={drone.images?.[0] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMmEyYTJhIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMGZmODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRyb25lIEltYWdlPC90ZXh0Pgo8L3N2Zz4K'}
-          alt={drone.name}
-          height={isMobile ? 180 : isTablet ? 190 : 200}
-          sx={{
-            backgroundColor: '#2a2a2a',
-          }}
-        />
+        {renderOptimizedImage(drone.images?.[0])}
         
         {/* Featured badge */}
         {drone.featured && (

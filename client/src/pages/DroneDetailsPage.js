@@ -44,6 +44,12 @@ import {
 import { useDrone } from '../hooks/queries/useDroneQueries';
 import { NavigationBar } from '../components/common';
 import { ROUTES } from '../utils/constants';
+import { AdvancedImage } from '@cloudinary/react';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { format, quality } from '@cloudinary/url-gen/actions/delivery';
+import cloudinaryService from '../services/cloudinaryService';
 
 const DroneDetailsPage = () => {
   const { droneId } = useParams();
@@ -53,6 +59,13 @@ const DroneDetailsPage = () => {
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+
+  // Initialize Cloudinary
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: process.env.REACT_APP_CLOUDINARY_CLOUD_NAME
+    }
+  });
 
   const {
     data: drone,
@@ -123,6 +136,63 @@ const DroneDetailsPage = () => {
     if (!drone.inStock || drone.stockQuantity === 0) return 'Out of Stock';
     if (drone.stockQuantity < 5) return 'Low Stock';
     return 'In Stock';
+  };
+
+  const renderOptimizedImage = (imageUrl, width = 600, height = 400) => {
+    if (!imageUrl) {
+      return (
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMmEyYTJhIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMGZmODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRyb25lIEltYWdlPC90ZXh0Pgo8L3N2Zz4K"
+          alt="Drone"
+          style={{
+            width: '100%',
+            height: height,
+            objectFit: 'cover',
+            backgroundColor: '#2a2a2a',
+          }}
+        />
+      );
+    }
+
+    // Check if it's a Cloudinary URL
+    const publicId = cloudinaryService.extractPublicId(imageUrl);
+    if (publicId && process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
+      try {
+        const img = cld
+          .image(publicId)
+          .format(format.auto())
+          .quality(quality.auto())
+          .resize(auto().gravity(autoGravity()).width(width).height(height));
+
+        return (
+          <AdvancedImage 
+            cldImg={img} 
+            style={{
+              width: '100%',
+              height: height,
+              objectFit: 'cover',
+              backgroundColor: '#2a2a2a',
+            }}
+          />
+        );
+      } catch (error) {
+        console.error('Error rendering Cloudinary image:', error);
+      }
+    }
+
+    // Fallback to regular image
+    return (
+      <img
+        src={imageUrl}
+        alt="Drone"
+        style={{
+          width: '100%',
+          height: height,
+          objectFit: 'cover',
+          backgroundColor: '#2a2a2a',
+        }}
+      />
+    );
   };
 
   // Loading state
@@ -232,17 +302,7 @@ const DroneDetailsPage = () => {
                   }}
                   onClick={() => handleImageClick(selectedImageIndex)}
                 >
-                  <Box
-                    component="img"
-                    src={images[selectedImageIndex] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMmEyYTJhIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMGZmODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRyb25lIEltYWdlPC90ZXh0Pgo8L3N2Zz4K'}
-                    alt={drone.name}
-                    sx={{
-                      width: '100%',
-                      height: 400,
-                      objectFit: 'cover',
-                      backgroundColor: '#2a2a2a',
-                    }}
-                  />
+                  {renderOptimizedImage(images[selectedImageIndex], 600, 400)}
                   
                   {/* Featured badge */}
                   {drone.featured && (
@@ -275,15 +335,7 @@ const DroneDetailsPage = () => {
                         }}
                         onClick={() => setSelectedImageIndex(index)}
                       >
-                        <img
-                          src={image}
-                          alt={`${drone.name} ${index + 1}`}
-                          style={{
-                            width: '100%',
-                            height: 80,
-                            objectFit: 'cover',
-                          }}
-                        />
+                        {renderOptimizedImage(image, 120, 80)}
                       </ImageListItem>
                     ))}
                   </ImageList>
