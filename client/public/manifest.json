@@ -3,13 +3,18 @@
   "name": "Arrow3 Aerospace Platform",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "logoarrow3.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logoarrow3.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#2ea4a5",
+  "background_color": "#0a0a0a"
 }

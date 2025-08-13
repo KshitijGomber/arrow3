@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
@@ -11,12 +11,8 @@ import {
   Rating,
   useTheme,
   Fade,
-  Slide,
-  IconButton,
 } from '@mui/material';
 import {
-  ArrowBackIos,
-  ArrowForwardIos,
   Verified,
   Security,
   LocalShipping,
@@ -28,7 +24,6 @@ import { useNavigate } from 'react-router-dom';
 const TestimonialsSection = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const testimonials = [
     {
@@ -94,22 +89,6 @@ const TestimonialsSection = () => {
     { number: '150+', label: 'Countries Served' },
     { number: '4.9/5', label: 'Average Rating' },
   ];
-
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
-
-  const nextTestimonial = () => {
-    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-  };
-
-  const prevTestimonial = () => {
-    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
 
   return (
     <Box
@@ -209,162 +188,107 @@ const TestimonialsSection = () => {
               Join thousands of satisfied customers who have taken their creativity to new heights
             </Typography>
 
-            {/* Testimonial Carousel */}
-            <Box sx={{ position: 'relative', maxWidth: 800, mx: 'auto' }}>
-              <Card
-                sx={{
-                  background: `linear-gradient(135deg, 
-                    rgba(26, 26, 26, 0.8) 0%, 
-                    rgba(42, 42, 42, 0.6) 100%
-                  )`,
-                  border: '1px solid',
-                  borderColor: 'rgba(46, 164, 165, 0.2)',
-                  borderRadius: 3,
-                  p: 4,
-                  minHeight: 280,
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <Slide
-                  direction="left"
-                  in
-                  key={currentTestimonial}
-                  timeout={500}
-                >
-                  <CardContent sx={{ textAlign: 'center', width: '100%' }}>
-                    <Avatar
+            {/* Testimonials Grid - Show 3-4 at once */}
+            <Grid container spacing={3} sx={{ mb: 6 }}>
+              {testimonials.map((testimonial, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <Fade in timeout={1000 + index * 200}>
+                    <Card
                       sx={{
-                        width: 80,
-                        height: 80,
-                        mx: 'auto',
-                        mb: 3,
-                        backgroundColor: 'primary.main',
-                        color: 'primary.contrastText',
-                        fontSize: '1.5rem',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {testimonials[currentTestimonial].avatar}
-                    </Avatar>
-                    
-                    <Rating
-                      value={testimonials[currentTestimonial].rating}
-                      readOnly
-                      sx={{
-                        mb: 3,
-                        '& .MuiRating-iconFilled': {
-                          color: 'primary.main',
+                        background: `linear-gradient(135deg, 
+                          rgba(26, 26, 26, 0.8) 0%, 
+                          rgba(42, 42, 42, 0.6) 100%
+                        )`,
+                        border: '1px solid',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: 2,
+                        p: 2,
+                        height: '280px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          borderColor: 'rgba(46, 164, 165, 0.2)',
+                          transform: 'translateY(-4px)',
+                          backgroundColor: 'rgba(46, 164, 165, 0.05)',
                         },
                       }}
-                    />
-                    
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontStyle: 'italic',
-                        mb: 3,
-                        color: 'text.primary',
-                        lineHeight: 1.6,
-                        fontSize: { xs: '1rem', md: '1.25rem' },
-                      }}
                     >
-                      "{testimonials[currentTestimonial].text}"
-                    </Typography>
-                    
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        color: 'primary.main',
-                        mb: 1,
-                      }}
-                    >
-                      {testimonials[currentTestimonial].name}
-                    </Typography>
-                    
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        mb: 1,
-                      }}
-                    >
-                      {testimonials[currentTestimonial].role}
-                    </Typography>
-                    
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: 'text.secondary',
-                      }}
-                    >
-                      {testimonials[currentTestimonial].location}
-                    </Typography>
-                  </CardContent>
-                </Slide>
-              </Card>
-
-              {/* Navigation buttons */}
-              <IconButton
-                onClick={prevTestimonial}
-                sx={{
-                  position: 'absolute',
-                  left: -20,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  backgroundColor: 'rgba(46, 164, 165, 0.1)',
-                  border: '1px solid',
-                  borderColor: 'primary.main',
-                  color: 'primary.main',
-                  '&:hover': {
-                    backgroundColor: 'rgba(46, 164, 165, 0.2)',
-                  },
-                }}
-              >
-                <ArrowBackIos />
-              </IconButton>
-              
-              <IconButton
-                onClick={nextTestimonial}
-                sx={{
-                  position: 'absolute',
-                  right: -20,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  backgroundColor: 'rgba(46, 164, 165, 0.1)',
-                  border: '1px solid',
-                  borderColor: 'primary.main',
-                  color: 'primary.main',
-                  '&:hover': {
-                    backgroundColor: 'rgba(46, 164, 165, 0.2)',
-                  },
-                }}
-              >
-                <ArrowForwardIos />
-              </IconButton>
-
-              {/* Dots indicator */}
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 1 }}>
-                {testimonials.map((_, index) => (
-                  <Box
-                    key={index}
-                    onClick={() => setCurrentTestimonial(index)}
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      backgroundColor: index === currentTestimonial ? 'primary.main' : 'rgba(255, 255, 255, 0.3)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        backgroundColor: 'primary.light',
-                      },
-                    }}
-                  />
-                ))}
-              </Box>
-            </Box>
+                      <CardContent sx={{ textAlign: 'center', flex: 1, p: '0 !important' }}>
+                        <Avatar
+                          sx={{
+                            width: 48,
+                            height: 48,
+                            mx: 'auto',
+                            mb: 2,
+                            backgroundColor: 'primary.main',
+                            color: 'primary.contrastText',
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {testimonial.avatar}
+                        </Avatar>
+                        
+                        <Rating
+                          value={testimonial.rating}
+                          readOnly
+                          size="small"
+                          sx={{
+                            mb: 2,
+                            '& .MuiRating-iconFilled': {
+                              color: 'primary.main',
+                            },
+                          }}
+                        />
+                        
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontStyle: 'italic',
+                            mb: 2,
+                            color: 'text.primary',
+                            lineHeight: 1.4,
+                            fontSize: '0.875rem',
+                            overflow: 'hidden',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 4,
+                            WebkitBoxOrient: 'vertical',
+                          }}
+                        >
+                          "{testimonial.text}"
+                        </Typography>
+                        
+                        <Box sx={{ mt: 'auto' }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 600,
+                              color: 'primary.main',
+                              mb: 0.5,
+                              fontSize: '0.875rem',
+                            }}
+                          >
+                            {testimonial.name}
+                          </Typography>
+                          
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: '0.75rem',
+                              lineHeight: 1.2,
+                            }}
+                          >
+                            {testimonial.role}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Fade>
+                </Grid>
+              ))}
+            </Grid>
           </Box>
         </Fade>
 

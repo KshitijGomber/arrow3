@@ -35,37 +35,6 @@ const HeroSection = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Logo at top-left */}
-      <Box
-        onClick={() => navigate('/')}
-        sx={{
-          position: 'absolute',
-          top: { xs: 12, sm: 16 },
-          left: { xs: 12, sm: 16 },
-          zIndex: 3,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          cursor: 'pointer',
-        }}
-      >
-        <img
-          src="/logoarrow3.png"
-          alt="Arrow3"
-          style={{
-            height: 36,
-            width: 'auto',
-            filter: `drop-shadow(0 0 6px ${theme.palette.primary.main})`,
-          }}
-        />
-        <Typography
-          variant="h6"
-          sx={{ color: 'primary.main', fontWeight: 700, display: { xs: 'none', sm: 'block' } }}
-        >
-          Arrow3
-        </Typography>
-      </Box>
-
       {/* Animated background elements */}
       <Box
         sx={{

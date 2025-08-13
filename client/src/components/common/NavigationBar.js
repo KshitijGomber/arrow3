@@ -322,23 +322,44 @@ const NavigationBar = () => {
       >
         <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
           {/* Logo */}
-          <Typography
-            variant="h5"
-            component="div"
+          <Box
             onClick={() => navigate('/')}
             sx={{
               flexGrow: 0,
-              fontWeight: 700,
-              color: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
               cursor: 'pointer',
               mr: 4,
               '&:hover': {
-                color: 'primary.light',
+                '& .logo-text': {
+                  color: 'primary.light',
+                },
               },
             }}
           >
-            Arrow3
-          </Typography>
+            <img
+              src="/logoarrow3.png"
+              alt="Arrow3 Logo"
+              style={{
+                height: 32,
+                width: 'auto',
+                filter: `drop-shadow(0 0 4px ${theme.palette.primary.main})`,
+              }}
+            />
+            <Typography
+              variant="h5"
+              component="div"
+              className="logo-text"
+              sx={{
+                fontWeight: 700,
+                color: 'primary.main',
+                transition: 'color 0.2s ease',
+              }}
+            >
+              Arrow3
+            </Typography>
+          </Box>
 
           {/* Desktop Menu */}
           <Box sx={{ flexGrow: 1 }}>
