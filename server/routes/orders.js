@@ -173,6 +173,13 @@ router.post('/', authenticate, orderValidation, handleValidationErrors, async (r
     // Populate drone details for response
     await order.populate('droneId', 'name model price images');
 
+    console.log('Order created successfully:', {
+      orderId: order._id,
+      totalAmount: order.totalAmount,
+      hasCustomerInfo: !!order.customerInfo,
+      droneId: order.droneId._id
+    });
+
     res.status(201).json({
       success: true,
       message: 'Order created successfully',

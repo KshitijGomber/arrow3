@@ -71,8 +71,10 @@ export const useCreateOrder = () => {
   
   return useMutation({
     mutationFn: async (orderData) => {
+      console.log('Creating order with data:', orderData);
       const response = await api.post(API_ENDPOINTS.ORDERS, orderData);
-      return response.data.data;
+      console.log('Order creation response:', response.data);
+      return response.data.data.order; // Extract the order from the nested structure
     },
     onSuccess: (newOrder) => {
       // Invalidate user orders

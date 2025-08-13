@@ -35,8 +35,25 @@ const PaymentPage = () => {
   // Get order data from navigation state
   useEffect(() => {
     if (location.state?.orderData) {
-      setOrderData(location.state.orderData);
+      const orderData = location.state.orderData;
+      
+      // Validate that orderData has required fields
+      if (!orderData._id) {
+        console.error('Order data missing ID:', orderData);
+        navigate(ROUTES.DRONES, { replace: true });
+        return;
+      }
+      
+      if (!orderData.totalAmount || orderData.totalAmount <= 0) {
+        console.error('Order data missing or invalid total amount:', orderData);
+        navigate(ROUTES.DRONES, { replace: true });
+        return;
+      }
+      
+      setOrderData(orderData);
+      console.log('PaymentPage: Order data loaded successfully:', orderData);
     } else {
+      console.warn('PaymentPage: No order data in navigation state');
       // If no order data, redirect back to catalog
       navigate(ROUTES.DRONES, { replace: true });
     }
@@ -231,8 +248,11 @@ const PaymentPage = () => {
                   
                   {orderData.droneId && (
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Drone: {orderData.droneId.name || 'Drone'}
+                      <Typography variant="body1" gutterBottom>
+                        {orderData.droneId.name || 'Drone'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Model: {orderData.droneId.model || 'N/A'}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Quantity: {orderData.quantity || 1}
@@ -240,7 +260,39 @@ const PaymentPage = () => {
                     </Box>
                   )}
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  {/* Price Breakdown */}
+                  <Box sx={{ mb: 2 }}>
+                    {orderData.droneId && (
+                      <>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Subtotal ({orderData.quantity || 1}x ${orderData.droneId.price?.toFixed(2) || '0.00'})
+                          </Typography>
+                          <Typography variant="body2">
+                            ${((orderData.droneId.price || 0) * (orderData.quantity || 1)).toFixed(2)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Tax (8%)
+                          </Typography>
+                          <Typography variant="body2">
+                            ${(((orderData.droneId.price || 0) * (orderData.quantity || 1)) * 0.08).toFixed(2)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Shipping
+                          </Typography>
+                          <Typography variant="body2" color="primary.main">
+                            FREE
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, pt: 2, borderTop: '1px solid #333' }}>
                     <Typography variant="h6" fontWeight={700}>
                       Total Amount
                     </Typography>

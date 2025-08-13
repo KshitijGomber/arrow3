@@ -153,7 +153,26 @@ const MockPaymentForm = ({ orderData, onPaymentSuccess, onPaymentError }) => {
 
   const handlePaymentSubmit = async (values) => {
     if (!orderData) {
-      toast.error('Order data is missing');
+      toast.error('Order data is missing. Please try placing the order again.');
+      return;
+    }
+
+    // Enhanced validation with detailed error messages
+    if (!orderData._id) {
+      console.error('Missing order ID. Order data:', orderData);
+      toast.error('Order ID is missing. Please try placing the order again.');
+      return;
+    }
+
+    if (!orderData.totalAmount || orderData.totalAmount <= 0) {
+      console.error('Invalid total amount. Order data:', orderData);
+      toast.error(`Invalid order amount: $${orderData.totalAmount || 0}. Please try again.`);
+      return;
+    }
+
+    if (!orderData.customerInfo) {
+      console.error('Missing customer info. Order data:', orderData);
+      toast.error('Customer information is missing. Please try again.');
       return;
     }
 
@@ -177,18 +196,6 @@ const MockPaymentForm = ({ orderData, onPaymentSuccess, onPaymentError }) => {
         amountType: typeof orderData.totalAmount,
         amountValue: orderData.totalAmount
       });
-
-      if (!orderData._id) {
-        throw new Error('Order ID is missing. Please try placing the order again.');
-      }
-
-      if (!orderData.totalAmount || orderData.totalAmount <= 0) {
-        throw new Error(`Invalid order amount: ${orderData.totalAmount}. Please try again.`);
-      }
-
-      if (!orderData.customerInfo) {
-        throw new Error('Customer information is missing. Please try again.');
-      }
 
       const paymentIntent = await createPaymentIntentMutation.mutateAsync(paymentIntentData);
       
@@ -538,11 +545,14 @@ const MockPaymentForm = ({ orderData, onPaymentSuccess, onPaymentError }) => {
               fontWeight: 600,
             }}
           >
-            {isProcessing ? 'Processing Payment...' : `Pay $${(orderData?.totalAmount || 0).toFixed(2)}`}
+            {isProcessing ? 'Processing Payment...' : `Pay $${(orderData?.totalAmount || 0).toFixed(2)} (Mock Payment)`}
           </Button>
 
           <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block', textAlign: 'center' }}>
-            🔒 Your payment information is secure and encrypted (Demo Mode)
+            🔒 This is a demo payment system - No real charges will be made
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
+            💡 Use any card details to simulate a successful payment
           </Typography>
         </Box>
       </form>

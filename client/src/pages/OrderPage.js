@@ -146,9 +146,31 @@ const OrderPage = () => {
 
       try {
         const newOrder = await createOrderMutation.mutateAsync(orderData);
-        // Navigate to payment page with order ID
+        
+        // Ensure the order has all required fields for payment
+        const completeOrderData = {
+          ...newOrder,
+          _id: newOrder._id || newOrder.id,
+          totalAmount: newOrder.totalAmount || calculateTotal(),
+          droneId: newOrder.droneId || {
+            _id: drone._id,
+            name: drone.name,
+            model: drone.model,
+            price: drone.price,
+            images: drone.images
+          },
+          customerInfo: newOrder.customerInfo || values.customerInfo,
+          quantity: newOrder.quantity || quantity
+        };
+        
+        console.log('Navigating to payment with order data:', completeOrderData);
+        
+        // Navigate to payment page with complete order data
         navigate(ROUTES.PAYMENT, { 
-          state: { orderId: newOrder._id, orderData: newOrder } 
+          state: { 
+            orderId: completeOrderData._id, 
+            orderData: completeOrderData 
+          } 
         });
       } catch (error) {
         console.error('Order creation failed:', error);
