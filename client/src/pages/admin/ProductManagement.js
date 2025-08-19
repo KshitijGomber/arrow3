@@ -137,7 +137,7 @@ const ProductManagement = () => {
         <Typography 
           variant="h4" 
           sx={{ 
-            color: 'white',
+            color: theme.palette.text.primary,
             fontWeight: 'bold',
             display: 'flex',
             alignItems: 'center',
@@ -164,18 +164,12 @@ const ProductManagement = () => {
             startIcon={<AddIcon />}
             onClick={() => navigate('/admin/products/add')}
             sx={{
-              background: `linear-gradient(135deg, 
-                #2ea4a5 0%, 
-                #1e7a7b 100%
-              )`,
-              color: '#ffffff',
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.common.white,
               '&:hover': {
-                background: `linear-gradient(135deg, 
-                  #1e7a7b 0%, 
-                  #2ea4a5 100%
-                )`,
+                backgroundColor: theme.palette.primary.dark,
                 transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(46, 164, 165, 0.3)',
+                boxShadow: `0 8px 25px ${theme.palette.primary.main}4D`,
               },
               borderRadius: 2,
               fontWeight: 600,
@@ -188,11 +182,8 @@ const ProductManagement = () => {
 
       {/* Navigation Tabs */}
       <Paper sx={{ 
-        background: `linear-gradient(135deg, 
-          rgba(26, 26, 26, 0.8) 0%, 
-          rgba(42, 42, 42, 0.6) 100%
-        )`,
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backgroundColor: theme.palette.background.elevated,
+        border: `1px solid ${theme.palette.divider}`,
         borderRadius: 2,
         mb: 3
       }}>
@@ -201,7 +192,7 @@ const ProductManagement = () => {
           onChange={handleTabChange}
           sx={{
             '& .MuiTab-root': {
-              color: '#aaa',
+              color: theme.palette.text.secondary,
               '&.Mui-selected': {
                 color: theme.palette.primary.main,
               },
@@ -252,11 +243,11 @@ const ProductManagement = () => {
           },
         }}
       >
-        <DialogTitle sx={{ color: 'white' }}>
+        <DialogTitle sx={{ color: theme.palette.text.primary }}>
           Confirm Delete
         </DialogTitle>
         <DialogContent>
-          <Typography sx={{ color: '#aaa' }}>
+          <Typography sx={{ color: theme.palette.text.secondary }}>
             Are you sure you want to delete "{deleteDialog.drone?.name}"? This action cannot be undone.
           </Typography>
           {deleteDialog.drone?.stockQuantity > 0 && (
@@ -268,7 +259,7 @@ const ProductManagement = () => {
         <DialogActions>
           <Button 
             onClick={handleDeleteCancel}
-            sx={{ color: '#aaa' }}
+            sx={{ color: theme.palette.text.secondary }}
           >
             Cancel
           </Button>
@@ -308,7 +299,7 @@ const DroneListView = ({
   
   if (error) {
     return (
-      <Alert severity="error" sx={{ backgroundColor: 'rgba(244, 67, 54, 0.1)' }}>
+      <Alert severity="error" sx={{ backgroundColor: theme.palette.error.main + '1A' }}>
         Error loading drones: {error.message}
       </Alert>
     );
@@ -319,7 +310,7 @@ const DroneListView = ({
       {/* Filters */}
       <Paper sx={{ backgroundColor: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, mb: 3 }}>
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" sx={{ color: 'white' }}>
+          <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
             Filters
           </Typography>
           <Button
@@ -348,12 +339,12 @@ const DroneListView = ({
             <TableRow sx={{ backgroundColor: theme.palette.background.elevated }}>
               <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Image</TableCell>
               <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Name</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Price</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Stock</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Featured</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Category</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Price</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Stock</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Status</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Featured</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -361,7 +352,7 @@ const DroneListView = ({
               <TableRow>
                 <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
                   <CircularProgress sx={{ color: theme.palette.primary.main }} />
-                  <Typography sx={{ color: '#aaa', mt: 2 }}>
+                  <Typography sx={{ color: theme.palette.text.secondary, mt: 2 }}>
                     Loading drones...
                   </Typography>
                 </TableCell>
@@ -369,7 +360,7 @@ const DroneListView = ({
             ) : dronesData?.drones?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
-                  <Typography sx={{ color: '#aaa' }}>
+                  <Typography sx={{ color: theme.palette.text.secondary }}>
                     No drones found
                   </Typography>
                 </TableCell>
@@ -393,10 +384,10 @@ const DroneListView = ({
                     </Avatar>
                   </TableCell>
                   <TableCell>
-                    <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
+                    <Typography sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                       {drone.name}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#aaa' }}>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                       {drone.model}
                     </Typography>
                   </TableCell>
@@ -406,7 +397,7 @@ const DroneListView = ({
                       size="small"
                       sx={{ 
                         backgroundColor: theme.palette.primary.main,
-                        color: '#000',
+                        color: theme.palette.common.black,
                         fontWeight: 'bold'
                       }}
                     />
@@ -417,7 +408,7 @@ const DroneListView = ({
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography sx={{ color: 'white' }}>
+                    <Typography sx={{ color: theme.palette.text.primary }}>
                       {drone.stockQuantity}
                     </Typography>
                   </TableCell>
@@ -441,7 +432,7 @@ const DroneListView = ({
                         <IconButton
                           size="small"
                           onClick={() => onView(drone._id)}
-                          sx={{ color: '#4fc3f7' }}
+                          sx={{ color: theme.palette.info.main }}
                         >
                           <ViewIcon />
                         </IconButton>
@@ -459,7 +450,7 @@ const DroneListView = ({
                         <IconButton
                           size="small"
                           onClick={() => onDelete(drone)}
-                          sx={{ color: '#f44336' }}
+                          sx={{ color: theme.palette.error.main }}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -476,7 +467,7 @@ const DroneListView = ({
       {/* Pagination Info */}
       {dronesData?.pagination && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-          <Typography sx={{ color: '#aaa' }}>
+          <Typography sx={{ color: theme.palette.text.secondary }}>
             Showing {dronesData.drones.length} of {dronesData.pagination.totalCount} drones
           </Typography>
         </Box>

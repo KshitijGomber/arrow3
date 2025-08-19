@@ -131,9 +131,9 @@ const AdminDashboard = () => {
           severity="error" 
           sx={{ 
             mb: 3,
-            backgroundColor: 'rgba(255, 68, 68, 0.1)',
-            border: '1px solid rgba(255, 68, 68, 0.2)',
-            color: '#ffffff'
+            backgroundColor: theme.palette.error.main + '1A',
+            border: `1px solid ${theme.palette.error.main}33`,
+            color: theme.palette.text.primary
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -164,30 +164,30 @@ const AdminDashboard = () => {
     {
       title: 'Total Products',
       value: stats.totalProducts || 0,
-      icon: <ProductsIcon sx={{ fontSize: 40, color: '#2ea4a5' }} />,
+      icon: <ProductsIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />,
       action: () => navigate('/admin/products'),
-      color: '#2ea4a5'
+      color: theme.palette.primary.main
     },
     {
       title: 'Total Orders',
       value: stats.totalOrders || 0,
-      icon: <OrdersIcon sx={{ fontSize: 40, color: '#ff6b35' }} />,
+      icon: <OrdersIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />,
       action: () => navigate('/admin/orders'),
-      color: '#ff6b35'
+      color: theme.palette.secondary.main
     },
     {
       title: 'Total Users',
       value: stats.totalUsers || 0,
-      icon: <UsersIcon sx={{ fontSize: 40, color: '#4fc3f7' }} />,
+      icon: <UsersIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />,
       action: () => {},
-      color: '#4fc3f7'
+      color: theme.palette.info.main
     },
     {
       title: 'Total Revenue',
       value: `$${(stats.totalRevenue || 0).toLocaleString()}`,
-      icon: <RevenueIcon sx={{ fontSize: 40, color: '#ffd54f' }} />,
+      icon: <RevenueIcon sx={{ fontSize: 40, color: theme.palette.warning.main }} />,
       action: () => {},
-      color: '#ffd54f'
+      color: theme.palette.warning.main
     }
   ];
 
@@ -205,7 +205,7 @@ const AdminDashboard = () => {
   if (statsLoading) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
+        <Typography variant="h4" gutterBottom sx={{ color: theme.palette.text.primary }}>
           Loading Dashboard...
         </Typography>
         <LinearProgress sx={{ mt: 2, backgroundColor: theme.palette.background.elevated }} />
@@ -250,13 +250,13 @@ const AdminDashboard = () => {
             justifyContent: 'center'
           }}
         >
-          <DashboardIcon sx={{ color: '#2ea4a5' }} />
+          <DashboardIcon sx={{ color: theme.palette.primary.main }} />
           Admin Dashboard
         </Typography>
         <Typography 
           variant="subtitle1" 
           sx={{ 
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: theme.palette.text.secondary,
             textAlign: 'center'
           }}
         >
@@ -287,10 +287,10 @@ const AdminDashboard = () => {
                 borderRadius: 2,
                 backdropFilter: 'blur(10px)',
                 '&:hover': {
-                  borderColor: 'rgba(46, 164, 165, 0.3)',
+                  borderColor: theme.palette.primary.main + '4D',
                   transform: 'translateY(-2px)',
-                  backgroundColor: 'rgba(46, 164, 165, 0.05)',
-                  boxShadow: '0 8px 25px rgba(46, 164, 165, 0.2)'
+                  backgroundColor: theme.palette.primary.main + '0D',
+                  boxShadow: `0 8px 25px ${theme.palette.primary.main}33`
                 }
               }}
               onClick={card.action}
@@ -301,7 +301,7 @@ const AdminDashboard = () => {
                     <Typography 
                       variant="h4" 
                       sx={{ 
-                        color: '#2ea4a5', 
+                        color: card.color, 
                         fontWeight: 700,
                         mb: 1
                       }}
@@ -323,7 +323,7 @@ const AdminDashboard = () => {
                   </Box>
                   <Box 
                     sx={{ 
-                      backgroundColor: 'rgba(46, 164, 165, 0.1)',
+                      backgroundColor: card.color + '1A',
                       borderRadius: '50%',
                       p: 1.5,
                       display: 'flex',
@@ -357,7 +357,7 @@ const AdminDashboard = () => {
                 variant="h6" 
                 gutterBottom 
                 sx={{ 
-                  color: 'white',
+                  color: theme.palette.text.primary,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1
@@ -378,19 +378,19 @@ const AdminDashboard = () => {
                         justifyContent: 'space-between', 
                         alignItems: 'center',
                         p: 2,
-                        backgroundColor: 'rgba(26, 26, 26, 0.5)',
+                        backgroundColor: theme.palette.background.elevated,
                         borderRadius: 1,
-                        border: '1px solid rgba(255, 255, 255, 0.1)'
+                        border: `1px solid ${theme.palette.divider}`
                       }}
                     >
                       <Box>
-                        <Typography variant="subtitle2" sx={{ color: 'white' }}>
+                        <Typography variant="subtitle2" sx={{ color: theme.palette.text.primary }}>
                           {order.orderId || 'N/A'}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#aaa' }}>
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                           {order.customer || 'Unknown Customer'}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#666' }}>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                           {order.drone || 'Unknown Drone'}
                         </Typography>
                       </Box>
@@ -408,7 +408,7 @@ const AdminDashboard = () => {
                   ))}
                 </Box>
               ) : (
-                <Typography variant="body2" sx={{ color: '#aaa' }}>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                   No recent orders
                 </Typography>
               )}
@@ -428,11 +428,8 @@ const AdminDashboard = () => {
         {/* Alerts & Notifications */}
         <Grid item xs={12} md={4}>
           <Card sx={{ 
-            background: `linear-gradient(135deg, 
-              rgba(26, 26, 26, 0.8) 0%, 
-              rgba(42, 42, 42, 0.6) 100%
-            )`,
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundColor: theme.palette.background.elevated,
+            border: `1px solid ${theme.palette.divider}`,
             borderRadius: 2
           }}>
             <CardContent>
@@ -440,13 +437,13 @@ const AdminDashboard = () => {
                 variant="h6" 
                 gutterBottom 
                 sx={{ 
-                  color: 'white',
+                  color: theme.palette.text.primary,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1
                 }}
               >
-                <NotificationsIcon sx={{ color: '#ff6b35' }} />
+                <NotificationsIcon sx={{ color: theme.palette.secondary.main }} />
                 Alerts
               </Typography>
               <Divider sx={{ backgroundColor: theme.palette.divider, mb: 2 }} />

@@ -17,8 +17,7 @@ import {
   CircularProgress,
   Divider,
   InputAdornment,
-  Autocomplete,
-  useTheme
+  Autocomplete
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -29,6 +28,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { useDrone, useCreateDrone, useUpdateDrone } from '../../../hooks/queries/useDroneQueries';
 import { CloudinaryUploadField } from '../../../components/common';
+import { useCustomTheme } from '../../../context/ThemeContext';
 import toast from 'react-hot-toast';
 import api from '../../../utils/api';
 
@@ -52,7 +52,7 @@ const AI_MODES = [
 const DroneForm = ({ mode = 'create' }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   const isEditMode = mode === 'edit' && id;
 
   // Fetch drone data for edit mode
@@ -240,8 +240,8 @@ const DroneForm = ({ mode = 'create' }) => {
   if (isEditMode && isLoadingDrone) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-        <CircularProgress sx={{ color: 'theme.palette.primary.main' }} />
-        <Typography sx={{ color: '#aaa', ml: 2 }}>
+        <CircularProgress sx={{ color: theme.palette.primary.main }} />
+        <Typography sx={{ color: theme.palette.text.secondary, ml: 2 }}>
           Loading drone data...
         </Typography>
       </Box>
@@ -302,12 +302,12 @@ const DroneForm = ({ mode = 'create' }) => {
                         helperText={errors.name?.message}
                         sx={{
                           '& .MuiOutlinedInput-root': {
-                            color: 'white',
-                            '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
-                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
+                            color: theme.palette.text.primary,
+                            '& fieldset': { borderColor: theme.palette.divider },
+                            '&:hover fieldset': { borderColor: theme.palette.primary.main },
+                            '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main }
                           },
-                          '& .MuiInputLabel-root': { color: '#aaa' }
+                          '& .MuiInputLabel-root': { color: theme.palette.text.secondary }
                         }}
                       />
                     )}
@@ -328,12 +328,12 @@ const DroneForm = ({ mode = 'create' }) => {
                         helperText={errors.model?.message}
                         sx={{
                           '& .MuiOutlinedInput-root': {
-                            color: 'white',
-                            '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
-                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
+                            color: theme.palette.text.primary,
+                            '& fieldset': { borderColor: theme.palette.divider },
+                            '&:hover fieldset': { borderColor: theme.palette.primary.main },
+                            '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main }
                           },
-                          '& .MuiInputLabel-root': { color: '#aaa' }
+                          '& .MuiInputLabel-root': { color: theme.palette.text.secondary }
                         }}
                       />
                     )}
@@ -683,7 +683,7 @@ const DroneForm = ({ mode = 'create' }) => {
               <Divider sx={{ my: 3, backgroundColor: theme.palette.divider }} />
 
               {/* Dimensions */}
-              <Typography variant="subtitle1" sx={{ color: 'white', mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary, mb: 2 }}>
                 Dimensions (cm)
               </Typography>
               <Grid container spacing={2}>
@@ -848,7 +848,7 @@ const DroneForm = ({ mode = 'create' }) => {
               <Divider sx={{ my: 3, backgroundColor: '#333' }} />
 
               {/* Features */}
-              <Typography variant="subtitle1" sx={{ color: 'white', mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary, mb: 2 }}>
                 Features
               </Typography>
               <Grid container spacing={2}>

@@ -192,7 +192,7 @@ const OrderManagement = () => {
         <Typography 
           variant="h4" 
           sx={{ 
-            color: 'white',
+            color: theme.palette.text.primary,
             fontWeight: 'bold',
             display: 'flex',
             alignItems: 'center',
@@ -304,12 +304,12 @@ const OrderManagement = () => {
             <TableRow sx={{ backgroundColor: theme.palette.background.elevated }}>
               <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Order ID</TableCell>
               <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Customer</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Drone</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Amount</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Payment</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Drone</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Amount</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Status</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Payment</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Date</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -340,13 +340,13 @@ const OrderManagement = () => {
                   }}
                 >
                   <TableCell>
-                    <Typography sx={{ color: 'white', fontFamily: 'monospace' }}>
+                    <Typography sx={{ color: theme.palette.text.primary, fontFamily: 'monospace' }}>
                       #{order._id.slice(-8).toUpperCase()}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Box>
-                      <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
+                      <Typography sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                         {order.customerInfo.firstName} {order.customerInfo.lastName}
                       </Typography>
                       <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
@@ -542,7 +542,7 @@ const OrderDetailsDialog = ({
         },
       }}
     >
-      <DialogTitle sx={{ color: 'white' }}>
+      <DialogTitle sx={{ color: theme.palette.text.primary }}>
         Order Details - #{order._id.slice(-8).toUpperCase()}
       </DialogTitle>
       

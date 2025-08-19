@@ -25,7 +25,6 @@ import {
   Paper,
   Skeleton,
   Avatar,
-  useTheme,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -38,6 +37,7 @@ import {
   Assignment as ProcessingIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
+import { useCustomTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 import { formatDate, formatPrice } from '../utils/helpers';
 import NavigationBar from '../components/common/NavigationBar';
@@ -69,7 +69,7 @@ const getStatusIcon = (status) => {
 };
 
 const ProfilePage = () => {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   const { user, updateUser } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [orders, setOrders] = useState([]);
@@ -180,7 +180,7 @@ const ProfilePage = () => {
       <Box
         sx={{
           minHeight: '100vh',
-          backgroundColor: '#0a0a0a',
+          backgroundColor: theme.palette.background.default,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -199,7 +199,7 @@ const ProfilePage = () => {
       <Box
         sx={{
           minHeight: '100vh',
-          backgroundColor: '#0a0a0a',
+          backgroundColor: theme.palette.background.default,
           py: 4,
         }}
       >
@@ -221,7 +221,7 @@ const ProfilePage = () => {
           <Typography
             variant="body1"
             sx={{
-              color: '#cccccc',
+              color: theme.palette.text.secondary,
               textAlign: 'center',
               maxWidth: 600,
               mx: 'auto',
@@ -238,7 +238,7 @@ const ProfilePage = () => {
           </Alert>
         )}
         {error && (
-          <Alert severity="error" sx={{ mb: 3, backgroundColor: 'rgba(255, 82, 82, 0.1)' }}>
+          <Alert severity="error" sx={{ mb: 3, backgroundColor: theme.palette.error.main + '1A' }}>
             {error}
           </Alert>
         )}
@@ -246,8 +246,8 @@ const ProfilePage = () => {
         {/* Tabs */}
         <Paper
           sx={{
-            backgroundColor: '#1a1a1a',
-            border: '1px solid #333',
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
             borderRadius: 2,
             overflow: 'hidden',
           }}
@@ -256,9 +256,9 @@ const ProfilePage = () => {
             value={tabValue}
             onChange={handleTabChange}
             sx={{
-              borderBottom: '1px solid #333',
+              borderBottom: `1px solid ${theme.palette.divider}`,
               '& .MuiTab-root': {
-                color: '#cccccc',
+                color: theme.palette.text.secondary,
                 '&.Mui-selected': {
                   color: theme.palette.primary.main,
                 },
@@ -279,8 +279,8 @@ const ProfilePage = () => {
                 <Grid item xs={12} md={4}>
                   <Card
                     sx={{
-                      backgroundColor: '#2a2a2a',
-                      border: '1px solid #444',
+                      backgroundColor: theme.palette.background.elevated,
+                      border: `1px solid ${theme.palette.divider}`,
                       textAlign: 'center',
                     }}
                   >
@@ -297,10 +297,10 @@ const ProfilePage = () => {
                       >
                         {user?.firstName?.[0]?.toUpperCase() || 'U'}
                       </Avatar>
-                      <Typography variant="h6" sx={{ color: '#fff', mb: 1 }}>
+                      <Typography variant="h6" sx={{ color: theme.palette.text.primary, mb: 1 }}>
                         {user?.firstName} {user?.lastName}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#cccccc', mb: 2 }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 2 }}>
                         {user?.email}
                       </Typography>
                       <Button
@@ -325,42 +325,42 @@ const ProfilePage = () => {
                 <Grid item xs={12} md={8}>
                   <Card
                     sx={{
-                      backgroundColor: '#2a2a2a',
-                      border: '1px solid #444',
+                      backgroundColor: theme.palette.background.elevated,
+                      border: `1px solid ${theme.palette.divider}`,
                     }}
                   >
                     <CardContent>
-                      <Typography variant="h6" sx={{ color: '#fff', mb: 3 }}>
+                      <Typography variant="h6" sx={{ color: theme.palette.text.primary, mb: 3 }}>
                         Account Information
                       </Typography>
                       
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                          <Typography variant="body2" sx={{ color: '#999', mb: 1 }}>
+                          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
                             First Name
                           </Typography>
-                          <Typography variant="body1" sx={{ color: '#fff' }}>
+                          <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
                             {user?.firstName || 'Not provided'}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography variant="body2" sx={{ color: '#999', mb: 1 }}>
+                          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
                             Last Name
                           </Typography>
-                          <Typography variant="body1" sx={{ color: '#fff' }}>
+                          <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
                             {user?.lastName || 'Not provided'}
                           </Typography>
                         </Grid>
-                        <Grid item xs={12}>
-                          <Typography variant="body2" sx={{ color: '#999', mb: 1 }}>
-                            Email Address
+                                                <Grid item xs={12}>
+                          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
+                            Email
                           </Typography>
-                          <Typography variant="body1" sx={{ color: '#fff' }}>
-                            {user?.email}
+                          <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
+                            {user?.email || 'Not provided'}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography variant="body2" sx={{ color: '#999', mb: 1 }}>
+                          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
                             Account Status
                           </Typography>
                           <Chip
@@ -370,10 +370,10 @@ const ProfilePage = () => {
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography variant="body2" sx={{ color: '#999', mb: 1 }}>
+                          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
                             Member Since
                           </Typography>
-                          <Typography variant="body1" sx={{ color: '#fff' }}>
+                          <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
                             {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
                           </Typography>
                         </Grid>
@@ -388,7 +388,7 @@ const ProfilePage = () => {
           {/* Order History Tab */}
           {tabValue === 1 && (
             <Box sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ color: '#fff', mb: 3 }}>
+              <Typography variant="h6" sx={{ color: theme.palette.text.primary, mb: 3 }}>
                 Order History
               </Typography>
               
@@ -399,25 +399,25 @@ const ProfilePage = () => {
                       key={index}
                       variant="rectangular"
                       height={80}
-                      sx={{ mb: 2, backgroundColor: '#333' }}
+                      sx={{ mb: 2, backgroundColor: theme.palette.divider }}
                     />
                   ))}
                 </Box>
               ) : orders.length === 0 ? (
                 <Card
                   sx={{
-                    backgroundColor: '#2a2a2a',
-                    border: '1px solid #444',
+                    backgroundColor: theme.palette.background.elevated,
+                    border: `1px solid ${theme.palette.divider}`,
                     textAlign: 'center',
                     py: 6,
                   }}
                 >
                   <CardContent>
-                    <OrderIcon sx={{ fontSize: 64, color: '#666', mb: 2 }} />
-                    <Typography variant="h6" sx={{ color: '#fff', mb: 1 }}>
+                    <OrderIcon sx={{ fontSize: 64, color: theme.palette.text.disabled, mb: 2 }} />
+                    <Typography variant="h6" sx={{ color: theme.palette.text.primary, mb: 1 }}>
                       No Orders Yet
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#999', mb: 3 }}>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
                       You haven't placed any orders yet. Start exploring our drone collection!
                     </Typography>
                     <Button
@@ -425,9 +425,9 @@ const ProfilePage = () => {
                       href="/drones"
                       sx={{
                         backgroundColor: theme.palette.primary.main,
-                        color: '#000',
+                        color: theme.palette.primary.contrastText,
                         '&:hover': {
-                          backgroundColor: '#00cc6a',
+                          backgroundColor: theme.palette.primary.dark,
                         },
                       }}
                     >
@@ -439,29 +439,29 @@ const ProfilePage = () => {
                 <TableContainer
                   component={Paper}
                   sx={{
-                    backgroundColor: '#2a2a2a',
-                    border: '1px solid #444',
+                    backgroundColor: theme.palette.background.paper,
+                    border: `1px solid ${theme.palette.divider}`,
                   }}
                 >
                   <Table>
                     <TableHead>
-                      <TableRow sx={{ '& th': { borderBottom: '1px solid #444' } }}>
-                        <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>
+                      <TableRow sx={{ '& th': { borderBottom: `1px solid ${theme.palette.divider}` } }}>
+                        <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                           Order ID
                         </TableCell>
-                        <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>
+                        <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                           Drone
                         </TableCell>
-                        <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>
+                        <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                           Date
                         </TableCell>
-                        <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>
+                        <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                           Total
                         </TableCell>
-                        <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>
+                        <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                           Status
                         </TableCell>
-                        <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>
+                        <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                           Payment
                         </TableCell>
                       </TableRow>
@@ -472,8 +472,8 @@ const ProfilePage = () => {
                           key={order._id}
                           sx={{
                             '& td': {
-                              borderBottom: '1px solid #444',
-                              color: '#fff',
+                              borderBottom: `1px solid ${theme.palette.divider}`,
+                              color: theme.palette.text.primary,
                             },
                             '&:hover': {
                               backgroundColor: theme.palette.action.hover,
@@ -539,12 +539,12 @@ const ProfilePage = () => {
           fullWidth
           PaperProps={{
             sx: {
-              backgroundColor: '#1a1a1a',
-              border: '1px solid #333',
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
             },
           }}
         >
-          <DialogTitle sx={{ color: '#fff', borderBottom: '1px solid #333' }}>
+          <DialogTitle sx={{ color: theme.palette.text.primary, borderBottom: `1px solid ${theme.palette.divider}` }}>
             Edit Profile
           </DialogTitle>
           <DialogContent sx={{ pt: 3 }}>
@@ -558,21 +558,21 @@ const ProfilePage = () => {
                   variant="outlined"
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      color: '#fff',
+                      color: theme.palette.text.primary,
                       '& fieldset': {
-                        borderColor: '#444',
+                        borderColor: theme.palette.divider,
                       },
                       '&:hover fieldset': {
-                        borderColor: 'theme.palette.primary.main',
+                        borderColor: theme.palette.primary.main,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: 'theme.palette.primary.main',
+                        borderColor: theme.palette.primary.main,
                       },
                     },
                     '& .MuiInputLabel-root': {
-                      color: '#999',
+                      color: theme.palette.text.secondary,
                       '&.Mui-focused': {
-                        color: 'theme.palette.primary.main',
+                        color: theme.palette.primary.main,
                       },
                     },
                   }}
@@ -587,21 +587,21 @@ const ProfilePage = () => {
                   variant="outlined"
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      color: '#fff',
+                      color: theme.palette.text.primary,
                       '& fieldset': {
-                        borderColor: '#444',
+                        borderColor: theme.palette.divider,
                       },
                       '&:hover fieldset': {
-                        borderColor: 'theme.palette.primary.main',
+                        borderColor: theme.palette.primary.main,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: 'theme.palette.primary.main',
+                        borderColor: theme.palette.primary.main,
                       },
                     },
                     '& .MuiInputLabel-root': {
-                      color: '#999',
+                      color: theme.palette.text.secondary,
                       '&.Mui-focused': {
-                        color: 'theme.palette.primary.main',
+                        color: theme.palette.primary.main,
                       },
                     },
                   }}
@@ -610,15 +610,15 @@ const ProfilePage = () => {
             </Grid>
             
             {error && (
-              <Alert severity="error" sx={{ mt: 2, backgroundColor: 'rgba(255, 82, 82, 0.1)' }}>
+              <Alert severity="error" sx={{ mt: 2, backgroundColor: `${theme.palette.error.main}1A` }}>
                 {error}
               </Alert>
             )}
           </DialogContent>
-          <DialogActions sx={{ p: 3, borderTop: '1px solid #333' }}>
+          <DialogActions sx={{ p: 3, borderTop: `1px solid ${theme.palette.divider}` }}>
             <Button
               onClick={() => setEditDialogOpen(false)}
-              sx={{ color: '#999' }}
+              sx={{ color: theme.palette.text.secondary }}
               disabled={updateLoading}
             >
               Cancel
@@ -629,14 +629,14 @@ const ProfilePage = () => {
               disabled={updateLoading || !editForm.firstName.trim() || !editForm.lastName.trim()}
               sx={{
                 backgroundColor: theme.palette.primary.main,
-                color: '#000',
+                color: theme.palette.primary.contrastText,
                 '&:hover': {
-                  backgroundColor: '#00cc6a',
-                },
-                '&:disabled': {
-                  backgroundColor: '#333',
-                  color: '#666',
-                },
+                          backgroundColor: theme.palette.primary.dark,
+                        },
+                        '&:disabled': {
+                          backgroundColor: theme.palette.action.disabledBackground,
+                          color: theme.palette.action.disabled,
+                        },
               }}
             >
               {updateLoading ? 'Updating...' : 'Update Profile'}
