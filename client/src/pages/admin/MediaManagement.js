@@ -24,7 +24,8 @@ import {
   Select,
   MenuItem,
   CircularProgress,
-  Divider
+  Divider,
+  useTheme
 } from '@mui/material';
 import {
   PhotoLibrary as MediaIcon,
@@ -41,8 +42,10 @@ import { useDrones } from '../../hooks/queries/useDroneQueries';
 import { useMediaUpload, useMediaDelete, useDroneMedia } from '../../hooks/queries/useMediaQueries';
 import { CloudinaryUploadField } from '../../components/common';
 import cloudinaryService from '../../services/cloudinaryService';
+import { adminStyles } from '../../utils/adminTheme';
 
 const MediaManagement = () => {
+  const theme = useTheme();
   const [selectedDroneId, setSelectedDroneId] = useState('');
   const [uploadDialog, setUploadDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, media: null });
@@ -131,7 +134,7 @@ const MediaManagement = () => {
             gap: 2
           }}
         >
-          <MediaIcon sx={{ color: '#00ff88' }} />
+          <MediaIcon sx={{ color: theme.palette.primary.main }} />
           Media Management
         </Typography>
         
@@ -139,7 +142,7 @@ const MediaManagement = () => {
           <Tooltip title="Refresh Media">
             <IconButton 
               onClick={() => refetchMedia()}
-              sx={{ color: '#00ff88' }}
+              sx={{ color: theme.palette.primary.main }}
               disabled={!selectedDroneId || isLoadingMedia}
             >
               <RefreshIcon />
@@ -152,7 +155,7 @@ const MediaManagement = () => {
             onClick={handleUploadClick}
             disabled={!selectedDroneId}
             sx={{
-              backgroundColor: '#00ff88',
+              backgroundColor: theme.palette.primary.main,
               color: '#000',
               '&:hover': {
                 backgroundColor: '#00cc6a',
@@ -184,8 +187,8 @@ const MediaManagement = () => {
             sx={{
               color: 'white',
               '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main }
             }}
           >
             {dronesData?.drones?.map((drone) => (
@@ -199,7 +202,7 @@ const MediaManagement = () => {
         {selectedDrone && (
           <Box sx={{ mt: 2, p: 2, backgroundColor: '#1a1a1a', borderRadius: 1 }}>
             <Typography variant="body2" sx={{ color: '#aaa' }}>
-              Selected: <strong style={{ color: '#00ff88' }}>{selectedDrone.name}</strong>
+              Selected: <strong style={{ color: theme.palette.primary.main }}>{selectedDrone.name}</strong>
             </Typography>
             <Typography variant="body2" sx={{ color: '#666' }}>
               Current media: {mediaData?.drone?.totalImages || 0} images, {mediaData?.drone?.totalVideos || 0} videos
@@ -217,7 +220,7 @@ const MediaManagement = () => {
 
           {isLoadingMedia ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
-              <CircularProgress sx={{ color: '#00ff88' }} />
+              <CircularProgress sx={{ color: theme.palette.primary.main }} />
               <Typography sx={{ color: '#aaa', ml: 2 }}>
                 Loading media...
               </Typography>
@@ -441,6 +444,7 @@ const MediaCard = ({ media, onDelete, onPreview }) => {
 
 // Cloudinary Media Upload Dialog Component
 const MediaUploadDialog = ({ open, onClose, droneId, droneName, onUploadComplete }) => {
+  const theme = useTheme();
   const [mediaUrls, setMediaUrls] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -495,7 +499,7 @@ const MediaUploadDialog = ({ open, onClose, droneId, droneName, onUploadComplete
     >
       <DialogTitle sx={{ color: 'white', display: 'flex', alignItems: 'center', gap: 1 }}>
         <span>Upload Media - {droneName}</span>
-        <Chip label="☁️ Cloudinary" size="small" sx={{ backgroundColor: '#00ff88', color: 'black' }} />
+        <Chip label="☁️ Cloudinary" size="small" sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText }} />
       </DialogTitle>
       
       <DialogContent>
@@ -517,7 +521,7 @@ const MediaUploadDialog = ({ open, onClose, droneId, droneName, onUploadComplete
         
         {isUploading && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-            <CircularProgress size={20} sx={{ color: '#00ff88' }} />
+            <CircularProgress size={20} sx={{ color: theme.palette.primary.main }} />
             <Typography variant="body2" sx={{ color: '#aaa' }}>
               Updating drone media...
             </Typography>

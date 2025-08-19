@@ -8,7 +8,8 @@ import {
   Select,
   MenuItem,
   Button,
-  InputAdornment
+  InputAdornment,
+  useTheme
 } from '@mui/material';
 import {
   Clear as ClearIcon,
@@ -26,6 +27,8 @@ const SORT_OPTIONS = [
 ];
 
 const DroneFilters = ({ filters, onFiltersChange }) => {
+  const theme = useTheme();
+  
   const handleFilterChange = (field, value) => {
     const newFilters = {
       ...filters,
@@ -42,6 +45,23 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
 
+  const inputStyles = {
+    '& .MuiOutlinedInput-root': {
+      color: theme.palette.text.primary,
+      '& fieldset': { borderColor: theme.palette.divider },
+      '&:hover fieldset': { borderColor: theme.palette.primary.main },
+      '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main }
+    },
+    '& .MuiInputLabel-root': { color: theme.palette.text.secondary }
+  };
+
+  const selectStyles = {
+    color: theme.palette.text.primary,
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.divider },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main }
+  };
+
   return (
     <Box>
       <Grid container spacing={2} alignItems="center">
@@ -55,36 +75,23 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: '#aaa' }} />
+                  <SearchIcon sx={{ color: theme.palette.text.secondary }} />
                 </InputAdornment>
               ),
             }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': { borderColor: '#333' },
-                '&:hover fieldset': { borderColor: '#00ff88' },
-                '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-              },
-              '& .MuiInputLabel-root': { color: '#aaa' }
-            }}
+            sx={inputStyles}
           />
         </Grid>
 
         {/* Category */}
         <Grid item xs={12} md={2}>
           <FormControl fullWidth>
-            <InputLabel sx={{ color: '#aaa' }}>Category</InputLabel>
+            <InputLabel sx={{ color: theme.palette.text.secondary }}>Category</InputLabel>
             <Select
               value={filters.category || ''}
               onChange={(e) => handleFilterChange('category', e.target.value)}
               label="Category"
-              sx={{
-                color: 'white',
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
-              }}
+              sx={selectStyles}
             >
               <MenuItem value="">All Categories</MenuItem>
               {CATEGORIES.map((category) => (
@@ -107,15 +114,7 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
             InputProps={{
               startAdornment: <InputAdornment position="start">$</InputAdornment>,
             }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': { borderColor: '#333' },
-                '&:hover fieldset': { borderColor: '#00ff88' },
-                '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-              },
-              '& .MuiInputLabel-root': { color: '#aaa' }
-            }}
+            sx={inputStyles}
           />
         </Grid>
 
@@ -129,32 +128,19 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
             InputProps={{
               startAdornment: <InputAdornment position="start">$</InputAdornment>,
             }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': { borderColor: '#333' },
-                '&:hover fieldset': { borderColor: '#00ff88' },
-                '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-              },
-              '& .MuiInputLabel-root': { color: '#aaa' }
-            }}
+            sx={inputStyles}
           />
         </Grid>
 
         {/* Sort By */}
         <Grid item xs={12} md={2}>
           <FormControl fullWidth>
-            <InputLabel sx={{ color: '#aaa' }}>Sort By</InputLabel>
+            <InputLabel sx={{ color: theme.palette.text.secondary }}>Sort By</InputLabel>
             <Select
               value={filters.sortBy || ''}
               onChange={(e) => handleFilterChange('sortBy', e.target.value)}
               label="Sort By"
-              sx={{
-                color: 'white',
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
-              }}
+              sx={selectStyles}
             >
               <MenuItem value="">Default</MenuItem>
               {SORT_OPTIONS.map((option) => (
@@ -174,11 +160,11 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
             startIcon={<ClearIcon />}
             onClick={handleClearFilters}
             sx={{
-              color: '#aaa',
-              borderColor: '#333',
+              color: theme.palette.text.secondary,
+              borderColor: theme.palette.divider,
               '&:hover': {
-                borderColor: '#aaa',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                borderColor: theme.palette.text.secondary,
+                backgroundColor: theme.palette.action.hover,
               },
             }}
           >
@@ -192,17 +178,12 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
         {/* Camera Resolution */}
         <Grid item xs={12} md={3}>
           <FormControl fullWidth>
-            <InputLabel sx={{ color: '#aaa' }}>Camera Resolution</InputLabel>
+            <InputLabel sx={{ color: theme.palette.text.secondary }}>Camera Resolution</InputLabel>
             <Select
               value={filters.cameraResolution || ''}
               onChange={(e) => handleFilterChange('cameraResolution', e.target.value)}
               label="Camera Resolution"
-              sx={{
-                color: 'white',
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
-              }}
+              sx={selectStyles}
             >
               <MenuItem value="">All Resolutions</MenuItem>
               {CAMERA_RESOLUTIONS.map((resolution) => (
@@ -225,32 +206,19 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
             InputProps={{
               endAdornment: <InputAdornment position="end">min</InputAdornment>,
             }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': { borderColor: '#333' },
-                '&:hover fieldset': { borderColor: '#00ff88' },
-                '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-              },
-              '& .MuiInputLabel-root': { color: '#aaa' }
-            }}
+            sx={inputStyles}
           />
         </Grid>
 
         {/* Stock Status */}
         <Grid item xs={12} md={3}>
           <FormControl fullWidth>
-            <InputLabel sx={{ color: '#aaa' }}>Stock Status</InputLabel>
+            <InputLabel sx={{ color: theme.palette.text.secondary }}>Stock Status</InputLabel>
             <Select
               value={filters.stockStatus || ''}
               onChange={(e) => handleFilterChange('stockStatus', e.target.value)}
               label="Stock Status"
-              sx={{
-                color: 'white',
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
-              }}
+              sx={selectStyles}
             >
               <MenuItem value="">All Stock</MenuItem>
               <MenuItem value="inStock">In Stock</MenuItem>
@@ -263,17 +231,12 @@ const DroneFilters = ({ filters, onFiltersChange }) => {
         {/* Featured Status */}
         <Grid item xs={12} md={3}>
           <FormControl fullWidth>
-            <InputLabel sx={{ color: '#aaa' }}>Featured</InputLabel>
+            <InputLabel sx={{ color: theme.palette.text.secondary }}>Featured</InputLabel>
             <Select
               value={filters.featured || ''}
               onChange={(e) => handleFilterChange('featured', e.target.value)}
               label="Featured"
-              sx={{
-                color: 'white',
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
-              }}
+              sx={selectStyles}
             >
               <MenuItem value="">All Drones</MenuItem>
               <MenuItem value="true">Featured Only</MenuItem>

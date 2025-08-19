@@ -31,7 +31,8 @@ import {
   Alert,
   Tabs,
   Tab,
-  Badge
+  Badge,
+  useTheme
 } from '@mui/material';
 import {
   ShoppingCart as OrdersIcon,
@@ -52,6 +53,7 @@ import { useAllOrders, useUpdateOrderStatus } from '../../hooks/queries/useOrder
 import { ORDER_STATUS, PAYMENT_STATUS } from '../../utils/constants';
 
 const OrderManagement = () => {
+  const theme = useTheme();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderDetailsDialog, setOrderDetailsDialog] = useState(false);
   const [statusUpdateDialog, setStatusUpdateDialog] = useState(false);
@@ -197,7 +199,7 @@ const OrderManagement = () => {
             gap: 2
           }}
         >
-          <OrdersIcon sx={{ color: '#00ff88' }} />
+          <OrdersIcon sx={{ color: theme.palette.primary.main }} />
           Order Management
         </Typography>
         
@@ -205,7 +207,7 @@ const OrderManagement = () => {
           <Tooltip title="Refresh Orders">
             <IconButton 
               onClick={() => refetch()}
-              sx={{ color: '#00ff88' }}
+              sx={{ color: theme.palette.primary.main }}
               disabled={isLoading}
             >
               <RefreshIcon />
@@ -225,11 +227,11 @@ const OrderManagement = () => {
             '& .MuiTab-root': {
               color: '#aaa',
               '&.Mui-selected': {
-                color: '#00ff88',
+                color: theme.palette.primary.main,
               },
             },
             '& .MuiTabs-indicator': {
-              backgroundColor: '#00ff88',
+              backgroundColor: theme.palette.primary.main,
             },
           }}
         >
@@ -314,7 +316,7 @@ const OrderManagement = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
-                  <CircularProgress sx={{ color: '#00ff88' }} />
+                  <CircularProgress sx={{ color: theme.palette.primary.main }} />
                   <Typography sx={{ color: '#aaa', mt: 2 }}>
                     Loading orders...
                   </Typography>
@@ -363,7 +365,7 @@ const OrderManagement = () => {
                     </Box>
                   </TableCell>
                   <TableCell>
-                    <Typography sx={{ color: '#00ff88', fontWeight: 'bold' }}>
+                    <Typography sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }}>
                       {formatCurrency(order.totalAmount)}
                     </Typography>
                   </TableCell>
@@ -401,7 +403,7 @@ const OrderManagement = () => {
                         <IconButton
                           size="small"
                           onClick={() => handleStatusUpdate(order)}
-                          sx={{ color: '#00ff88' }}
+                          sx={{ color: theme.palette.primary.main }}
                         >
                           <EditIcon />
                         </IconButton>
@@ -456,8 +458,8 @@ const OrderManagement = () => {
                 sx={{
                   color: 'white',
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main }
                 }}
               >
                 {Object.values(ORDER_STATUS).map((status) => (
@@ -479,8 +481,8 @@ const OrderManagement = () => {
                 '& .MuiOutlinedInput-root': {
                   color: 'white',
                   '& fieldset': { borderColor: '#333' },
-                  '&:hover fieldset': { borderColor: '#00ff88' },
-                  '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                  '&:hover fieldset': { borderColor: theme.palette.primary.main },
+                  '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main }
                 },
                 '& .MuiInputLabel-root': { color: '#aaa' }
               }}
@@ -499,7 +501,7 @@ const OrderManagement = () => {
             variant="contained"
             disabled={!statusUpdate.status || updateOrderStatusMutation.isLoading}
             sx={{
-              backgroundColor: '#00ff88',
+              backgroundColor: theme.palette.primary.main,
               color: '#000',
               '&:hover': {
                 backgroundColor: '#00cc6a',
@@ -524,6 +526,7 @@ const OrderDetailsDialog = ({
   getStatusColor, 
   getPaymentStatusColor 
 }) => {
+  const theme = useTheme();
   if (!order) return null;
 
   return (
@@ -549,7 +552,7 @@ const OrderDetailsDialog = ({
           <Grid item xs={12} md={6}>
             <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
               <CardContent>
-                <Typography variant="h6" sx={{ color: '#00ff88', mb: 2 }}>
+                <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                   Order Information
                 </Typography>
                 
@@ -581,7 +584,7 @@ const OrderDetailsDialog = ({
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography sx={{ color: '#aaa' }}>Total Amount:</Typography>
-                    <Typography sx={{ color: '#00ff88', fontWeight: 'bold' }}>
+                    <Typography sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }}>
                       {formatCurrency(order.totalAmount)}
                     </Typography>
                   </Box>
@@ -603,7 +606,7 @@ const OrderDetailsDialog = ({
           <Grid item xs={12} md={6}>
             <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
               <CardContent>
-                <Typography variant="h6" sx={{ color: '#00ff88', mb: 2 }}>
+                <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                   Customer Information
                 </Typography>
                 
@@ -651,7 +654,7 @@ const OrderDetailsDialog = ({
           <Grid item xs={12}>
             <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
               <CardContent>
-                <Typography variant="h6" sx={{ color: '#00ff88', mb: 2 }}>
+                <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                   Drone Information
                 </Typography>
                 
@@ -699,7 +702,7 @@ const OrderDetailsDialog = ({
             <Grid item xs={12}>
               <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
                 <CardContent>
-                  <Typography variant="h6" sx={{ color: '#00ff88', mb: 2 }}>
+                  <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                     Notes
                   </Typography>
                   <Typography sx={{ color: '#aaa' }}>

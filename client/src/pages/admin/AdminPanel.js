@@ -1,7 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, Container, Paper } from '@mui/material';
+import { Box, Container, Paper, useTheme } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
+import { adminStyles } from '../../utils/adminTheme';
 
 // Admin components
 import AdminDashboard from './AdminDashboard';
@@ -11,6 +12,7 @@ import OrderManagement from './OrderManagement';
 import MediaManagement from './MediaManagement';
 
 const AdminPanel = () => {
+  const theme = useTheme();
   const { user } = useAuth();
 
   // Double-check admin role (should already be handled by ProtectedRoute)
@@ -20,13 +22,7 @@ const AdminPanel = () => {
 
   return (
     <Box sx={{ 
-      minHeight: '100vh', 
-      background: `linear-gradient(180deg, 
-        rgba(10, 10, 10, 1) 0%, 
-        rgba(18, 18, 18, 1) 50%, 
-        rgba(10, 10, 10, 1) 100%
-      )`,
-      color: 'white',
+      ...adminStyles.gradientBackground(theme),
       position: 'relative'
     }}>
       {/* Background elements */}
@@ -37,8 +33,8 @@ const AdminPanel = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `radial-gradient(circle at 20% 20%, rgba(46, 164, 165, 0.03) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 80%, rgba(46, 164, 165, 0.03) 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 20% 20%, ${theme.palette.primary.main}08 0%, transparent 50%),
+                           radial-gradient(circle at 80% 80%, ${theme.palette.primary.main}08 0%, transparent 50%)`,
           pointerEvents: 'none',
         }}
       />
@@ -50,14 +46,8 @@ const AdminPanel = () => {
           <Paper 
             elevation={3}
             sx={{ 
-              background: `linear-gradient(135deg, 
-                rgba(26, 26, 26, 0.8) 0%, 
-                rgba(42, 42, 42, 0.6) 100%
-              )`,
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: 2,
-              overflow: 'hidden',
-              backdropFilter: 'blur(10px)'
+              ...adminStyles.glassPaper(theme),
+              overflow: 'hidden'
             }}
           >
             <Routes>

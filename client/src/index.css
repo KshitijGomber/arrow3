@@ -11,8 +11,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0a0a0a;
-  color: #ffffff;
+  /* Remove hardcoded colors to let theme handle them */
 }
 
 code {
@@ -20,23 +19,7 @@ code {
     monospace;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1a1a1a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #2ea4a5;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #1f7374;
-}
+/* Custom scrollbar - will be handled by theme */
 
 /* Smooth scrolling */
 html {
