@@ -60,13 +60,35 @@ const AdminDashboard = () => {
   if (statsLoading) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom sx={{ color: 'white', mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          gutterBottom 
+          sx={{ 
+            fontWeight: 700,
+            background: `linear-gradient(135deg, 
+              #ffffff 0%, 
+              #2ea4a5 50%, 
+              #ffffff 100%
+            )`,
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            mb: 4,
+            textAlign: 'center'
+          }}
+        >
           Dashboard
         </Typography>
         <Grid container spacing={3}>
           {[1, 2, 3, 4].map((item) => (
             <Grid item xs={12} sm={6} md={3} key={item}>
-              <Card sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333' }}>
+              <Card sx={{ 
+                background: `linear-gradient(135deg, 
+                  rgba(26, 26, 26, 0.8) 0%, 
+                  rgba(42, 42, 42, 0.6) 100%
+                )`,
+                border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
                 <CardContent>
                   <Skeleton variant="text" width="60%" height={24} />
                   <Skeleton variant="text" width="40%" height={32} />
@@ -84,10 +106,34 @@ const AdminDashboard = () => {
     console.error('Dashboard stats error:', statsError);
     return (
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom sx={{ color: 'white', mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          gutterBottom 
+          sx={{ 
+            fontWeight: 700,
+            background: `linear-gradient(135deg, 
+              #ffffff 0%, 
+              #2ea4a5 50%, 
+              #ffffff 100%
+            )`,
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            mb: 4,
+            textAlign: 'center'
+          }}
+        >
           Dashboard
         </Typography>
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 3,
+            backgroundColor: 'rgba(255, 68, 68, 0.1)',
+            border: '1px solid rgba(255, 68, 68, 0.2)',
+            color: '#ffffff'
+          }}
+        >
           <Typography variant="h6" gutterBottom>
             Failed to load dashboard data
           </Typography>
@@ -116,9 +162,9 @@ const AdminDashboard = () => {
     {
       title: 'Total Products',
       value: stats.totalProducts || 0,
-      icon: <ProductsIcon sx={{ fontSize: 40, color: '#00ff88' }} />,
+      icon: <ProductsIcon sx={{ fontSize: 40, color: '#2ea4a5' }} />,
       action: () => navigate('/admin/products'),
-      color: '#00ff88'
+      color: '#2ea4a5'
     },
     {
       title: 'Total Orders',
@@ -186,17 +232,32 @@ const AdminDashboard = () => {
           variant="h4" 
           gutterBottom 
           sx={{ 
-            color: 'white',
-            fontWeight: 'bold',
+            fontWeight: 700,
+            background: `linear-gradient(135deg, 
+              #ffffff 0%, 
+              #2ea4a5 50%, 
+              #ffffff 100%
+            )`,
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
             display: 'flex',
             alignItems: 'center',
-            gap: 2
+            gap: 2,
+            textAlign: 'center',
+            justifyContent: 'center'
           }}
         >
-          <DashboardIcon sx={{ color: '#00ff88' }} />
+          <DashboardIcon sx={{ color: '#2ea4a5' }} />
           Admin Dashboard
         </Typography>
-        <Typography variant="subtitle1" sx={{ color: '#aaa' }}>
+        <Typography 
+          variant="subtitle1" 
+          sx={{ 
+            color: 'rgba(255, 255, 255, 0.7)',
+            textAlign: 'center'
+          }}
+        >
           Welcome back, {user?.firstName}! Here's what's happening with your drone store.
         </Typography>
       </Box>
@@ -207,14 +268,19 @@ const AdminDashboard = () => {
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card 
               sx={{ 
-                backgroundColor: '#2a2a2a',
-                border: '1px solid #333',
+                background: `linear-gradient(135deg, 
+                  rgba(26, 26, 26, 0.8) 0%, 
+                  rgba(42, 42, 42, 0.6) 100%
+                )`,
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
+                borderRadius: 2,
                 '&:hover': {
-                  borderColor: card.color,
+                  borderColor: 'rgba(46, 164, 165, 0.3)',
                   transform: 'translateY(-2px)',
-                  boxShadow: `0 4px 20px rgba(${card.color === '#00ff88' ? '0, 255, 136' : card.color === '#ff6b35' ? '255, 107, 53' : card.color === '#4fc3f7' ? '79, 195, 247' : '255, 213, 79'}, 0.3)`
+                  backgroundColor: 'rgba(46, 164, 165, 0.05)',
+                  boxShadow: '0 8px 25px rgba(46, 164, 165, 0.2)'
                 }
               }}
               onClick={card.action}
@@ -222,14 +288,39 @@ const AdminDashboard = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold' }}>
+                    <Typography 
+                      variant="h4" 
+                      sx={{ 
+                        color: '#2ea4a5', 
+                        fontWeight: 700,
+                        mb: 1
+                      }}
+                    >
                       {card.value}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#aaa' }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        fontSize: '0.85rem',
+                        fontWeight: 500
+                      }}
+                    >
                       {card.title}
                     </Typography>
                   </Box>
-                  {card.icon}
+                  <Box 
+                    sx={{ 
+                      backgroundColor: 'rgba(46, 164, 165, 0.1)',
+                      borderRadius: '50%',
+                      p: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {card.icon}
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
@@ -241,7 +332,14 @@ const AdminDashboard = () => {
       <Grid container spacing={3}>
         {/* Recent Orders */}
         <Grid item xs={12} md={8}>
-          <Card sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333' }}>
+          <Card sx={{ 
+            background: `linear-gradient(135deg, 
+              rgba(26, 26, 26, 0.8) 0%, 
+              rgba(42, 42, 42, 0.6) 100%
+            )`,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2
+          }}>
             <CardContent>
               <Typography 
                 variant="h6" 
@@ -268,9 +366,9 @@ const AdminDashboard = () => {
                         justifyContent: 'space-between', 
                         alignItems: 'center',
                         p: 2,
-                        backgroundColor: '#1a1a1a',
+                        backgroundColor: 'rgba(26, 26, 26, 0.5)',
                         borderRadius: 1,
-                        border: '1px solid #333'
+                        border: '1px solid rgba(255, 255, 255, 0.1)'
                       }}
                     >
                       <Box>
@@ -317,7 +415,14 @@ const AdminDashboard = () => {
 
         {/* Alerts & Notifications */}
         <Grid item xs={12} md={4}>
-          <Card sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333' }}>
+          <Card sx={{ 
+            background: `linear-gradient(135deg, 
+              rgba(26, 26, 26, 0.8) 0%, 
+              rgba(42, 42, 42, 0.6) 100%
+            )`,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2
+          }}>
             <CardContent>
               <Typography 
                 variant="h6" 

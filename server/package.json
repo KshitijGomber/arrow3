@@ -9,7 +9,9 @@
     "test": "jest --watchAll=false",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --watchAll=false",
-    "test:integration": "jest --testPathPattern=integration --watchAll=false"
+    "test:integration": "jest --testPathPattern=integration --watchAll=false",
+    "db:delete-orders": "node utils/deleteAllOrdersInteractive.js",
+    "db:delete-orders-force": "node utils/deleteAllOrders.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

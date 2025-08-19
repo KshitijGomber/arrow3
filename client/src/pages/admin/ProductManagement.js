@@ -162,11 +162,21 @@ const ProductManagement = () => {
             startIcon={<AddIcon />}
             onClick={() => navigate('/admin/products/add')}
             sx={{
-              backgroundColor: '#00ff88',
-              color: '#000',
+              background: `linear-gradient(135deg, 
+                #2ea4a5 0%, 
+                #1e7a7b 100%
+              )`,
+              color: '#ffffff',
               '&:hover': {
-                backgroundColor: '#00cc6a',
+                background: `linear-gradient(135deg, 
+                  #1e7a7b 0%, 
+                  #2ea4a5 100%
+                )`,
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 25px rgba(46, 164, 165, 0.3)',
               },
+              borderRadius: 2,
+              fontWeight: 600,
             }}
           >
             Add New Drone
@@ -175,7 +185,15 @@ const ProductManagement = () => {
       </Box>
 
       {/* Navigation Tabs */}
-      <Paper sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333', mb: 3 }}>
+      <Paper sx={{ 
+        background: `linear-gradient(135deg, 
+          rgba(26, 26, 26, 0.8) 0%, 
+          rgba(42, 42, 42, 0.6) 100%
+        )`,
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: 2,
+        mb: 3
+      }}>
         <Tabs
           value={currentTab}
           onChange={handleTabChange}

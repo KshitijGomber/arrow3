@@ -74,9 +74,13 @@ const AdminNavigation = () => {
     <AppBar 
       position="sticky" 
       sx={{ 
-        backgroundColor: '#1a1a1a',
-        borderBottom: '1px solid #333',
-        boxShadow: 'none'
+        background: `linear-gradient(135deg, 
+          rgba(26, 26, 26, 0.95) 0%, 
+          rgba(42, 42, 42, 0.95) 100%
+        )`,
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(46, 164, 165, 0.2)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
       }}
     >
       <Toolbar>
@@ -86,8 +90,15 @@ const AdminNavigation = () => {
             variant="h6" 
             component="div" 
             sx={{ 
-              fontWeight: 'bold',
-              color: '#00ff88',
+              fontWeight: 700,
+              background: `linear-gradient(135deg, 
+                #ffffff 0%, 
+                #2ea4a5 50%, 
+                #ffffff 100%
+              )`,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
@@ -99,8 +110,8 @@ const AdminNavigation = () => {
             size="small" 
             sx={{ 
               ml: 2,
-              backgroundColor: '#00ff88',
-              color: '#000',
+              backgroundColor: '#2ea4a5',
+              color: '#ffffff',
               fontWeight: 'bold',
               fontSize: '0.7rem'
             }} 
@@ -115,17 +126,17 @@ const AdminNavigation = () => {
               startIcon={item.icon}
               onClick={() => navigate(item.path)}
               sx={{
-                color: item.active ? '#00ff88' : 'white',
-                backgroundColor: item.active ? 'rgba(0, 255, 136, 0.1)' : 'transparent',
-                border: item.active ? '1px solid #00ff88' : '1px solid transparent',
+                color: item.active ? '#2ea4a5' : 'white',
+                backgroundColor: item.active ? 'rgba(46, 164, 165, 0.1)' : 'transparent',
+                border: item.active ? '1px solid #2ea4a5' : '1px solid transparent',
                 borderRadius: 2,
                 px: 2,
                 py: 1,
                 textTransform: 'none',
                 fontWeight: item.active ? 'bold' : 'normal',
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 255, 136, 0.1)',
-                  border: '1px solid #00ff88'
+                  backgroundColor: 'rgba(46, 164, 165, 0.1)',
+                  border: '1px solid #2ea4a5'
                 }
               }}
             >
@@ -163,8 +174,8 @@ const AdminNavigation = () => {
               sx={{ 
                 width: 32, 
                 height: 32, 
-                backgroundColor: '#00ff88',
-                color: '#000',
+                backgroundColor: '#2ea4a5',
+                color: '#ffffff',
                 fontSize: '0.9rem',
                 fontWeight: 'bold'
               }}
@@ -179,8 +190,12 @@ const AdminNavigation = () => {
             onClose={handleUserMenuClose}
             PaperProps={{
               sx: {
-                backgroundColor: '#2a2a2a',
-                border: '1px solid #333',
+                background: `linear-gradient(135deg, 
+                  rgba(26, 26, 26, 0.95) 0%, 
+                  rgba(42, 42, 42, 0.95) 100%
+                )`,
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(46, 164, 165, 0.2)',
                 color: 'white',
                 mt: 1
               }
@@ -196,7 +211,7 @@ const AdminNavigation = () => {
                 </Typography>
               </Box>
             </MenuItem>
-            <Divider sx={{ backgroundColor: '#333' }} />
+            <Divider sx={{ backgroundColor: 'rgba(46, 164, 165, 0.2)' }} />
             <MenuItem onClick={handleLogout}>
               <LogoutIcon sx={{ mr: 2 }} />
               Logout
