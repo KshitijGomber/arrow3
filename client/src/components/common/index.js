@@ -6,6 +6,7 @@ export { default as QueryErrorBoundary } from './QueryErrorBoundary';
 export { default as NavigationBar } from './NavigationBar';
 export { default as MediaUploadField } from './MediaUploadField';
 export { default as CloudinaryUploadField } from './CloudinaryUploadField';
+export { default as ThemeToggle } from './ThemeToggle';
 export { default as ResponsiveContainer } from './ResponsiveContainer';
 export { default as ResponsiveGrid } from './ResponsiveGrid';
 export { default as LazyImage } from './LazyImage';

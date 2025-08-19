@@ -7,6 +7,7 @@ import { ErrorBoundary, ProtectedRoute, LoadingSpinner, PerformanceMonitor } fro
 
 // Context providers
 import { AuthProvider } from './context/AuthContext';
+import { CustomThemeProvider } from './context/ThemeContext';
 
 
 // Lazy load components for code splitting
@@ -30,9 +31,10 @@ const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <PerformanceMonitor />
-        <Box sx={{ minHeight: '100vh', backgroundColor: '#0a0a0a' }}>
+      <CustomThemeProvider>
+        <AuthProvider>
+          <PerformanceMonitor />
+          <Box sx={{ minHeight: '100vh' }}>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               {/* Public routes */}
@@ -86,6 +88,7 @@ function App() {
           </Suspense>
         </Box>
       </AuthProvider>
+      </CustomThemeProvider>
     </ErrorBoundary>
   );
 }

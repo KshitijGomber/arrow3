@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ThemeToggle } from './index';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -219,9 +220,12 @@ const NavigationBar = () => {
         <Typography variant="h6" color="primary.main">
           Menu
         </Typography>
-        <IconButton onClick={handleMobileMenuToggle}>
-          <CloseIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <ThemeToggle size="small" />
+          <IconButton onClick={handleMobileMenuToggle}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
       </Box>
       <Divider />
       <List>
@@ -368,6 +372,9 @@ const NavigationBar = () => {
 
           {/* Auth Buttons */}
           {renderAuthButtons()}
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* Mobile Menu Button */}
           <IconButton

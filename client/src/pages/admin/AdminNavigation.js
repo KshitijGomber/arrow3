@@ -22,6 +22,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ThemeToggle } from '../../components/common';
 
 const AdminNavigation = () => {
   const navigate = useNavigate();
@@ -147,6 +148,7 @@ const AdminNavigation = () => {
 
         {/* User Menu */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <ThemeToggle size="small" />
           <Button
             startIcon={<HomeIcon />}
             onClick={() => navigate('/')}

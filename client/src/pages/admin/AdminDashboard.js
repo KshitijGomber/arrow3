@@ -28,11 +28,13 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useDashboardStats, useDashboardAlerts } from '../../hooks/queries/useDashboardQueries';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isDark } = useTheme();
   
   // Fetch real-time dashboard data
   const { 
@@ -268,14 +270,22 @@ const AdminDashboard = () => {
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card 
               sx={{ 
-                background: `linear-gradient(135deg, 
-                  rgba(26, 26, 26, 0.8) 0%, 
-                  rgba(42, 42, 42, 0.6) 100%
-                )`,
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: isDark 
+                  ? `linear-gradient(135deg, 
+                      rgba(26, 26, 26, 0.8) 0%, 
+                      rgba(42, 42, 42, 0.6) 100%
+                    )`
+                  : `linear-gradient(135deg, 
+                      rgba(255, 255, 255, 0.9) 0%, 
+                      rgba(248, 249, 250, 0.8) 100%
+                    )`,
+                border: isDark 
+                  ? '1px solid rgba(255, 255, 255, 0.1)' 
+                  : '1px solid rgba(0, 0, 0, 0.1)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 borderRadius: 2,
+                backdropFilter: 'blur(10px)',
                 '&:hover': {
                   borderColor: 'rgba(46, 164, 165, 0.3)',
                   transform: 'translateY(-2px)',
@@ -301,7 +311,9 @@ const AdminDashboard = () => {
                     <Typography 
                       variant="body2" 
                       sx={{ 
-                        color: 'rgba(255, 255, 255, 0.7)',
+                        color: isDark 
+                          ? 'rgba(255, 255, 255, 0.7)' 
+                          : 'rgba(0, 0, 0, 0.6)',
                         fontSize: '0.85rem',
                         fontWeight: 500
                       }}
