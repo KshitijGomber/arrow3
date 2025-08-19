@@ -1,7 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, Container, Paper, useTheme } from '@mui/material';
+import { Box, Container, Paper } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
+import { useCustomTheme } from '../../context/ThemeContext';
 import { adminStyles } from '../../utils/adminTheme';
 
 // Admin components
@@ -9,10 +10,9 @@ import AdminDashboard from './AdminDashboard';
 import AdminNavigation from './AdminNavigation';
 import ProductManagement from './ProductManagement';
 import OrderManagement from './OrderManagement';
-import MediaManagement from './MediaManagement';
 
 const AdminPanel = () => {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   const { user } = useAuth();
 
   // Double-check admin role (should already be handled by ProtectedRoute)
@@ -55,7 +55,6 @@ const AdminPanel = () => {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="products/*" element={<ProductManagement />} />
               <Route path="orders/*" element={<OrderManagement />} />
-              <Route path="media/*" element={<MediaManagement />} />
               <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
             </Routes>
           </Paper>

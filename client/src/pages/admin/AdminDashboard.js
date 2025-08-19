@@ -28,13 +28,13 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { useCustomTheme } from '../../context/ThemeContext';
 import { useDashboardStats, useDashboardAlerts } from '../../hooks/queries/useDashboardQueries';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isDark } = useTheme();
+  const { theme, isDark } = useCustomTheme();
   
   // Fetch real-time dashboard data
   const { 
@@ -86,10 +86,10 @@ const AdminDashboard = () => {
             <Grid item xs={12} sm={6} md={3} key={item}>
               <Card sx={{ 
                 background: `linear-gradient(135deg, 
-                  rgba(26, 26, 26, 0.8) 0%, 
-                  rgba(42, 42, 42, 0.6) 100%
+                  ${theme.palette.background.paper} 0%, 
+                  ${theme.palette.background.elevated} 100%
                 )`,
-                border: '1px solid rgba(255, 255, 255, 0.1)'
+                border: `1px solid ${theme.palette.divider}`
               }}>
                 <CardContent>
                   <Skeleton variant="text" width="60%" height={24} />
@@ -208,7 +208,7 @@ const AdminDashboard = () => {
         <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
           Loading Dashboard...
         </Typography>
-        <LinearProgress sx={{ mt: 2, backgroundColor: '#333' }} />
+        <LinearProgress sx={{ mt: 2, backgroundColor: theme.palette.background.elevated }} />
       </Box>
     );
   }
@@ -346,10 +346,10 @@ const AdminDashboard = () => {
         <Grid item xs={12} md={8}>
           <Card sx={{ 
             background: `linear-gradient(135deg, 
-              rgba(26, 26, 26, 0.8) 0%, 
-              rgba(42, 42, 42, 0.6) 100%
+              ${theme.palette.background.paper} 0%, 
+              ${theme.palette.background.elevated} 100%
             )`,
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: `1px solid ${theme.palette.divider}`,
             borderRadius: 2
           }}>
             <CardContent>
@@ -363,10 +363,10 @@ const AdminDashboard = () => {
                   gap: 1
                 }}
               >
-                <TrendingIcon sx={{ color: '#00ff88' }} />
+                <TrendingIcon sx={{ color: theme.palette.primary.main }} />
                 Recent Orders
               </Typography>
-              <Divider sx={{ backgroundColor: '#333', mb: 2 }} />
+              <Divider sx={{ backgroundColor: theme.palette.divider, mb: 2 }} />
               
               {recentOrders.length > 0 ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -395,7 +395,7 @@ const AdminDashboard = () => {
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="subtitle2" sx={{ color: '#00ff88' }}>
+                        <Typography variant="subtitle2" sx={{ color: theme.palette.primary.main }}>
                           ${(order.amount || 0).toFixed(2)}
                         </Typography>
                         <Chip 
@@ -417,7 +417,7 @@ const AdminDashboard = () => {
               <Button 
                 size="small" 
                 onClick={() => navigate('/admin/orders')}
-                sx={{ color: '#00ff88' }}
+                sx={{ color: theme.palette.primary.main }}
               >
                 View All Orders
               </Button>
@@ -449,12 +449,12 @@ const AdminDashboard = () => {
                 <NotificationsIcon sx={{ color: '#ff6b35' }} />
                 Alerts
               </Typography>
-              <Divider sx={{ backgroundColor: '#333', mb: 2 }} />
+              <Divider sx={{ backgroundColor: theme.palette.divider, mb: 2 }} />
               
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {alertsLoading ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-                    <CircularProgress size={24} sx={{ color: '#00ff88' }} />
+                    <CircularProgress size={24} sx={{ color: theme.palette.primary.main }} />
                   </Box>
                 ) : alerts.length > 0 ? (
                   alerts.map((alert, index) => {
@@ -518,7 +518,7 @@ const AdminDashboard = () => {
               <Button 
                 size="small" 
                 onClick={() => navigate('/admin/products')}
-                sx={{ color: '#00ff88' }}
+                sx={{ color: theme.palette.primary.main }}
               >
                 Manage Inventory
               </Button>

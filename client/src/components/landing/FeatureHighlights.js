@@ -55,11 +55,17 @@ const FeatureHighlights = () => {
     <Box
       sx={{
         py: { xs: 8, md: 12 },
-        background: `linear-gradient(180deg, 
-          rgba(10, 10, 10, 1) 0%, 
-          rgba(26, 26, 26, 1) 50%, 
-          rgba(10, 10, 10, 1) 100%
-        )`,
+        background: theme.palette.mode === 'dark' 
+          ? `linear-gradient(180deg, 
+              rgba(10, 10, 10, 1) 0%, 
+              rgba(26, 26, 26, 1) 50%, 
+              rgba(10, 10, 10, 1) 100%
+            )`
+          : `linear-gradient(180deg, 
+              rgba(250, 250, 250, 1) 0%, 
+              rgba(255, 255, 255, 1) 50%, 
+              rgba(250, 250, 250, 1) 100%
+            )`,
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -123,12 +129,17 @@ const FeatureHighlights = () => {
                 <Card
                   sx={{
                     height: '100%',
-                    background: `linear-gradient(135deg, 
-                      rgba(26, 26, 26, 0.8) 0%, 
-                      rgba(42, 42, 42, 0.6) 100%
-                    )`,
+                    background: theme.palette.mode === 'dark'
+                      ? `linear-gradient(135deg, 
+                          rgba(26, 26, 26, 0.8) 0%, 
+                          rgba(42, 42, 42, 0.6) 100%
+                        )`
+                      : `linear-gradient(135deg, 
+                          rgba(255, 255, 255, 0.8) 0%, 
+                          rgba(248, 249, 250, 0.6) 100%
+                        )`,
                     border: '1px solid',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: theme.palette.divider,
                     borderRadius: 3,
                     transition: 'all 0.3s ease',
                     position: 'relative',

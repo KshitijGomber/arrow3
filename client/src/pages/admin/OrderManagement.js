@@ -31,8 +31,7 @@ import {
   Alert,
   Tabs,
   Tab,
-  Badge,
-  useTheme
+  Badge
 } from '@mui/material';
 import {
   ShoppingCart as OrdersIcon,
@@ -49,11 +48,12 @@ import {
   Payment as PaymentIcon,
   Schedule as ScheduleIcon
 } from '@mui/icons-material';
+import { useCustomTheme } from '../../context/ThemeContext';
 import { useAllOrders, useUpdateOrderStatus } from '../../hooks/queries/useOrderQueries';
 import { ORDER_STATUS, PAYMENT_STATUS } from '../../utils/constants';
 
 const OrderManagement = () => {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderDetailsDialog, setOrderDetailsDialog] = useState(false);
   const [statusUpdateDialog, setStatusUpdateDialog] = useState(false);
@@ -178,7 +178,7 @@ const OrderManagement = () => {
   if (error) {
     return (
       <Box sx={{ p: 3 }}>
-        <Alert severity="error" sx={{ backgroundColor: 'rgba(244, 67, 54, 0.1)' }}>
+        <Alert severity="error" sx={{ backgroundColor: `${theme.palette.error.main}20` }}>
           Error loading orders: {error.message}
         </Alert>
       </Box>
@@ -217,7 +217,7 @@ const OrderManagement = () => {
       </Box>
 
       {/* Order Status Tabs */}
-      <Paper sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333', mb: 3 }}>
+      <Paper sx={{ backgroundColor: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, mb: 3 }}>
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -225,7 +225,7 @@ const OrderManagement = () => {
           scrollButtons="auto"
           sx={{
             '& .MuiTab-root': {
-              color: '#aaa',
+              color: theme.palette.text.secondary,
               '&.Mui-selected': {
                 color: theme.palette.primary.main,
               },
@@ -297,13 +297,13 @@ const OrderManagement = () => {
       {/* Orders Table */}
       <TableContainer 
         component={Paper} 
-        sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333' }}
+        sx={{ backgroundColor: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}` }}
       >
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#1a1a1a' }}>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Order ID</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Customer</TableCell>
+            <TableRow sx={{ backgroundColor: theme.palette.background.elevated }}>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Order ID</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Customer</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Drone</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Amount</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
@@ -317,7 +317,7 @@ const OrderManagement = () => {
               <TableRow>
                 <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
                   <CircularProgress sx={{ color: theme.palette.primary.main }} />
-                  <Typography sx={{ color: '#aaa', mt: 2 }}>
+                  <Typography sx={{ color: theme.palette.text.secondary, mt: 2 }}>
                     Loading orders...
                   </Typography>
                 </TableCell>
@@ -325,7 +325,7 @@ const OrderManagement = () => {
             ) : ordersData?.orders?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
-                  <Typography sx={{ color: '#aaa' }}>
+                  <Typography sx={{ color: theme.palette.text.secondary }}>
                     No orders found
                   </Typography>
                 </TableCell>
@@ -335,8 +335,8 @@ const OrderManagement = () => {
                 <TableRow 
                   key={order._id}
                   sx={{ 
-                    '&:hover': { backgroundColor: '#333' },
-                    borderBottom: '1px solid #333'
+                    '&:hover': { backgroundColor: theme.palette.action.hover },
+                    borderBottom: `1px solid ${theme.palette.divider}`
                   }}
                 >
                   <TableCell>
@@ -349,17 +349,17 @@ const OrderManagement = () => {
                       <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
                         {order.customerInfo.firstName} {order.customerInfo.lastName}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#aaa' }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                         {order.customerInfo.email}
                       </Typography>
                     </Box>
                   </TableCell>
                   <TableCell>
                     <Box>
-                      <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
+                      <Typography sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                         {order.droneId?.name || 'Unknown Drone'}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#aaa' }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                         Qty: {order.quantity}
                       </Typography>
                     </Box>
@@ -384,7 +384,7 @@ const OrderManagement = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Typography sx={{ color: '#aaa' }}>
+                    <Typography sx={{ color: theme.palette.text.secondary }}>
                       {formatDate(order.orderDate)}
                     </Typography>
                   </TableCell>
@@ -394,7 +394,7 @@ const OrderManagement = () => {
                         <IconButton
                           size="small"
                           onClick={() => handleViewOrder(order)}
-                          sx={{ color: '#4fc3f7' }}
+                          sx={{ color: theme.palette.info.main }}
                         >
                           <ViewIcon />
                         </IconButton>
@@ -439,25 +439,25 @@ const OrderManagement = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: '#2a2a2a',
-            border: '1px solid #333',
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
           },
         }}
       >
-        <DialogTitle sx={{ color: 'white' }}>
+        <DialogTitle sx={{ color: theme.palette.text.primary }}>
           Update Order Status
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
             <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel sx={{ color: '#aaa' }}>Status</InputLabel>
+              <InputLabel sx={{ color: theme.palette.text.secondary }}>Status</InputLabel>
               <Select
                 value={statusUpdate.status}
                 onChange={(e) => setStatusUpdate({ ...statusUpdate, status: e.target.value })}
                 label="Status"
                 sx={{
-                  color: 'white',
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
+                  color: theme.palette.text.primary,
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.divider },
                   '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main }
                 }}
@@ -479,12 +479,12 @@ const OrderManagement = () => {
               onChange={(e) => setStatusUpdate({ ...statusUpdate, notes: e.target.value })}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  color: 'white',
-                  '& fieldset': { borderColor: '#333' },
+                  color: theme.palette.text.primary,
+                  '& fieldset': { borderColor: theme.palette.divider },
                   '&:hover fieldset': { borderColor: theme.palette.primary.main },
                   '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main }
                 },
-                '& .MuiInputLabel-root': { color: '#aaa' }
+                '& .MuiInputLabel-root': { color: theme.palette.text.secondary }
               }}
             />
           </Box>
@@ -492,7 +492,7 @@ const OrderManagement = () => {
         <DialogActions>
           <Button 
             onClick={() => setStatusUpdateDialog(false)}
-            sx={{ color: '#aaa' }}
+            sx={{ color: theme.palette.text.secondary }}
           >
             Cancel
           </Button>
@@ -502,9 +502,9 @@ const OrderManagement = () => {
             disabled={!statusUpdate.status || updateOrderStatusMutation.isLoading}
             sx={{
               backgroundColor: theme.palette.primary.main,
-              color: '#000',
+              color: theme.palette.common.black,
               '&:hover': {
-                backgroundColor: '#00cc6a',
+                backgroundColor: theme.palette.primary.dark,
               },
             }}
           >
@@ -526,7 +526,7 @@ const OrderDetailsDialog = ({
   getStatusColor, 
   getPaymentStatusColor 
 }) => {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   if (!order) return null;
 
   return (
@@ -537,8 +537,8 @@ const OrderDetailsDialog = ({
       fullWidth
       PaperProps={{
         sx: {
-          backgroundColor: '#2a2a2a',
-          border: '1px solid #333',
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
         },
       }}
     >
@@ -550,7 +550,7 @@ const OrderDetailsDialog = ({
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* Order Information */}
           <Grid item xs={12} md={6}>
-            <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
+            <Card sx={{ backgroundColor: theme.palette.background.elevated, border: `1px solid ${theme.palette.divider}` }}>
               <CardContent>
                 <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                   Order Information
@@ -558,7 +558,7 @@ const OrderDetailsDialog = ({
                 
                 <Stack spacing={2}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ color: '#aaa' }}>Status:</Typography>
+                    <Typography sx={{ color: theme.palette.text.secondary }}>Status:</Typography>
                     <Chip 
                       label={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       size="small"
@@ -567,7 +567,7 @@ const OrderDetailsDialog = ({
                   </Box>
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ color: '#aaa' }}>Payment Status:</Typography>
+                    <Typography sx={{ color: theme.palette.text.secondary }}>Payment Status:</Typography>
                     <Chip 
                       label={order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
                       size="small"
@@ -576,14 +576,14 @@ const OrderDetailsDialog = ({
                   </Box>
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ color: '#aaa' }}>Order Date:</Typography>
-                    <Typography sx={{ color: 'white' }}>
+                    <Typography sx={{ color: theme.palette.text.secondary }}>Order Date:</Typography>
+                    <Typography sx={{ color: theme.palette.text.primary }}>
                       {formatDate(order.orderDate)}
                     </Typography>
                   </Box>
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ color: '#aaa' }}>Total Amount:</Typography>
+                    <Typography sx={{ color: theme.palette.text.secondary }}>Total Amount:</Typography>
                     <Typography sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }}>
                       {formatCurrency(order.totalAmount)}
                     </Typography>
@@ -591,8 +591,8 @@ const OrderDetailsDialog = ({
                   
                   {order.trackingNumber && (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: '#aaa' }}>Tracking:</Typography>
-                      <Typography sx={{ color: 'white', fontFamily: 'monospace' }}>
+                      <Typography sx={{ color: theme.palette.text.secondary }}>Tracking:</Typography>
+                      <Typography sx={{ color: theme.palette.text.primary, fontFamily: 'monospace' }}>
                         {order.trackingNumber}
                       </Typography>
                     </Box>
@@ -604,7 +604,7 @@ const OrderDetailsDialog = ({
 
           {/* Customer Information */}
           <Grid item xs={12} md={6}>
-            <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
+            <Card sx={{ backgroundColor: theme.palette.background.elevated, border: `1px solid ${theme.palette.divider}` }}>
               <CardContent>
                 <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                   Customer Information
@@ -612,35 +612,35 @@ const OrderDetailsDialog = ({
                 
                 <Stack spacing={2}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
+                    <Typography sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>
                       {order.customerInfo.firstName} {order.customerInfo.lastName}
                     </Typography>
                   </Box>
                   
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <EmailIcon sx={{ color: '#aaa', fontSize: 16 }} />
-                    <Typography sx={{ color: '#aaa' }}>
+                    <EmailIcon sx={{ color: theme.palette.text.secondary, fontSize: 16 }} />
+                    <Typography sx={{ color: theme.palette.text.secondary }}>
                       {order.customerInfo.email}
                     </Typography>
                   </Box>
                   
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PhoneIcon sx={{ color: '#aaa', fontSize: 16 }} />
-                    <Typography sx={{ color: '#aaa' }}>
+                    <PhoneIcon sx={{ color: theme.palette.text.secondary, fontSize: 16 }} />
+                    <Typography sx={{ color: theme.palette.text.secondary }}>
                       {order.customerInfo.phone}
                     </Typography>
                   </Box>
                   
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                    <LocationIcon sx={{ color: '#aaa', fontSize: 16, mt: 0.5 }} />
+                    <LocationIcon sx={{ color: theme.palette.text.secondary, fontSize: 16, mt: 0.5 }} />
                     <Box>
-                      <Typography sx={{ color: '#aaa' }}>
+                      <Typography sx={{ color: theme.palette.text.secondary }}>
                         {order.shippingAddress.street}
                       </Typography>
-                      <Typography sx={{ color: '#aaa' }}>
+                      <Typography sx={{ color: theme.palette.text.secondary }}>
                         {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                       </Typography>
-                      <Typography sx={{ color: '#aaa' }}>
+                      <Typography sx={{ color: theme.palette.text.secondary }}>
                         {order.shippingAddress.country}
                       </Typography>
                     </Box>
@@ -652,7 +652,7 @@ const OrderDetailsDialog = ({
 
           {/* Drone Information */}
           <Grid item xs={12}>
-            <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
+            <Card sx={{ backgroundColor: theme.palette.background.elevated, border: `1px solid ${theme.palette.divider}` }}>
               <CardContent>
                 <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                   Drone Information
@@ -661,17 +661,17 @@ const OrderDetailsDialog = ({
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={8}>
                     <Stack spacing={1}>
-                      <Typography variant="h6" sx={{ color: 'white' }}>
+                      <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
                         {order.droneId?.name || 'Unknown Drone'}
                       </Typography>
-                      <Typography sx={{ color: '#aaa' }}>
+                      <Typography sx={{ color: theme.palette.text.secondary }}>
                         Model: {order.droneId?.model || 'N/A'}
                       </Typography>
-                      <Typography sx={{ color: '#aaa' }}>
+                      <Typography sx={{ color: theme.palette.text.secondary }}>
                         Quantity: {order.quantity}
                       </Typography>
                       {order.droneId?.description && (
-                        <Typography sx={{ color: '#aaa', mt: 1 }}>
+                        <Typography sx={{ color: theme.palette.text.secondary, mt: 1 }}>
                           {order.droneId.description}
                         </Typography>
                       )}
@@ -700,12 +700,12 @@ const OrderDetailsDialog = ({
           {/* Notes */}
           {order.notes && (
             <Grid item xs={12}>
-              <Card sx={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
+              <Card sx={{ backgroundColor: theme.palette.background.elevated, border: `1px solid ${theme.palette.divider}` }}>
                 <CardContent>
                   <Typography variant="h6" sx={{ color: theme.palette.primary.main, mb: 2 }}>
                     Notes
                   </Typography>
-                  <Typography sx={{ color: '#aaa' }}>
+                  <Typography sx={{ color: theme.palette.text.secondary }}>
                     {order.notes}
                   </Typography>
                 </CardContent>
@@ -716,7 +716,7 @@ const OrderDetailsDialog = ({
       </DialogContent>
       
       <DialogActions>
-        <Button onClick={onClose} sx={{ color: '#aaa' }}>
+        <Button onClick={onClose} sx={{ color: theme.palette.text.secondary }}>
           Close
         </Button>
       </DialogActions>

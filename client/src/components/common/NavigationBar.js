@@ -86,7 +86,7 @@ const NavigationBar = () => {
             py: 1,
             borderRadius: 2,
             '&:hover': {
-              backgroundColor: 'rgba(0, 255, 136, 0.1)',
+              backgroundColor: theme.palette.action.hover,
               color: 'primary.main',
             },
           }}
@@ -178,7 +178,7 @@ const NavigationBar = () => {
             color: 'primary.main',
             '&:hover': {
               borderColor: 'primary.light',
-              backgroundColor: 'rgba(0, 255, 136, 0.1)',
+              backgroundColor: theme.palette.action.hover,
             },
           }}
         >
@@ -236,7 +236,7 @@ const NavigationBar = () => {
             onClick={() => handleNavigation(item.path)}
             sx={{
               '&:hover': {
-                backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                backgroundColor: theme.palette.action.hover,
               },
             }}
           >
@@ -318,7 +318,9 @@ const NavigationBar = () => {
         position="sticky"
         elevation={0}
         sx={{
-          backgroundColor: 'rgba(10, 10, 10, 0.95)',
+          backgroundColor: theme.palette.mode === 'dark' 
+            ? 'rgba(10, 10, 10, 0.95)' 
+            : 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',
           borderBottom: '1px solid',
           borderColor: 'divider',

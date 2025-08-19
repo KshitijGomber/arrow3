@@ -7,14 +7,11 @@ import {
   Card,
   CardContent,
   Button,
-  useTheme,
   Fade,
   Paper,
 } from '@mui/material';
 import {
   Email,
-  Phone,
-  Chat,
   Support as SupportIcon,
   LiveHelp,
   ContactSupport,
@@ -22,9 +19,10 @@ import {
   CheckCircle,
 } from '@mui/icons-material';
 import { NavigationBar } from '../components/common';
+import { useCustomTheme } from '../context/ThemeContext';
 
 const SupportPage = () => {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
 
   const supportOptions = [
     {
@@ -90,9 +88,9 @@ const SupportPage = () => {
         sx={{
           minHeight: '100vh',
           background: `linear-gradient(180deg, 
-            rgba(10, 10, 10, 1) 0%, 
-            rgba(18, 18, 18, 1) 50%, 
-            rgba(10, 10, 10, 1) 100%
+            ${theme.palette.background.default} 0%, 
+            ${theme.palette.background.paper} 50%, 
+            ${theme.palette.background.default} 100%
           )`,
           pt: 10,
           pb: 8,
@@ -184,11 +182,11 @@ const SupportPage = () => {
                       sx={{
                         height: '100%',
                         background: `linear-gradient(135deg, 
-                          rgba(26, 26, 26, 0.8) 0%, 
-                          rgba(42, 42, 42, 0.6) 100%
+                          ${theme.palette.background.paper} 0%, 
+                          ${theme.palette.background.elevated} 100%
                         )`,
                         border: '1px solid',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderColor: theme.palette.divider,
                         borderRadius: 3,
                         transition: 'all 0.3s ease',
                         '&:hover': {
@@ -310,11 +308,11 @@ const SupportPage = () => {
                       sx={{
                         p: 3,
                         background: `linear-gradient(135deg, 
-                          rgba(26, 26, 26, 0.6) 0%, 
-                          rgba(42, 42, 42, 0.4) 100%
+                          ${theme.palette.background.paper} 0%, 
+                          ${theme.palette.background.elevated} 100%
                         )`,
                         border: '1px solid',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderColor: theme.palette.divider,
                         borderRadius: 2,
                         transition: 'all 0.3s ease',
                         '&:hover': {

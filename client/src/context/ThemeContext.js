@@ -4,10 +4,10 @@ import { CssBaseline } from '@mui/material';
 
 const ThemeContext = createContext();
 
-export const useTheme = () => {
+export const useCustomTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error('useCustomTheme must be used within a ThemeProvider');
   }
   return context;
 };
@@ -27,8 +27,8 @@ const lightPalette = {
     contrastText: '#ffffff',
   },
   background: {
-    default: '#ffffff',
-    paper: '#f8f9fa',
+    default: '#fafafa',
+    paper: '#ffffff',
     elevated: '#ffffff',
   },
   text: {

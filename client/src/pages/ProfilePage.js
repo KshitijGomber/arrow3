@@ -25,6 +25,7 @@ import {
   Paper,
   Skeleton,
   Avatar,
+  useTheme,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -68,6 +69,7 @@ const getStatusIcon = (status) => {
 };
 
 const ProfilePage = () => {
+  const theme = useTheme();
   const { user, updateUser } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [orders, setOrders] = useState([]);
@@ -184,7 +186,7 @@ const ProfilePage = () => {
           justifyContent: 'center',
         }}
       >
-        <Typography variant="h6" sx={{ color: '#00ff88' }}>
+        <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
           Loading...
         </Typography>
       </Box>
@@ -208,7 +210,7 @@ const ProfilePage = () => {
             variant="h3"
             component="h1"
             sx={{
-              color: '#00ff88',
+              color: theme.palette.primary.main,
               fontWeight: 'bold',
               textAlign: 'center',
               mb: 2,
@@ -231,7 +233,7 @@ const ProfilePage = () => {
 
         {/* Success/Error Messages */}
         {success && (
-          <Alert severity="success" sx={{ mb: 3, backgroundColor: 'rgba(0, 255, 136, 0.1)' }}>
+          <Alert severity="success" sx={{ mb: 3, backgroundColor: theme.palette.success.light + '20' }}>
             {success}
           </Alert>
         )}
@@ -258,11 +260,11 @@ const ProfilePage = () => {
               '& .MuiTab-root': {
                 color: '#cccccc',
                 '&.Mui-selected': {
-                  color: '#00ff88',
+                  color: theme.palette.primary.main,
                 },
               },
               '& .MuiTabs-indicator': {
-                backgroundColor: '#00ff88',
+                backgroundColor: theme.palette.primary.main,
               },
             }}
           >
@@ -289,7 +291,7 @@ const ProfilePage = () => {
                           height: 80,
                           mx: 'auto',
                           mb: 2,
-                          backgroundColor: '#00ff88',
+                          backgroundColor: theme.palette.primary.main,
                           fontSize: '2rem',
                         }}
                       >
@@ -306,11 +308,11 @@ const ProfilePage = () => {
                         startIcon={<EditIcon />}
                         onClick={handleEditProfile}
                         sx={{
-                          borderColor: '#00ff88',
-                          color: '#00ff88',
+                          borderColor: theme.palette.primary.main,
+                          color: theme.palette.primary.main,
                           '&:hover': {
-                            borderColor: '#00ff88',
-                            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                            borderColor: theme.palette.primary.main,
+                            backgroundColor: theme.palette.action.hover,
                           },
                         }}
                       >
@@ -422,7 +424,7 @@ const ProfilePage = () => {
                       variant="contained"
                       href="/drones"
                       sx={{
-                        backgroundColor: '#00ff88',
+                        backgroundColor: theme.palette.primary.main,
                         color: '#000',
                         '&:hover': {
                           backgroundColor: '#00cc6a',
@@ -474,7 +476,7 @@ const ProfilePage = () => {
                               color: '#fff',
                             },
                             '&:hover': {
-                              backgroundColor: 'rgba(0, 255, 136, 0.05)',
+                              backgroundColor: theme.palette.action.hover,
                             },
                           }}
                         >
@@ -561,16 +563,16 @@ const ProfilePage = () => {
                         borderColor: '#444',
                       },
                       '&:hover fieldset': {
-                        borderColor: '#00ff88',
+                        borderColor: 'theme.palette.primary.main',
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#00ff88',
+                        borderColor: 'theme.palette.primary.main',
                       },
                     },
                     '& .MuiInputLabel-root': {
                       color: '#999',
                       '&.Mui-focused': {
-                        color: '#00ff88',
+                        color: 'theme.palette.primary.main',
                       },
                     },
                   }}
@@ -590,16 +592,16 @@ const ProfilePage = () => {
                         borderColor: '#444',
                       },
                       '&:hover fieldset': {
-                        borderColor: '#00ff88',
+                        borderColor: 'theme.palette.primary.main',
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#00ff88',
+                        borderColor: 'theme.palette.primary.main',
                       },
                     },
                     '& .MuiInputLabel-root': {
                       color: '#999',
                       '&.Mui-focused': {
-                        color: '#00ff88',
+                        color: 'theme.palette.primary.main',
                       },
                     },
                   }}
@@ -626,7 +628,7 @@ const ProfilePage = () => {
               variant="contained"
               disabled={updateLoading || !editForm.firstName.trim() || !editForm.lastName.trim()}
               sx={{
-                backgroundColor: '#00ff88',
+                backgroundColor: theme.palette.primary.main,
                 color: '#000',
                 '&:hover': {
                   backgroundColor: '#00cc6a',

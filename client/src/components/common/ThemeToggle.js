@@ -10,10 +10,10 @@ import {
   DarkMode as DarkModeIcon,
   Brightness4 as Brightness4Icon,
 } from '@mui/icons-material';
-import { useTheme } from '../../context/ThemeContext';
+import { useCustomTheme } from '../../context/ThemeContext';
 
 const ThemeToggle = ({ variant = 'icon', size = 'medium', showLabel = false }) => {
-  const { mode, toggleTheme, isDark } = useTheme();
+  const { mode, toggleTheme, isDark } = useCustomTheme();
   const muiTheme = useMuiTheme();
 
   const getIcon = () => {

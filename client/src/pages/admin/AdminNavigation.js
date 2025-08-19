@@ -16,18 +16,19 @@ import {
   Dashboard as DashboardIcon,
   Inventory as ProductsIcon,
   ShoppingCart as OrdersIcon,
-  PhotoLibrary as MediaIcon,
   ExitToApp as LogoutIcon,
   Home as HomeIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useCustomTheme } from '../../context/ThemeContext';
 import { ThemeToggle } from '../../components/common';
 
 const AdminNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { theme } = useCustomTheme();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleUserMenuOpen = (event) => {
@@ -62,12 +63,6 @@ const AdminNavigation = () => {
       path: '/admin/orders', 
       icon: <OrdersIcon />,
       active: location.pathname.startsWith('/admin/orders')
-    },
-    { 
-      label: 'Media', 
-      path: '/admin/media', 
-      icon: <MediaIcon />,
-      active: location.pathname.startsWith('/admin/media')
     }
   ];
 
@@ -76,12 +71,14 @@ const AdminNavigation = () => {
       position="sticky" 
       sx={{ 
         background: `linear-gradient(135deg, 
-          rgba(26, 26, 26, 0.95) 0%, 
-          rgba(42, 42, 42, 0.95) 100%
+          ${theme.palette.background.paper} 0%, 
+          ${theme.palette.background.elevated} 100%
         )`,
         backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(46, 164, 165, 0.2)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+        borderBottom: `1px solid ${theme.palette.primary.main}30`,
+        boxShadow: theme.palette.mode === 'dark' 
+          ? '0 4px 20px rgba(0, 0, 0, 0.3)' 
+          : '0 4px 20px rgba(0, 0, 0, 0.1)'
       }}
     >
       <Toolbar>
@@ -127,17 +124,17 @@ const AdminNavigation = () => {
               startIcon={item.icon}
               onClick={() => navigate(item.path)}
               sx={{
-                color: item.active ? '#2ea4a5' : 'white',
-                backgroundColor: item.active ? 'rgba(46, 164, 165, 0.1)' : 'transparent',
-                border: item.active ? '1px solid #2ea4a5' : '1px solid transparent',
+                color: item.active ? theme.palette.primary.main : theme.palette.text.primary,
+                backgroundColor: item.active ? `${theme.palette.primary.main}20` : 'transparent',
+                border: item.active ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent',
                 borderRadius: 2,
                 px: 2,
                 py: 1,
                 textTransform: 'none',
                 fontWeight: item.active ? 'bold' : 'normal',
                 '&:hover': {
-                  backgroundColor: 'rgba(46, 164, 165, 0.1)',
-                  border: '1px solid #2ea4a5'
+                  backgroundColor: `${theme.palette.primary.main}20`,
+                  border: `1px solid ${theme.palette.primary.main}`
                 }
               }}
             >
@@ -153,10 +150,10 @@ const AdminNavigation = () => {
             startIcon={<HomeIcon />}
             onClick={() => navigate('/')}
             sx={{
-              color: 'white',
+              color: theme.palette.text.primary,
               textTransform: 'none',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                backgroundColor: theme.palette.action.hover
               }
             }}
           >
@@ -166,9 +163,9 @@ const AdminNavigation = () => {
           <IconButton
             onClick={handleUserMenuOpen}
             sx={{ 
-              color: 'white',
+              color: theme.palette.text.primary,
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                backgroundColor: theme.palette.action.hover
               }
             }}
           >
@@ -193,12 +190,12 @@ const AdminNavigation = () => {
             PaperProps={{
               sx: {
                 background: `linear-gradient(135deg, 
-                  rgba(26, 26, 26, 0.95) 0%, 
-                  rgba(42, 42, 42, 0.95) 100%
+                  ${theme.palette.background.paper} 0%, 
+                  ${theme.palette.background.elevated} 100%
                 )`,
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(46, 164, 165, 0.2)',
-                color: 'white',
+                border: `1px solid ${theme.palette.primary.main}30`,
+                color: theme.palette.text.primary,
                 mt: 1
               }
             }}
@@ -208,12 +205,12 @@ const AdminNavigation = () => {
                 <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
                   {user?.firstName} {user?.lastName}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#aaa' }}>
+                <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                   {user?.email}
                 </Typography>
               </Box>
             </MenuItem>
-            <Divider sx={{ backgroundColor: 'rgba(46, 164, 165, 0.2)' }} />
+            <Divider sx={{ backgroundColor: theme.palette.divider }} />
             <MenuItem onClick={handleLogout}>
               <LogoutIcon sx={{ mr: 2 }} />
               Logout

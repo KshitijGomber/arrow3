@@ -17,7 +17,8 @@ import {
   CircularProgress,
   Divider,
   InputAdornment,
-  Autocomplete
+  Autocomplete,
+  useTheme
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -51,6 +52,7 @@ const AI_MODES = [
 const DroneForm = ({ mode = 'create' }) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
   const isEditMode = mode === 'edit' && id;
 
   // Fetch drone data for edit mode
@@ -238,7 +240,7 @@ const DroneForm = ({ mode = 'create' }) => {
   if (isEditMode && isLoadingDrone) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-        <CircularProgress sx={{ color: '#00ff88' }} />
+        <CircularProgress sx={{ color: 'theme.palette.primary.main' }} />
         <Typography sx={{ color: '#aaa', ml: 2 }}>
           Loading drone data...
         </Typography>
@@ -246,9 +248,33 @@ const DroneForm = ({ mode = 'create' }) => {
     );
   }
 
+  // Style objects for consistent theming
+  const paperStyles = {
+    p: 3,
+    backgroundColor: theme.palette.background.paper,
+    border: `1px solid ${theme.palette.divider}`
+  };
+
+  const textFieldStyles = {
+    '& .MuiOutlinedInput-root': {
+      color: theme.palette.text.primary,
+      '& fieldset': { borderColor: theme.palette.divider },
+      '&:hover fieldset': { borderColor: theme.palette.primary.main },
+      '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main }
+    },
+    '& .MuiInputLabel-root': { color: theme.palette.text.secondary }
+  };
+
+  const selectStyles = {
+    color: theme.palette.text.primary,
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.divider },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main }
+  };
+
   return (
     <Box>
-      <Typography variant="h5" sx={{ color: 'white', mb: 3, fontWeight: 'bold' }}>
+      <Typography variant="h5" sx={{ color: theme.palette.text.primary, mb: 3, fontWeight: 'bold' }}>
         {isEditMode ? 'Edit Drone' : 'Add New Drone'}
       </Typography>
 
@@ -256,8 +282,8 @@ const DroneForm = ({ mode = 'create' }) => {
         <Grid container spacing={3}>
           {/* Basic Information */}
           <Grid item xs={12}>
-            <Paper sx={{ p: 3, backgroundColor: '#2a2a2a', border: '1px solid #333' }}>
-              <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+            <Paper sx={paperStyles}>
+              <Typography variant="h6" sx={{ color: theme.palette.text.primary, mb: 2 }}>
                 Basic Information
               </Typography>
               
@@ -278,8 +304,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -304,8 +330,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -346,8 +372,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -370,8 +396,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           sx={{
                             color: 'white',
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
+                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'theme.palette.primary.main' }
                           }}
                         >
                           {CATEGORIES.map((category) => (
@@ -403,8 +429,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -418,8 +444,8 @@ const DroneForm = ({ mode = 'create' }) => {
 
           {/* Technical Specifications */}
           <Grid item xs={12}>
-            <Paper sx={{ p: 3, backgroundColor: '#2a2a2a', border: '1px solid #333' }}>
-              <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+            <Paper sx={paperStyles}>
+              <Typography variant="h6" sx={{ color: theme.palette.text.primary, mb: 2 }}>
                 Technical Specifications
               </Typography>
               
@@ -456,8 +482,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -498,8 +524,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -540,8 +566,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -582,8 +608,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -612,8 +638,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -643,8 +669,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -654,7 +680,7 @@ const DroneForm = ({ mode = 'create' }) => {
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 3, backgroundColor: '#333' }} />
+              <Divider sx={{ my: 3, backgroundColor: theme.palette.divider }} />
 
               {/* Dimensions */}
               <Typography variant="subtitle1" sx={{ color: 'white', mb: 2 }}>
@@ -684,8 +710,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -714,8 +740,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -747,8 +773,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -758,7 +784,7 @@ const DroneForm = ({ mode = 'create' }) => {
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 3, backgroundColor: '#333' }} />
+              <Divider sx={{ my: 3, backgroundColor: theme.palette.divider }} />
 
               {/* Camera and Stabilization */}
               <Grid container spacing={2}>
@@ -775,8 +801,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           sx={{
                             color: 'white',
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
+                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'theme.palette.primary.main' }
                           }}
                         >
                           {CAMERA_RESOLUTIONS.map((resolution) => (
@@ -803,8 +829,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           sx={{
                             color: 'white',
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
-                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00ff88' }
+                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'theme.palette.primary.main' }
                           }}
                         >
                           {STABILIZATION_TYPES.map((type) => (
@@ -838,10 +864,10 @@ const DroneForm = ({ mode = 'create' }) => {
                             checked={field.value}
                             sx={{
                               '& .MuiSwitch-switchBase.Mui-checked': {
-                                color: '#00ff88',
+                                color: 'theme.palette.primary.main',
                               },
                               '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: '#00ff88',
+                                backgroundColor: 'theme.palette.primary.main',
                               },
                             }}
                           />
@@ -865,10 +891,10 @@ const DroneForm = ({ mode = 'create' }) => {
                             checked={field.value}
                             sx={{
                               '& .MuiSwitch-switchBase.Mui-checked': {
-                                color: '#00ff88',
+                                color: 'theme.palette.primary.main',
                               },
                               '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: '#00ff88',
+                                backgroundColor: 'theme.palette.primary.main',
                               },
                             }}
                           />
@@ -892,10 +918,10 @@ const DroneForm = ({ mode = 'create' }) => {
                             checked={field.value}
                             sx={{
                               '& .MuiSwitch-switchBase.Mui-checked': {
-                                color: '#00ff88',
+                                color: 'theme.palette.primary.main',
                               },
                               '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: '#00ff88',
+                                backgroundColor: 'theme.palette.primary.main',
                               },
                             }}
                           />
@@ -930,7 +956,7 @@ const DroneForm = ({ mode = 'create' }) => {
                               label={option}
                               {...getTagProps({ index })}
                               key={option}
-                              sx={{ color: '#00ff88', borderColor: '#00ff88' }}
+                              sx={{ color: 'theme.palette.primary.main', borderColor: 'theme.palette.primary.main' }}
                             />
                           ))
                         }
@@ -942,8 +968,8 @@ const DroneForm = ({ mode = 'create' }) => {
                               '& .MuiOutlinedInput-root': {
                                 color: 'white',
                                 '& fieldset': { borderColor: '#333' },
-                                '&:hover fieldset': { borderColor: '#00ff88' },
-                                '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                                '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                                '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                               },
                               '& .MuiInputLabel-root': { color: '#aaa' }
                             }}
@@ -972,7 +998,7 @@ const DroneForm = ({ mode = 'create' }) => {
                               label={option}
                               {...getTagProps({ index })}
                               key={option}
-                              sx={{ color: '#00ff88', borderColor: '#00ff88' }}
+                              sx={{ color: 'theme.palette.primary.main', borderColor: 'theme.palette.primary.main' }}
                             />
                           ))
                         }
@@ -984,8 +1010,8 @@ const DroneForm = ({ mode = 'create' }) => {
                               '& .MuiOutlinedInput-root': {
                                 color: 'white',
                                 '& fieldset': { borderColor: '#333' },
-                                '&:hover fieldset': { borderColor: '#00ff88' },
-                                '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                                '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                                '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                               },
                               '& .MuiInputLabel-root': { color: '#aaa' }
                             }}
@@ -1056,8 +1082,8 @@ const DroneForm = ({ mode = 'create' }) => {
                           '& .MuiOutlinedInput-root': {
                             color: 'white',
                             '& fieldset': { borderColor: '#333' },
-                            '&:hover fieldset': { borderColor: '#00ff88' },
-                            '&.Mui-focused fieldset': { borderColor: '#00ff88' }
+                            '&:hover fieldset': { borderColor: 'theme.palette.primary.main' },
+                            '&.Mui-focused fieldset': { borderColor: 'theme.palette.primary.main' }
                           },
                           '& .MuiInputLabel-root': { color: '#aaa' }
                         }}
@@ -1078,10 +1104,10 @@ const DroneForm = ({ mode = 'create' }) => {
                             checked={field.value}
                             sx={{
                               '& .MuiSwitch-switchBase.Mui-checked': {
-                                color: '#00ff88',
+                                color: 'theme.palette.primary.main',
                               },
                               '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: '#00ff88',
+                                backgroundColor: 'theme.palette.primary.main',
                               },
                             }}
                           />
@@ -1105,10 +1131,10 @@ const DroneForm = ({ mode = 'create' }) => {
                             checked={field.value}
                             sx={{
                               '& .MuiSwitch-switchBase.Mui-checked': {
-                                color: '#00ff88',
+                                color: 'theme.palette.primary.main',
                               },
                               '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: '#00ff88',
+                                backgroundColor: 'theme.palette.primary.main',
                               },
                             }}
                           />
@@ -1146,7 +1172,7 @@ const DroneForm = ({ mode = 'create' }) => {
                 startIcon={isSubmitting ? <CircularProgress size={16} /> : <SaveIcon />}
                 disabled={isSubmitting}
                 sx={{
-                  backgroundColor: '#00ff88',
+                  backgroundColor: 'theme.palette.primary.main',
                   color: '#000',
                   '&:hover': {
                     backgroundColor: '#00cc6a',

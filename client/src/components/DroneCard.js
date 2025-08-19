@@ -151,7 +151,7 @@ const DroneCard = ({ drone, onOrderClick }) => {
         transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: '0 8px 25px rgba(0, 255, 136, 0.15)',
+          boxShadow: `0 8px 25px ${theme.palette.primary.main}25`,
         },
       }}
       onClick={handleViewDetails}
@@ -196,7 +196,7 @@ const DroneCard = ({ drone, onOrderClick }) => {
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
             color: 'white',
             '&:hover': {
-              backgroundColor: 'rgba(0, 255, 136, 0.8)',
+              backgroundColor: theme.palette.primary.dark,
             },
           }}
           onClick={(e) => {

@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   Button,
-  useTheme,
   Fade,
   Paper,
   Chip,
@@ -26,9 +25,10 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { NavigationBar } from '../components/common';
+import { useCustomTheme } from '../context/ThemeContext';
 
 const WhereToBuyPage = () => {
-  const theme = useTheme();
+  const { theme } = useCustomTheme();
   const navigate = useNavigate();
 
   const purchaseFeatures = [
@@ -79,9 +79,9 @@ const WhereToBuyPage = () => {
         sx={{
           minHeight: '100vh',
           background: `linear-gradient(180deg, 
-            rgba(10, 10, 10, 1) 0%, 
-            rgba(18, 18, 18, 1) 50%, 
-            rgba(10, 10, 10, 1) 100%
+            ${theme.palette.background.default} 0%, 
+            ${theme.palette.background.paper} 50%, 
+            ${theme.palette.background.default} 100%
           )`,
           pt: 10,
           pb: 8,
@@ -189,8 +189,8 @@ const WhereToBuyPage = () => {
               p: 6,
               borderRadius: 4,
               background: `linear-gradient(135deg, 
-                rgba(26, 26, 26, 0.8) 0%, 
-                rgba(42, 42, 42, 0.6) 100%
+                ${theme.palette.background.paper} 0%, 
+                ${theme.palette.background.elevated} 100%
               )`,
               border: '2px solid',
               borderColor: 'rgba(46, 164, 165, 0.3)',
@@ -361,11 +361,11 @@ const WhereToBuyPage = () => {
                       sx={{
                         height: '100%',
                         background: `linear-gradient(135deg, 
-                          rgba(26, 26, 26, 0.8) 0%, 
-                          rgba(42, 42, 42, 0.6) 100%
+                          ${theme.palette.background.paper} 0%, 
+                          ${theme.palette.background.elevated} 100%
                         )`,
                         border: '1px solid',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderColor: theme.palette.divider,
                         borderRadius: 3,
                         transition: 'all 0.3s ease',
                         '&:hover': {

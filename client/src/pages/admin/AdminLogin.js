@@ -16,11 +16,13 @@ import {
   Login as LoginIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
+import { useCustomTheme } from '../../context/ThemeContext';
 import api from '../../utils/api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, login } = useAuth();
+  const { theme } = useCustomTheme();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -47,6 +49,18 @@ const AdminLogin = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const textFieldStyles = {
+    mb: 2,
+    '& .MuiOutlinedInput-root': {
+      backgroundColor: theme.palette.background.elevated,
+      '& fieldset': { borderColor: theme.palette.divider },
+      '&:hover fieldset': { borderColor: theme.palette.primary.main },
+      '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main }
+    },
+    '& .MuiInputLabel-root': { color: theme.palette.text.secondary },
+    '& .MuiInputBase-input': { color: theme.palette.text.primary }
   };
 
   const handleLogin = async (e) => {
@@ -109,20 +123,20 @@ const AdminLogin = () => {
           elevation={3} 
           sx={{ 
             p: 4, 
-            backgroundColor: '#1a1a1a',
-            border: '1px solid #333',
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
             borderRadius: 2
           }}
         >
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <AdminIcon sx={{ fontSize: 48, color: '#00ff88', mb: 2 }} />
+            <AdminIcon sx={{ fontSize: 48, color: theme.palette.primary.main, mb: 2 }} />
             <Typography 
               variant="h4" 
               component="h1" 
               gutterBottom 
               sx={{ 
                 fontWeight: 600,
-                color: 'white'
+                color: theme.palette.text.primary
               }}
             >
               {isSetupMode ? 'Admin Setup' : 'Admin Login'}
@@ -130,7 +144,7 @@ const AdminLogin = () => {
             <Typography 
               variant="body1" 
               sx={{ 
-                color: '#aaa'
+                color: theme.palette.text.secondary
               }}
             >
               {isSetupMode 
@@ -178,17 +192,7 @@ const AdminLogin = () => {
                   value={formData.firstName}
                   onChange={handleInputChange}
                   required
-                  sx={{ 
-                    mb: 2,
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#2a2a2a',
-                      '& fieldset': { borderColor: '#333' },
-                      '&:hover fieldset': { borderColor: '#00ff88' },
-                      '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-                    },
-                    '& .MuiInputLabel-root': { color: '#aaa' },
-                    '& .MuiInputBase-input': { color: 'white' }
-                  }}
+                  sx={textFieldStyles}
                 />
                 <TextField
                   fullWidth
@@ -197,17 +201,7 @@ const AdminLogin = () => {
                   value={formData.lastName}
                   onChange={handleInputChange}
                   required
-                  sx={{ 
-                    mb: 2,
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#2a2a2a',
-                      '& fieldset': { borderColor: '#333' },
-                      '&:hover fieldset': { borderColor: '#00ff88' },
-                      '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-                    },
-                    '& .MuiInputLabel-root': { color: '#aaa' },
-                    '& .MuiInputBase-input': { color: 'white' }
-                  }}
+                  sx={textFieldStyles}
                 />
               </>
             )}
@@ -220,17 +214,7 @@ const AdminLogin = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
-              sx={{ 
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#2a2a2a',
-                  '& fieldset': { borderColor: '#333' },
-                  '&:hover fieldset': { borderColor: '#00ff88' },
-                  '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-                },
-                '& .MuiInputLabel-root': { color: '#aaa' },
-                '& .MuiInputBase-input': { color: 'white' }
-              }}
+              sx={textFieldStyles}
             />
 
             <TextField
@@ -241,17 +225,7 @@ const AdminLogin = () => {
               value={formData.password}
               onChange={handleInputChange}
               required
-              sx={{ 
-                mb: 3,
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#2a2a2a',
-                  '& fieldset': { borderColor: '#333' },
-                  '&:hover fieldset': { borderColor: '#00ff88' },
-                  '&.Mui-focused fieldset': { borderColor: '#00ff88' }
-                },
-                '& .MuiInputLabel-root': { color: '#aaa' },
-                '& .MuiInputBase-input': { color: 'white' }
-              }}
+              sx={{ ...textFieldStyles, mb: 3 }}
             />
 
             <Button
@@ -262,15 +236,15 @@ const AdminLogin = () => {
               startIcon={loading ? <CircularProgress size={20} /> : <LoginIcon />}
               sx={{
                 py: 1.5,
-                backgroundColor: '#00ff88',
-                color: '#000',
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
                 fontWeight: 'bold',
                 '&:hover': {
-                  backgroundColor: '#00cc6a'
+                  backgroundColor: theme.palette.primary.dark
                 },
                 '&:disabled': {
-                  backgroundColor: '#333',
-                  color: '#666'
+                  backgroundColor: theme.palette.action.disabled,
+                  color: theme.palette.text.disabled
                 }
               }}
             >
@@ -281,7 +255,7 @@ const AdminLogin = () => {
             </Button>
           </Box>
 
-          <Divider sx={{ my: 3, backgroundColor: '#333' }} />
+          <Divider sx={{ my: 3, backgroundColor: theme.palette.divider }} />
 
           <Box sx={{ textAlign: 'center' }}>
             {process.env.NODE_ENV === 'development' && (
@@ -294,7 +268,7 @@ const AdminLogin = () => {
                 }}
                 sx={{ 
                   textTransform: 'none',
-                  color: '#00ff88'
+                  color: theme.palette.primary.main
                 }}
               >
                 {isSetupMode ? 'Back to Login' : 'Need to create admin account?'}
@@ -307,7 +281,7 @@ const AdminLogin = () => {
                 onClick={() => navigate('/')}
                 sx={{ 
                   textTransform: 'none',
-                  color: '#aaa'
+                  color: theme.palette.text.secondary
                 }}
               >
                 ← Back to Main Site

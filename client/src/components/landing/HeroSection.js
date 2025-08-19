@@ -22,11 +22,17 @@ const HeroSection = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: `linear-gradient(135deg, 
-          rgba(10, 10, 10, 0.9) 0%, 
-          rgba(26, 26, 26, 0.8) 50%, 
-          rgba(10, 10, 10, 0.9) 100%
-        ), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%2300ff88" stop-opacity="0.1"/><stop offset="100%" stop-color="%2300ff88" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>')`,
+        background: theme.palette.mode === 'dark' 
+          ? `linear-gradient(135deg, 
+              rgba(10, 10, 10, 0.9) 0%, 
+              rgba(26, 26, 26, 0.8) 50%, 
+              rgba(10, 10, 10, 0.9) 100%
+            ), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%232ea4a5" stop-opacity="0.1"/><stop offset="100%" stop-color="%232ea4a5" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>')`
+          : `linear-gradient(135deg, 
+              rgba(250, 250, 250, 0.9) 0%, 
+              rgba(255, 255, 255, 0.8) 50%, 
+              rgba(250, 250, 250, 0.9) 100%
+            ), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%232ea4a5" stop-opacity="0.1"/><stop offset="100%" stop-color="%232ea4a5" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         display: 'flex',

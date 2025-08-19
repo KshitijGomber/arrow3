@@ -34,6 +34,7 @@ import {
   FilterList as FilterIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
+import { useCustomTheme } from '../../context/ThemeContext';
 import { useDrones, useDeleteDrone } from '../../hooks/queries/useDroneQueries';
 import DroneForm from './components/DroneForm';
 import DroneFilters from './components/DroneFilters';
@@ -41,6 +42,7 @@ import DroneFilters from './components/DroneFilters';
 const ProductManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme } = useCustomTheme();
   const [deleteDialog, setDeleteDialog] = useState({ open: false, drone: null });
   const [filters, setFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
@@ -142,7 +144,7 @@ const ProductManagement = () => {
             gap: 2
           }}
         >
-          <ProductsIcon sx={{ color: '#00ff88' }} />
+          <ProductsIcon sx={{ color: theme.palette.primary.main }} />
           Product Management
         </Typography>
         
@@ -150,7 +152,7 @@ const ProductManagement = () => {
           <Tooltip title="Refresh Data">
             <IconButton 
               onClick={() => refetch()}
-              sx={{ color: '#00ff88' }}
+              sx={{ color: theme.palette.primary.main }}
               disabled={isLoading}
             >
               <RefreshIcon />
@@ -201,11 +203,11 @@ const ProductManagement = () => {
             '& .MuiTab-root': {
               color: '#aaa',
               '&.Mui-selected': {
-                color: '#00ff88',
+                color: theme.palette.primary.main,
               },
             },
             '& .MuiTabs-indicator': {
-              backgroundColor: '#00ff88',
+              backgroundColor: theme.palette.primary.main,
             },
           }}
         >
@@ -245,8 +247,8 @@ const ProductManagement = () => {
         onClose={handleDeleteCancel}
         PaperProps={{
           sx: {
-            backgroundColor: '#2a2a2a',
-            border: '1px solid #333',
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
           },
         }}
       >
@@ -302,6 +304,8 @@ const DroneListView = ({
   getStatusColor,
   getStatusText
 }) => {
+  const { theme } = useCustomTheme();
+  
   if (error) {
     return (
       <Alert severity="error" sx={{ backgroundColor: 'rgba(244, 67, 54, 0.1)' }}>
@@ -313,7 +317,7 @@ const DroneListView = ({
   return (
     <Box>
       {/* Filters */}
-      <Paper sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333', mb: 3 }}>
+      <Paper sx={{ backgroundColor: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, mb: 3 }}>
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h6" sx={{ color: 'white' }}>
             Filters
@@ -321,7 +325,7 @@ const DroneListView = ({
           <Button
             startIcon={<FilterIcon />}
             onClick={onToggleFilters}
-            sx={{ color: '#00ff88' }}
+            sx={{ color: theme.palette.primary.main }}
           >
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </Button>
@@ -337,13 +341,13 @@ const DroneListView = ({
       {/* Drones Table */}
       <TableContainer 
         component={Paper} 
-        sx={{ backgroundColor: '#2a2a2a', border: '1px solid #333' }}
+        sx={{ backgroundColor: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}` }}
       >
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#1a1a1a' }}>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Image</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Name</TableCell>
+            <TableRow sx={{ backgroundColor: theme.palette.background.elevated }}>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Image</TableCell>
+              <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Name</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Price</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Stock</TableCell>
@@ -356,7 +360,7 @@ const DroneListView = ({
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
-                  <CircularProgress sx={{ color: '#00ff88' }} />
+                  <CircularProgress sx={{ color: theme.palette.primary.main }} />
                   <Typography sx={{ color: '#aaa', mt: 2 }}>
                     Loading drones...
                   </Typography>
@@ -375,8 +379,8 @@ const DroneListView = ({
                 <TableRow 
                   key={drone._id}
                   sx={{ 
-                    '&:hover': { backgroundColor: '#333' },
-                    borderBottom: '1px solid #333'
+                    '&:hover': { backgroundColor: theme.palette.action.hover },
+                    borderBottom: `1px solid ${theme.palette.divider}`
                   }}
                 >
                   <TableCell>
@@ -401,14 +405,14 @@ const DroneListView = ({
                       label={formatCategory(drone.category)}
                       size="small"
                       sx={{ 
-                        backgroundColor: '#00ff88',
+                        backgroundColor: theme.palette.primary.main,
                         color: '#000',
                         fontWeight: 'bold'
                       }}
                     />
                   </TableCell>
                   <TableCell>
-                    <Typography sx={{ color: '#00ff88', fontWeight: 'bold' }}>
+                    <Typography sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }}>
                       {formatPrice(drone.price)}
                     </Typography>
                   </TableCell>
@@ -446,7 +450,7 @@ const DroneListView = ({
                         <IconButton
                           size="small"
                           onClick={() => onEdit(drone._id)}
-                          sx={{ color: '#00ff88' }}
+                          sx={{ color: theme.palette.primary.main }}
                         >
                           <EditIcon />
                         </IconButton>
