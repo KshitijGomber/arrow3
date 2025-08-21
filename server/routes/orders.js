@@ -180,6 +180,23 @@ router.post('/', authenticate, orderValidation, handleValidationErrors, async (r
       droneId: order.droneId._id
     });
 
+    // Send order confirmation email
+    try {
+      const emailService = require('../services/emailService');
+      console.log('📧 Attempting to send order confirmation email for order:', order._id);
+      
+      await emailService.sendOrderConfirmation(order);
+      console.log('✅ Order confirmation email sent for order:', order._id);
+    } catch (emailError) {
+      // Log the error but don't fail the order creation
+      console.error('❌ Order confirmation email error:', emailError);
+      console.error('❌ Email error details:', {
+        message: emailError.message,
+        stack: emailError.stack
+      });
+      // Note: We don't throw this error to avoid failing the order creation
+    }
+
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
