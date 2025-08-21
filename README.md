@@ -799,7 +799,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@arrow3aerospace.com or create an issue in the GitHub repository.
+For support, email kshitijgomber@gmail.com or create an issue in the GitHub repository.
 
 ---
 
@@ -824,7 +824,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-For support, email support@arrow3aerospace.com or create an issue in this repository.
+For support, email kshitijgomber@gmail.com or create an issue in this repository.
 
 ---
 
